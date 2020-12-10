@@ -1,0 +1,2 @@
+com/yaobanTech/springcloud/InspectApplication.java
+ com.yaobanTech.springcloud.InspectApplication

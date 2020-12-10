@@ -1,0 +1,76 @@
+buildscript {
+    //配置常量
+    ext{
+        springBootVersion = '2.3.5.RELEASE'
+        springBootActuator = '2.3.5.RELEASE'
+        springCloudVersion = 'Hoxton.SR9'
+        junitVersion = '4.12'
+    }
+    //配置仓库
+    repositories{
+        mavenLocal()
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+    }
+}
+
+//配置所有项目公共内容
+configure(allprojects) {
+    //配置项目信息
+    group 'com.yaobanTech'
+    version '1.0-SNAPSHOT'
+    //指定需要的插件
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'org.springframework.boot'
+
+    //配置仓库
+    repositories{
+        mavenLocal()
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        mavenCentral()
+    }
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    //配置字符编码
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+}
+
+//配置子工程
+configure(subprojects) {
+    //dependency-management 插件
+    apply plugin: 'io.spring.dependency-management'
+    //依赖信息管理
+    dependencyManagement {
+        imports {
+            //spring bom helps us to declare dependencies without specifying version numbers.
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+            mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
+            mavenBom "org.springframework.boot:spring-boot-starter-actuator:${springBootActuator}"
+        }
+    }
+    //子工程实际会下载的依赖
+    dependencies {
+        /*classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"*/
+    }
+    jar {
+        manifest.attributes provider: 'gradle'
+    }
+}
+
+/**
+ * 关闭父项目的打包功能
+ */
+bootJar{
+    enabled=false
+}
+jar{
+    enabled=false
+}
