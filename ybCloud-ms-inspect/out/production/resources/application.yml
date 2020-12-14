@@ -17,7 +17,8 @@ spring:
       read-only: false
       validation-timeout: 3000
       login-timeout: 5
-
+  application:
+    name: inspectService
 mybatis:
   #mapper-locations: classpath:mapping/*Mapper.xml
   #type-aliases-package: com.yaoban.kmsw.pojos

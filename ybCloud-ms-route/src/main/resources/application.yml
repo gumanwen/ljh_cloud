@@ -17,7 +17,15 @@ spring:
       read-only: false
       validation-timeout: 3000
       login-timeout: 5
-
+  application:
+    name: routeService
+  cloud:
+    nacos:
+      config:
+        server-addr: 192.168.99.1:8848
+        file-extension: properties
+        namespace: 8740fef6-e5cd-4bee-aa59-1982b454323e
+        group: DEFAULT_GROUP
 mybatis:
   #mapper-locations: classpath:mapping/*Mapper.xml
   #type-aliases-package: com.yaoban.kmsw.pojos

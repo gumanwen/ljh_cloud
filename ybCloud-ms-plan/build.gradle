@@ -10,6 +10,12 @@ dependencies {
     implementation group: 'org.mybatis.spring.boot', name: 'mybatis-spring-boot-starter', version: '2.1.2'
     implementation group: 'org.springframework.boot', name: 'spring-boot-devtools', version: '2.3.5.RELEASE'
     implementation group: 'com.microsoft.sqlserver', name: 'mssql-jdbc', version: '7.4.1.jre8'
+    compile group: 'com.alibaba.cloud', name: 'spring-cloud-starter-alibaba-nacos-discovery', version: '2.2.1.RELEASE'
+    // https://mvnrepository.com/artifact/com.alibaba.cloud/spring-cloud-starter-alibaba-nacos-config
+    compile group: 'com.alibaba.cloud', name: 'spring-cloud-starter-alibaba-nacos-config', version: '2.2.1.RELEASE'
+    // https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-openfeign
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '2.2.5.RELEASE'
+
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
