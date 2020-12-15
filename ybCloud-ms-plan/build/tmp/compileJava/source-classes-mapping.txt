@@ -1,2 +1,0 @@
-com/yaobanTech/springcloud/PlanApplication.java
- com.yaobanTech.springcloud.PlanApplication

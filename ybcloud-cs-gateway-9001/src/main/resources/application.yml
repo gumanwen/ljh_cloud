@@ -1,0 +1,46 @@
+spring:
+  datasource:
+    url: jdbc:sqlserver://localhost:1433;DatabaseName=kmtysw
+    username: sa
+    password: yaobanTech3131 #yaobanTech3131
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      minimum-idle: 10 # 最小空闲连接数量
+      maximum-pool-size: 60 # 连接池最大连接数，默认是10
+      auto-commit: true # 此属性控制从池返回的连接的默认自动提交行为,默认值：true
+      idle-timeout: 600000 # 空闲连接在池中存活最大时间，默认600000（10分钟）
+      pool-name: HikariCP # 连接池的名称
+      max-lifetime: 1800000 # 此属性控制池中连接的最长生命周期，值0表示无限生命周期，默认1800000即30分钟
+      connection-timeout: 30000 # 数据库连接超时时间,默认30秒，即30000
+      connection-test-query: SELECT 1 # （驱动程序支持JDBC4，最好不要设置此属性）
+      read-only: false
+      validation-timeout: 3000
+      login-timeout: 5
+  application:
+    name: gatewayService
+  cloud:
+    nacos:
+      config:
+        server-addr: 192.168.99.1:8848
+        file-extension: properties
+        namespace: 8740fef6-e5cd-4bee-aa59-1982b454323e
+        group: DEFAULT_GROUP
+    gateway:
+
+      discovery:
+        locator:
+          enabled: true #动态路由
+      routes:
+      - id: route-ms
+        uri: lb://routeService #负载均衡 动态路由
+        predicates:
+        - Path=/api/route/**
+mybatis:
+  #mapper-locations: classpath:mapping/*Mapper.xml
+  #type-aliases-package: com.yaoban.kmsw.pojos
+  configuration:
+    call-setters-on-nulls: true
+
+server:
+  port: 9001
