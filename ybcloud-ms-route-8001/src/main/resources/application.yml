@@ -31,6 +31,13 @@ mybatis:
   #type-aliases-package: com.yaoban.kmsw.pojos
   configuration:
     call-setters-on-nulls: true
+jpa:
+  show-sql: true
+  database-platform: org.hibernate.dialect.SQLServerDialect
+  hibernate:
+    ddl-auto: none
+    naming:
+      physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 
 server:
   port: 8001
