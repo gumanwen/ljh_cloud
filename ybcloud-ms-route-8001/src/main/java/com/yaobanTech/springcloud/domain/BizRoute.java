@@ -19,6 +19,7 @@ public class BizRoute {
     private Integer hiddenDangerAmount;
     private Double pipeDiameter;
     private Double actInspectionMileage;
+    private Integer enabled;
 
     @Id
     @Column(name = "id")
@@ -150,10 +151,20 @@ public class BizRoute {
         this.actInspectionMileage = actInspectionMileage;
     }
 
+    @Basic
+    @Column(name = "enabled")
+    public Integer getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Integer enabled) {
+        this.enabled = enabled;
+    }
+
     public BizRoute() {
     }
 
-    public BizRoute(Integer id, Enum waterManagementOffice, Enum status, String routeName, Enum routeType, String routeCreator, Integer signIn, Enum fixedPointInspectionType, Double planInspectionMileage, Date createdTime, Integer hiddenDangerAmount, Double pipeDiameter, Double actInspectionMileage) {
+    public BizRoute(Integer id, Enum waterManagementOffice, Enum status, String routeName, Enum routeType, String routeCreator, Integer signIn, Enum fixedPointInspectionType, Double planInspectionMileage, Date createdTime, Integer hiddenDangerAmount, Double pipeDiameter, Double actInspectionMileage, Integer enabled) {
         this.id = id;
         this.waterManagementOffice = waterManagementOffice;
         this.status = status;
@@ -167,6 +178,7 @@ public class BizRoute {
         this.hiddenDangerAmount = hiddenDangerAmount;
         this.pipeDiameter = pipeDiameter;
         this.actInspectionMileage = actInspectionMileage;
+        this.enabled = enabled;
     }
 
     @Override
@@ -185,6 +197,7 @@ public class BizRoute {
                 ", hiddenDangerAmount=" + hiddenDangerAmount +
                 ", pipeDiameter=" + pipeDiameter +
                 ", actInspectionMileage=" + actInspectionMileage +
+                ", enabled=" + enabled +
                 '}';
     }
 }

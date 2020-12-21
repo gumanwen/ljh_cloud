@@ -32,4 +32,9 @@ public class RouteController {
     public RespBean updateRoute(BizRoute route){
         return routeService.updateRoute(route);
     }
+
+    @GetMapping("/remove")
+    public RespBean deleteRoute(Integer id){
+        return routeService.deleteRoute(id);
+    }
 }

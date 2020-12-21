@@ -39,6 +39,20 @@ public class RouteService {
         }else{
             return RespBean.error("id为空！");
         }
-        return RespBean.ok("保存成功！");
+        return RespBean.ok("修改成功！");
+    }
+
+    public RespBean deleteRoute(Integer id) {
+        if(id != null) {
+            try {
+                BizRoute route = bizRouteRepository.deleteRoute(id);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return RespBean.error("删除失败！");
+            }
+        }else{
+            return RespBean.error("id为空！");
+        }
+        return RespBean.ok("删除成功！");
     }
 }
