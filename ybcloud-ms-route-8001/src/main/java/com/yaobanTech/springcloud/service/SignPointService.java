@@ -28,8 +28,8 @@ public class SignPointService {
         return RespBean.ok("保存成功！");
     }
 
-    public RespBean updateSignPoint(BizSignPoint bizSignPoint) {
-        if(bizSignPoint.getId() != null) {
+    public RespBean updateSignPoint(Integer id,BizSignPoint bizSignPoint) {
+        if(id != null) {
             try {
                 BizSignPoint signPoint = signPointRepository.save(bizSignPoint);
             } catch (Exception e) {

@@ -59,6 +59,18 @@ public class BizSignPoint  implements Serializable {
 	@Column(name = "enabled" )
 	private Integer enabled;
 
+	/**
+	 * 路线表id
+	 */
+	@Column(name = "route_id" )
+	private Integer routeId;
+
+	/**
+	 * 坐标
+	 */
+	@Column(name = "location" )
+	private Integer location;
+
 	public Long getId() {
 		return this.id;
 	}
@@ -115,16 +127,35 @@ public class BizSignPoint  implements Serializable {
 		this.enabled = enabled;
 	}
 
+	public Integer getRouteId() {
+		return routeId;
+	}
+
+	public void setRouteId(Integer routeId) {
+		this.routeId = routeId;
+	}
+
+	public Integer getLocation() {
+		return location;
+	}
+
+	public void setLocation(Integer location) {
+		this.location = location;
+	}
+
 	public BizSignPoint() {
 	}
 
-	public BizSignPoint(Long id, String currentChoosedAddress, String troubleCode, String troubleReason, Enum hiddenDangerType, String handleSuggestion) {
+	public BizSignPoint(Long id, String currentChoosedAddress, String troubleCode, String troubleReason, Enum hiddenDangerType, String handleSuggestion, Integer enabled, Integer routeId, Integer location) {
 		this.id = id;
 		this.currentChoosedAddress = currentChoosedAddress;
 		this.troubleCode = troubleCode;
 		this.troubleReason = troubleReason;
 		this.hiddenDangerType = hiddenDangerType;
 		this.handleSuggestion = handleSuggestion;
+		this.enabled = enabled;
+		this.routeId = routeId;
+		this.location = location;
 	}
 
 	@Override
@@ -136,6 +167,9 @@ public class BizSignPoint  implements Serializable {
 				", troubleReason='" + troubleReason + '\'' +
 				", hiddenDangerType=" + hiddenDangerType +
 				", handleSuggestion='" + handleSuggestion + '\'' +
+				", enabled=" + enabled +
+				", routeId=" + routeId +
+				", location=" + location +
 				'}';
 	}
 }

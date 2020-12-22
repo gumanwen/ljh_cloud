@@ -3,6 +3,7 @@ package com.yaobanTech.springcloud.service;
 import com.yaobanTech.springcloud.domain.BizRoute;
 import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.repository.BizRouteRepository;
+import com.yaobanTech.springcloud.repository.BizSignPointRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
@@ -18,11 +19,18 @@ public class RouteService {
     @Lazy
     private BizRouteRepository bizRouteRepository;
 
+    @Autowired
+    @Lazy
+    private BizSignPointRepository bizSignPointRepository;
+
 
     public RespBean saveRoute(BizRoute bizRoute) {
         if(bizRoute != null) {
             try {
                 BizRoute route = bizRouteRepository.save(bizRoute);
+                if(!bizRoute.getBizSignPoints().isEmpty()){
+                    bizSignPointRepository.saveAll(bizRoute.getBizSignPoints());
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("保存失败！");
@@ -33,8 +41,8 @@ public class RouteService {
         return RespBean.ok("保存成功！");
     }
 
-    public RespBean updateRoute(BizRoute bizRoute) {
-        if(bizRoute.getId() != null) {
+    public RespBean updateRoute(Integer id,BizRoute bizRoute) {
+        if(id != null) {
             try {
                 BizRoute route = bizRouteRepository.save(bizRoute);
             } catch (Exception e) {

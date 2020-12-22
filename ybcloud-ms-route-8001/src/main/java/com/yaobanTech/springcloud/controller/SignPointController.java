@@ -8,15 +8,12 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RefreshScope
 @Api(description = "签到点接口")
-@RequestMapping("/api/signPoint")
+@RequestMapping("/api/route/signPoint")
 public class SignPointController {
 
    /* @Value("${content}")
@@ -26,25 +23,25 @@ public class SignPointController {
     private SignPointService signPointService;
 
     @ApiOperation("保存签到点")
-    @PostMapping("/add")
-    public RespBean saveRoute(BizSignPoint signPoint){
+    @PostMapping()
+    public RespBean saveRoute(@RequestBody BizSignPoint signPoint){
         return signPointService.saveSignPoint(signPoint);
     }
 
     @ApiOperation("修改签到点")
-    @PostMapping("/modify")
-    public RespBean updateRoute(BizSignPoint signPoint){
-        return signPointService.updateSignPoint(signPoint);
+    @PutMapping("{id}")
+    public RespBean updateRoute(@PathVariable("id") Integer id,@RequestBody BizSignPoint signPoint){
+        return signPointService.updateSignPoint(id,signPoint);
     }
 
     @ApiOperation("删除签到点")
-    @GetMapping("/remove")
-    public RespBean deleteRoute(Integer id){
+    @DeleteMapping("{id}")
+    public RespBean deleteRoute(@PathVariable("id") Integer id){
         return signPointService.deleteSignPoint(id);
     }
 
 //    @ApiOperation("条件查询签到点")
-//    @GetMapping("/findList")
+//    @GetMapping()
 //    public RespBean findList(String waterManagementOffice,String fixedPointInspectionType,
 //                             String planInspectionMileage,String createdTime,
 //                             String routeName,String routeCreator,
