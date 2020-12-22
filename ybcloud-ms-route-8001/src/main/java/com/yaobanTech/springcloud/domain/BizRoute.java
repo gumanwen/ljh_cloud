@@ -36,6 +36,7 @@ public class BizRoute {
     private Integer enabled;
 
     @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name = "id")
     public Integer getId() {
         return id;
