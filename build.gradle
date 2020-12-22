@@ -59,6 +59,12 @@ configure(subprojects) {
     //子工程实际会下载的依赖
     dependencies {
         /*classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"*/
+        // https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui
+        compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.7.0'
+        // https://mvnrepository.com/artifact/io.springfox/springfox-swagger2
+        compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.7.0'
+
+
     }
     jar {
         manifest.attributes provider: 'gradle'

@@ -6,19 +6,33 @@ import java.util.Date;
 @Entity
 @Table(name = "biz_route")
 public class BizRoute {
+    //id
     private Integer id;
+    //用水管理所
     private Enum waterManagementOffice;
+    //状态
     private Enum status;
+    //路线名称
     private String routeName;
+    //路线类型
     private Enum routeType;
+    //路线创建人
     private String routeCreator;
+    //签到点
     private Integer signIn;
+    //定点巡查类型
     private Enum fixedPointInspectionType;
+    //计划巡查里程
     private Double planInspectionMileage;
+    //创建时间
     private Date createdTime;
+    //隐患时长
     private Integer hiddenDangerAmount;
+    //管径
     private Double pipeDiameter;
+    //实际巡查里程
     private Double actInspectionMileage;
+    //是否有效
     private Integer enabled;
 
     @Id
