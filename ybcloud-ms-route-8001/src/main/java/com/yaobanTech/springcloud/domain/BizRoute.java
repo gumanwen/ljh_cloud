@@ -1,5 +1,8 @@
 package com.yaobanTech.springcloud.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -30,13 +33,13 @@ public class BizRoute  implements Serializable {
 	 * 用水管理所
 	 */
    	@Column(name = "water_management_office" )
-	private Enum waterManagementOffice;
+	private String waterManagementOffice;
 
 	/**
 	 * 状态
 	 */
    	@Column(name = "status" )
-	private Enum status;
+	private String status;
 
 	/**
 	 * 路线名称
@@ -48,7 +51,7 @@ public class BizRoute  implements Serializable {
 	 * 路线类型
 	 */
    	@Column(name = "route_type" )
-	private Enum routeType;
+	private String routeType;
 
 	/**
 	 * 路线制定人
@@ -71,6 +74,11 @@ public class BizRoute  implements Serializable {
 	/**
 	 * 制定时间
 	 */
+	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(
+			pattern = "yyyy-MM-dd HH:mm:ss",
+			timezone = "GMT+8"
+	)
    	@Column(name = "created_time" )
 	private Date createdTime;
 
@@ -108,8 +116,11 @@ public class BizRoute  implements Serializable {
 	 * 定点巡查类型
 	 */
    	@Column(name = "point_inspection_type" )
-	private Enum pointInspectionType;
+	private String pointInspectionType;
 
+	/**
+	 * 签到点
+	 */
    	@OneToMany(targetEntity = BizSignPoint.class)
 	@JoinColumn(name = "route_id",referencedColumnName = "id")
    	private List<BizSignPoint> bizSignPoints = new ArrayList<>();
@@ -117,7 +128,7 @@ public class BizRoute  implements Serializable {
 	public BizRoute() {
 	}
 
-	public BizRoute(Integer id, Enum waterManagementOffice, Enum status, String routeName, Enum routeType, String routeCreator, Integer signIn, Double planInspectionMileage, Date createdTime, Integer hiddenDangerAmount, Double pipeDiameter, Double actInspectionMileage, Integer enabled, String location, Enum pointInspectionType, List<BizSignPoint> bizSignPoints) {
+	public BizRoute(Integer id, String waterManagementOffice, String status, String routeName, String routeType, String routeCreator, Integer signIn, Double planInspectionMileage, Date createdTime, Integer hiddenDangerAmount, Double pipeDiameter, Double actInspectionMileage, Integer enabled, String location, String pointInspectionType, List<BizSignPoint> bizSignPoints) {
 		this.id = id;
 		this.waterManagementOffice = waterManagementOffice;
 		this.status = status;
@@ -136,6 +147,10 @@ public class BizRoute  implements Serializable {
 		this.bizSignPoints = bizSignPoints;
 	}
 
+	public static long getSerialVersionUID() {
+		return serialVersionUID;
+	}
+
 	public Integer getId() {
 		return id;
 	}
@@ -144,19 +159,19 @@ public class BizRoute  implements Serializable {
 		this.id = id;
 	}
 
-	public Enum getWaterManagementOffice() {
+	public String getWaterManagementOffice() {
 		return waterManagementOffice;
 	}
 
-	public void setWaterManagementOffice(Enum waterManagementOffice) {
+	public void setWaterManagementOffice(String waterManagementOffice) {
 		this.waterManagementOffice = waterManagementOffice;
 	}
 
-	public Enum getStatus() {
+	public String getStatus() {
 		return status;
 	}
 
-	public void setStatus(Enum status) {
+	public void setStatus(String status) {
 		this.status = status;
 	}
 
@@ -168,11 +183,11 @@ public class BizRoute  implements Serializable {
 		this.routeName = routeName;
 	}
 
-	public Enum getRouteType() {
+	public String getRouteType() {
 		return routeType;
 	}
 
-	public void setRouteType(Enum routeType) {
+	public void setRouteType(String routeType) {
 		this.routeType = routeType;
 	}
 
@@ -248,11 +263,11 @@ public class BizRoute  implements Serializable {
 		this.location = location;
 	}
 
-	public Enum getPointInspectionType() {
+	public String getPointInspectionType() {
 		return pointInspectionType;
 	}
 
-	public void setPointInspectionType(Enum pointInspectionType) {
+	public void setPointInspectionType(String pointInspectionType) {
 		this.pointInspectionType = pointInspectionType;
 	}
 
@@ -268,10 +283,10 @@ public class BizRoute  implements Serializable {
 	public String toString() {
 		return "BizRoute{" +
 				"id=" + id +
-				", waterManagementOffice=" + waterManagementOffice +
-				", status=" + status +
+				", waterManagementOffice='" + waterManagementOffice + '\'' +
+				", status='" + status + '\'' +
 				", routeName='" + routeName + '\'' +
-				", routeType=" + routeType +
+				", routeType='" + routeType + '\'' +
 				", routeCreator='" + routeCreator + '\'' +
 				", signIn=" + signIn +
 				", planInspectionMileage=" + planInspectionMileage +
@@ -281,7 +296,7 @@ public class BizRoute  implements Serializable {
 				", actInspectionMileage=" + actInspectionMileage +
 				", enabled=" + enabled +
 				", location='" + location + '\'' +
-				", pointInspectionType=" + pointInspectionType +
+				", pointInspectionType='" + pointInspectionType + '\'' +
 				", bizSignPoints=" + bizSignPoints +
 				'}';
 	}

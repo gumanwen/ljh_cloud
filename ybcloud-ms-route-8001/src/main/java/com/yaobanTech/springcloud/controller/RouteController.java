@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/route/way")
 public class RouteController {
 
-   /* @Value("${content}")
-    private String content;*/
     @Autowired
     @Lazy
     private RouteService routeService;
@@ -42,10 +40,22 @@ public class RouteController {
 
     @ApiOperation("条件查询巡查路线")
     @GetMapping()
-    public RespBean findList(String waterManagementOffice,String fixedPointInspectionType,
+    public RespBean findCondition(@RequestParam String waterManagementOffice,String pointInspectionType,
                              String planInspectionMileage,String createdTime,
                              String routeName,String routeCreator,
                              String routeType){
-        return routeService.findCondition(waterManagementOffice,fixedPointInspectionType,planInspectionMileage,createdTime,routeName,routeCreator,routeType);
+        return routeService.findCondition(waterManagementOffice,pointInspectionType,planInspectionMileage,createdTime,routeName,routeCreator,routeType);
+    }
+
+    @ApiOperation("查询所有路线信息")
+    @GetMapping("findAll")
+    public RespBean findAll(){
+        return routeService.findAll();
+    }
+
+    @ApiOperation("查询定点巡查类型枚举")
+    @GetMapping("findEnumMenu")
+    public RespBean findEnumMenu(@RequestParam String mode){
+        return routeService.findEnumMenu(mode);
     }
 }

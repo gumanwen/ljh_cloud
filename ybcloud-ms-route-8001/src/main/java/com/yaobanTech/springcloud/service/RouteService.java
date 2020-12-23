@@ -2,6 +2,7 @@ package com.yaobanTech.springcloud.service;
 
 import com.yaobanTech.springcloud.domain.BizRoute;
 import com.yaobanTech.springcloud.domain.RespBean;
+import com.yaobanTech.springcloud.domain.enumDef.EnumMenu;
 import com.yaobanTech.springcloud.repository.BizRouteRepository;
 import com.yaobanTech.springcloud.repository.BizSignPointRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.criteria.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class RouteService {
@@ -69,7 +73,7 @@ public class RouteService {
         return RespBean.ok("删除成功！");
     }
 
-    public RespBean findCondition(String waterManagementOffice,String fixedPointInspectionType,
+    public RespBean findCondition(String waterManagementOffice,String pointInspectionType,
                                   String planInspectionMileage,String createdTime,
                                   String routeName,String routeCreator,
                                   String routeType) {
@@ -78,7 +82,7 @@ public class RouteService {
             public Predicate toPredicate(Root<BizRoute> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
                //从root取属性
                 Path<Object> path1 = root.get("waterManagementOffice");
-                Path<Object> path2 = root.get("fixedPointInspectionType");
+                Path<Object> path2 = root.get("pointInspectionType");
                 Path<Object> path3 = root.get("planInspectionMileage");
                 Path<Object> path4 = root.get("createdTime");
                 Path<Object> path5 = root.get("routeName");
@@ -86,12 +90,12 @@ public class RouteService {
                 Path<Object> path7 = root.get("routeType");
                 //cb构造查询条件
                 Predicate p1 = cb.equal(path1, waterManagementOffice);
-                Predicate p2 = cb.equal(path2, waterManagementOffice);
-                Predicate p3 = cb.equal(path3, waterManagementOffice);
-                Predicate p4 = cb.equal(path4, waterManagementOffice);
-                Predicate p5 = cb.equal(path5, waterManagementOffice);
-                Predicate p6 = cb.equal(path6, waterManagementOffice);
-                Predicate p7 = cb.equal(path7, waterManagementOffice);
+                Predicate p2 = cb.equal(path2, pointInspectionType);
+                Predicate p3 = cb.equal(path3, planInspectionMileage);
+                Predicate p4 = cb.equal(path4, createdTime);
+                Predicate p5 = cb.equal(path5, routeName);
+                Predicate p6 = cb.equal(path6, routeCreator);
+                Predicate p7 = cb.equal(path7, routeType);
                 //cb连接查询条件
                 Predicate predicate = cb.and(p1, p2, p3, p4, p5, p5, p7);
                 return predicate;
@@ -100,5 +104,30 @@ public class RouteService {
         Sort sort = Sort.by(Sort.Direction.DESC,"createdTime");
         List<BizRoute> routeList = bizRouteRepository.findAll(spec,sort);
        return RespBean.ok("查询成功！",routeList);
+    }
+
+    public RespBean findAll(){
+        List<BizRoute> list = bizRouteRepository.findAll();
+        return RespBean.ok("查询成功！",list);
+    }
+
+    public RespBean findEnumMenu(String mode){
+        List<Map<String, String>> list = new ArrayList<>();
+        if(mode != null) {
+            EnumMenu[] menus = EnumMenu.values();
+            for (int i = 0; i < menus.length; i++) {
+                Map<String, String> map = new HashMap();
+                EnumMenu menu = menus[i];
+                if (mode.equals(menu.getMode())) {
+                    map.put("mode", menu.getMode());
+                    map.put("code", menu.getCode());
+                    map.put("desc", menu.getDesc());
+                    list.add(map);
+                }
+            }
+        }else{
+            return RespBean.error("枚举mode为空！");
+        }
+        return RespBean.ok("查询成功！", list);
     }
 }
