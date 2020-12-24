@@ -1,8 +1,5 @@
 package com.yaobanTech.springcloud.domain.enumDef;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public enum EnumMenu {
 
 	DISCHARGE("0", "末梢水排放","定点巡查类型"),

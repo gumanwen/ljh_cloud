@@ -1,5 +1,6 @@
 package com.yaobanTech.springcloud.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.yaobanTech.springcloud.domain.BizRoute;
 import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.domain.enumDef.EnumMenu;
@@ -28,7 +29,8 @@ public class RouteService {
     private BizSignPointRepository bizSignPointRepository;
 
 
-    public RespBean saveRoute(BizRoute bizRoute) {
+    public RespBean saveRoute(HashMap<String,Object> param) {
+        BizRoute bizRoute = JSONObject.parseObject(param.get("form").toString()).toJavaObject(BizRoute.class);
         if(bizRoute != null) {
             try {
                 BizRoute route = bizRouteRepository.save(bizRoute);

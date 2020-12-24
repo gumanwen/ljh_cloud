@@ -10,6 +10,8 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+
 @RestController
 @RefreshScope
 @Api(description = "巡查路线接口")
@@ -22,8 +24,8 @@ public class RouteController {
 
     @ApiOperation("保存巡查路线")
     @PostMapping()
-    public RespBean saveRoute(@RequestBody BizRoute route){
-        return routeService.saveRoute(route);
+    public RespBean saveRoute(@RequestBody HashMap<String,Object> param){
+        return routeService.saveRoute(param);
     }
 
     @ApiOperation("修改巡查路线")
