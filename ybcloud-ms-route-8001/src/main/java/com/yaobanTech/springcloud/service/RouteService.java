@@ -30,7 +30,7 @@ public class RouteService {
 
 
     public RespBean saveRoute(HashMap<String,Object> param) {
-        BizRoute bizRoute = JSONObject.parseObject(param.get("form").toString()).toJavaObject(BizRoute.class);
+        BizRoute bizRoute = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizRoute.class);
         if(bizRoute != null) {
             try {
                 BizRoute route = bizRouteRepository.save(bizRoute);

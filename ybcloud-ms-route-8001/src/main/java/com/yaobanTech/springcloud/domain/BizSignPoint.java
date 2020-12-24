@@ -69,7 +69,7 @@ public class BizSignPoint  implements Serializable {
 	 * 坐标
 	 */
 	@Column(name = "location" )
-	private Integer location;
+	private String location;
 
 	public Long getId() {
 		return this.id;
@@ -135,18 +135,18 @@ public class BizSignPoint  implements Serializable {
 		this.routeId = routeId;
 	}
 
-	public Integer getLocation() {
+	public String getLocation() {
 		return location;
 	}
 
-	public void setLocation(Integer location) {
+	public void setLocation(String location) {
 		this.location = location;
 	}
 
 	public BizSignPoint() {
 	}
 
-	public BizSignPoint(Long id, String currentChoosedAddress, String troubleCode, String troubleReason, Enum hiddenDangerType, String handleSuggestion, Integer enabled, Integer routeId, Integer location) {
+	public BizSignPoint(Long id, String currentChoosedAddress, String troubleCode, String troubleReason, Enum hiddenDangerType, String handleSuggestion, Integer enabled, Integer routeId, String location) {
 		this.id = id;
 		this.currentChoosedAddress = currentChoosedAddress;
 		this.troubleCode = troubleCode;
