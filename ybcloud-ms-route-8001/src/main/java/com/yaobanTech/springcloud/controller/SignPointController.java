@@ -24,19 +24,19 @@ public class SignPointController {
 
     @ApiOperation("保存签到点")
     @PostMapping()
-    public RespBean saveRoute(@RequestBody BizSignPoint signPoint){
+    public RespBean saveSignPoint(@RequestBody BizSignPoint signPoint){
         return signPointService.saveSignPoint(signPoint);
     }
 
     @ApiOperation("修改签到点")
     @PutMapping("{id}")
-    public RespBean updateRoute(@PathVariable("id") Integer id,@RequestBody BizSignPoint signPoint){
+    public RespBean updateSignPoint(@PathVariable("id") Integer id,@RequestBody BizSignPoint signPoint){
         return signPointService.updateSignPoint(id,signPoint);
     }
 
     @ApiOperation("删除签到点")
     @DeleteMapping("{id}")
-    public RespBean deleteRoute(@PathVariable("id") Integer id){
+    public RespBean deleteSignPoint(@PathVariable("id") Integer id){
         return signPointService.deleteSignPoint(id);
     }
 
