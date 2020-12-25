@@ -3,6 +3,7 @@ package com.yaobanTech.springcloud.controller;
 import com.yaobanTech.springcloud.domain.BizRoute;
 import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.service.RouteService;
+import com.yaobanTech.springcloud.service.impl.RouteServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ public class RouteController {
 
     @Autowired
     @Lazy
-    private RouteService routeService;
+    private RouteServiceImpl routeService;
 
     @ApiOperation("保存巡查路线")
     @PostMapping()
