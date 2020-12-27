@@ -24,20 +24,26 @@ public class PlanController {
 
     @ApiOperation("保存巡查计划")
     @PostMapping()
-    public RespBean saveRoute(@RequestBody HashMap<String, Object> param) {
-        return planService.saveRoute(param);
+    public RespBean savePlan(@RequestBody HashMap<String, Object> param) {
+        return planService.savePlan(param);
     }
 
     @ApiOperation("修改巡查计划")
     @PutMapping("{id}")
-    public RespBean updateRoute(@PathVariable("id") Integer id, @RequestBody BizPlan plan) {
-        return planService.updateRoute(id, plan);
+    public RespBean updatePlan(@PathVariable("id") Integer id, @RequestBody BizPlan plan) {
+        return planService.updatePlan(id, plan);
     }
 
     @ApiOperation("删除巡查计划")
     @DeleteMapping("{id}")
-    public RespBean deleteRoute(@PathVariable("id") Integer id) {
-        return planService.deleteRoute(id);
+    public RespBean deletePlan(@PathVariable("id") Integer id) {
+        return planService.deletePlan(id);
+    }
+
+    @ApiOperation("查询路线Id")
+    @GetMapping("{id}")
+    public RespBean findPlanId(@PathVariable("id") Integer id) {
+        return planService.findPlanId(id);
     }
 
 //    @ApiOperation("条件查询巡查路线")

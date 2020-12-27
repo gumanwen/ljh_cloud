@@ -92,7 +92,7 @@ public class BizRoute  implements Serializable {
 	 * 管径
 	 */
    	@Column(name = "pipe_diameter" )
-	private Double pipeDiameter;
+	private Integer pipeDiameter;
 
 	/**
 	 * 实际巡查里程
@@ -128,7 +128,7 @@ public class BizRoute  implements Serializable {
 	public BizRoute() {
 	}
 
-	public BizRoute(Integer id, String waterManagementOffice, String status, String routeName, String routeType, String routeCreator, Integer signIn, Double planInspectionMileage, Date createdTime, Integer hiddenDangerAmount, Double pipeDiameter, Double actInspectionMileage, Integer enabled, String location, String pointInspectionType, List<BizSignPoint> bizSignPoints) {
+	public BizRoute(Integer id, String waterManagementOffice, String status, String routeName, String routeType, String routeCreator, Integer signIn, Double planInspectionMileage, Date createdTime, Integer hiddenDangerAmount, Integer pipeDiameter, Double actInspectionMileage, Integer enabled, String location, String pointInspectionType, List<BizSignPoint> bizSignPoints) {
 		this.id = id;
 		this.waterManagementOffice = waterManagementOffice;
 		this.status = status;
@@ -231,11 +231,11 @@ public class BizRoute  implements Serializable {
 		this.hiddenDangerAmount = hiddenDangerAmount;
 	}
 
-	public Double getPipeDiameter() {
+	public Integer getPipeDiameter() {
 		return pipeDiameter;
 	}
 
-	public void setPipeDiameter(Double pipeDiameter) {
+	public void setPipeDiameter(Integer pipeDiameter) {
 		this.pipeDiameter = pipeDiameter;
 	}
 

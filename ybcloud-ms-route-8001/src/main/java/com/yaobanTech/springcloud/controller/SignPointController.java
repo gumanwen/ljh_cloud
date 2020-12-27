@@ -2,7 +2,6 @@ package com.yaobanTech.springcloud.controller;
 
 import com.yaobanTech.springcloud.domain.BizSignPoint;
 import com.yaobanTech.springcloud.domain.RespBean;
-import com.yaobanTech.springcloud.service.SignPointService;
 import com.yaobanTech.springcloud.service.impl.SignPointServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -10,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 
 @RestController
 @RefreshScope
@@ -30,9 +31,9 @@ public class SignPointController {
     }
 
     @ApiOperation("修改签到点")
-    @PutMapping("{id}")
-    public RespBean updateSignPoint(@PathVariable("id") Integer id,@RequestBody BizSignPoint signPoint){
-        return signPointService.updateSignPoint(id,signPoint);
+    @PutMapping()
+    public RespBean updateSignPoint( @RequestBody HashMap<String,Object> param){
+        return signPointService.updateSignPoint(param);
     }
 
     @ApiOperation("删除签到点")
@@ -41,12 +42,15 @@ public class SignPointController {
         return signPointService.deleteSignPoint(id);
     }
 
-//    @ApiOperation("条件查询签到点")
-//    @GetMapping()
-//    public RespBean findList(String waterManagementOffice,String fixedPointInspectionType,
-//                             String planInspectionMileage,String createdTime,
-//                             String routeName,String routeCreator,
-//                             String routeType){
-//        return signPointService.findCondition(waterManagementOffice,fixedPointInspectionType,planInspectionMileage,createdTime,routeName,routeCreator,routeType);
-//    }
+    @ApiOperation("查询签到点详情")
+    @GetMapping("{id}")
+    public RespBean findSignPoint(@PathVariable("id") Integer id){
+        return signPointService.findSignPoint(id);
+    }
+
+    @ApiOperation("查询签到点列表")
+    @GetMapping("findList")
+    public RespBean findList(@RequestParam Integer routeId){
+        return signPointService.findList(routeId);
+    }
 }

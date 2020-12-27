@@ -21,7 +21,13 @@ public class BizSignPoint  implements Serializable {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
    	@Column(name = "id" )
-	private Long id;
+	private Integer id;
+
+	/**
+	 * 签到点编号
+	 */
+	@Column(name = "sign_point_code" )
+	private String signPointCode;
 
 	/**
 	 * 当前所选地址
@@ -45,7 +51,7 @@ public class BizSignPoint  implements Serializable {
 	 * 隐患类型
 	 */
    	@Column(name = "hidden_danger_type" )
-	private Enum hiddenDangerType;
+	private String hiddenDangerType;
 
 	/**
 	 * 处理意见
@@ -71,11 +77,11 @@ public class BizSignPoint  implements Serializable {
 	@Column(name = "location" )
 	private String location;
 
-	public Long getId() {
-		return this.id;
+	public Integer getId() {
+		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -103,11 +109,11 @@ public class BizSignPoint  implements Serializable {
 		this.troubleReason = troubleReason;
 	}
 
-	public Enum getHiddenDangerType() {
-		return this.hiddenDangerType;
+	public String getHiddenDangerType() {
+		return hiddenDangerType;
 	}
 
-	public void setHiddenDangerType(Enum hiddenDangerType) {
+	public void setHiddenDangerType(String hiddenDangerType) {
 		this.hiddenDangerType = hiddenDangerType;
 	}
 
@@ -143,11 +149,20 @@ public class BizSignPoint  implements Serializable {
 		this.location = location;
 	}
 
+	public String getSignPointCode() {
+		return signPointCode;
+	}
+
+	public void setSignPointCode(String signPointCode) {
+		this.signPointCode = signPointCode;
+	}
+
 	public BizSignPoint() {
 	}
 
-	public BizSignPoint(Long id, String currentChoosedAddress, String troubleCode, String troubleReason, Enum hiddenDangerType, String handleSuggestion, Integer enabled, Integer routeId, String location) {
+	public BizSignPoint(Integer id, String signPointCode, String currentChoosedAddress, String troubleCode, String troubleReason, String hiddenDangerType, String handleSuggestion, Integer enabled, Integer routeId, String location) {
 		this.id = id;
+		this.signPointCode = signPointCode;
 		this.currentChoosedAddress = currentChoosedAddress;
 		this.troubleCode = troubleCode;
 		this.troubleReason = troubleReason;
@@ -162,14 +177,15 @@ public class BizSignPoint  implements Serializable {
 	public String toString() {
 		return "BizSignPoint{" +
 				"id=" + id +
+				", signPointCode='" + signPointCode + '\'' +
 				", currentChoosedAddress='" + currentChoosedAddress + '\'' +
 				", troubleCode='" + troubleCode + '\'' +
 				", troubleReason='" + troubleReason + '\'' +
-				", hiddenDangerType=" + hiddenDangerType +
+				", hiddenDangerType='" + hiddenDangerType + '\'' +
 				", handleSuggestion='" + handleSuggestion + '\'' +
 				", enabled=" + enabled +
 				", routeId=" + routeId +
-				", location=" + location +
+				", location='" + location + '\'' +
 				'}';
 	}
 }
