@@ -49,6 +49,10 @@ spring:
           uri: lb://routeService #负载均衡 动态路由
           predicates:
             - Path=/api/route/**
+        - id: ms-plan
+          uri: lb://planService #负载均衡 动态路由
+          predicates:
+            - Path=/api/plan/**
         - id: ms-inspect
           uri: lb://inspectService #负载均衡 动态路由
           predicates:
