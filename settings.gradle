@@ -1,6 +1,11 @@
 rootProject.name = 'ybCloud'
+
+include 'ybcloud-bs-gateway-9001'
+include 'ybcloud-cs-activiti-6001'
+include 'ybcloud-cs-auth-6002'
 include 'ybCloud-ms-plan-8002'
 include 'ybCloud-ms-route-8001'
 include 'ybCloud-ms-inspect-8003'
-include 'ybcloud-cs-gateway-9001'
+include 'ybcloud-cs-auth-6003'
+include 'ybcloud-cs-file-6005'
 
