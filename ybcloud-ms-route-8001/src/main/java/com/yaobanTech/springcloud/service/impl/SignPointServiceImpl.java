@@ -1,17 +1,20 @@
 package com.yaobanTech.springcloud.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
+import com.yaobanTech.springcloud.domain.BizRoute;
 import com.yaobanTech.springcloud.domain.BizSignPoint;
 import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.repository.BizSignPointRepository;
-import com.yaobanTech.springcloud.service.SignPointService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 @Service
-public class SignPointServiceImpl implements SignPointService {
+public class SignPointServiceImpl {
     @Autowired
     @Lazy
     private BizSignPointRepository signPointRepository;
@@ -30,8 +33,10 @@ public class SignPointServiceImpl implements SignPointService {
         return RespBean.ok("保存成功！");
     }
 
-    public RespBean updateSignPoint(Integer id,BizSignPoint bizSignPoint) {
-        if(id != null) {
+    public RespBean updateSignPoint(HashMap<String,Object> param) {
+        if(!param.isEmpty() && param.get("form") != null) {
+            BizSignPoint bizSignPoint = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizSignPoint.class);
+            if(bizSignPoint.getId() != null){
             try {
                 BizSignPoint signPoint = signPointRepository.save(bizSignPoint);
             } catch (Exception e) {
@@ -42,6 +47,9 @@ public class SignPointServiceImpl implements SignPointService {
             return RespBean.error("id为空！");
         }
         return RespBean.ok("修改成功！");
+        }else{
+            return RespBean.error("参数为空！");
+        }
     }
 
     public RespBean deleteSignPoint(Integer id) {
@@ -58,8 +66,7 @@ public class SignPointServiceImpl implements SignPointService {
         return RespBean.ok("删除成功！");
     }
 
-    @Override
-    public RespBean getSignPoint(Integer id) {
+    public RespBean findSignPoint(Integer id) {
 
         Optional<BizSignPoint> byId = null;
         if(id != null) {
@@ -73,6 +80,21 @@ public class SignPointServiceImpl implements SignPointService {
             return RespBean.error("id为空！");
         }
         return RespBean.ok("查询成功！",byId);
+    }
+
+    public RespBean findList(Integer routeId) {
+        List<BizSignPoint> list = null;
+        if(routeId != null) {
+            try {
+                 list = signPointRepository.findByRouteId(routeId);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return RespBean.error("查询失败！");
+            }
+        }else{
+            return RespBean.error("id为空！");
+        }
+        return RespBean.ok("查询成功！",list);
     }
 
 //    public RespBean findCondition(String waterManagementOffice,String fixedPointInspectionType,

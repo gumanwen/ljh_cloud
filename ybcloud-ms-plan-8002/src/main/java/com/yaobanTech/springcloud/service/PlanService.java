@@ -20,7 +20,7 @@ public class PlanService {
     @Lazy
     private BizPlanRepository bizPlanRepository;
 
-    public RespBean saveRoute(HashMap<String,Object> param) {
+    public RespBean savePlan(HashMap<String,Object> param) {
         BizPlan bizPlan = JSONObject.parseObject(param.get("form").toString()).toJavaObject(BizPlan.class);
         if(bizPlan != null) {
             try {
@@ -35,7 +35,7 @@ public class PlanService {
         return RespBean.ok("保存成功！");
     }
 
-    public RespBean updateRoute(Integer id,BizPlan bizRoute) {
+    public RespBean updatePlan(Integer id,BizPlan bizRoute) {
         if(id != null) {
             try {
                 BizPlan plan = bizPlanRepository.save(bizRoute);
@@ -49,7 +49,7 @@ public class PlanService {
         return RespBean.ok("修改成功！");
     }
 
-    public RespBean deleteRoute(Integer id) {
+    public RespBean deletePlan(Integer id) {
         if(id != null) {
             try {
                 bizPlanRepository.deletePlan(id);
@@ -61,6 +61,21 @@ public class PlanService {
             return RespBean.error("id为空！");
         }
         return RespBean.ok("删除成功！");
+    }
+
+    public RespBean findPlanId(Integer id) {
+        Integer routeId = null;
+        if(id != null) {
+            try {
+                 routeId = bizPlanRepository.findRouteId(id);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return RespBean.error("查询失败！");
+            }
+        }else{
+            return RespBean.error("id为空！");
+        }
+        return RespBean.ok("查询成功！",routeId);
     }
 
 //    public RespBean findCondition() {

@@ -162,10 +162,22 @@ public class BizPlan  implements Serializable {
    	@Column(name = "enabled" )
 	private Integer enabled;
 
+   	/**
+	 * 是否有效
+	 */
+   	@Column(name = "route_id" )
+	private Integer routeId;
+
+	/**
+	 * 关键字
+	 */
+	@Column(name = "key" )
+	private String key;
+
 	public BizPlan() {
 	}
 
-	public BizPlan(Integer id, String planName, String waterManagementOffice, String routeName, String planType, Date startTime, Date endTime, String planCreatedBy, Date planCreatedTime, String planStatus, String actProcess, String planProcess, String planPorid, String taskDesc, String routeType, Integer signIn, String area, Double pipeDiameter, String fixedPointInspectionType, Double planInspectionMileage, String routeCreatedBy, String hiddenDangerReason, String memo, Integer enabled) {
+	public BizPlan(Integer id, String planName, String waterManagementOffice, String routeName, String planType, Date startTime, Date endTime, String planCreatedBy, Date planCreatedTime, String planStatus, String actProcess, String planProcess, String planPorid, String taskDesc, String routeType, Integer signIn, String area, Double pipeDiameter, String fixedPointInspectionType, Double planInspectionMileage, String routeCreatedBy, String hiddenDangerReason, String memo, Integer enabled, Integer routeId) {
 		this.id = id;
 		this.planName = planName;
 		this.waterManagementOffice = waterManagementOffice;
@@ -190,6 +202,15 @@ public class BizPlan  implements Serializable {
 		this.hiddenDangerReason = hiddenDangerReason;
 		this.memo = memo;
 		this.enabled = enabled;
+		this.routeId = routeId;
+	}
+
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
 	}
 
 	public static long getSerialVersionUID() {
@@ -388,6 +409,14 @@ public class BizPlan  implements Serializable {
 		this.enabled = enabled;
 	}
 
+	public Integer getRouteId() {
+		return routeId;
+	}
+
+	public void setRouteId(Integer routeId) {
+		this.routeId = routeId;
+	}
+
 	@Override
 	public String toString() {
 		return "BizPlan{" +
@@ -415,6 +444,7 @@ public class BizPlan  implements Serializable {
 				", hiddenDangerReason='" + hiddenDangerReason + '\'' +
 				", memo='" + memo + '\'' +
 				", enabled=" + enabled +
+				", routeId=" + routeId +
 				'}';
 	}
 }

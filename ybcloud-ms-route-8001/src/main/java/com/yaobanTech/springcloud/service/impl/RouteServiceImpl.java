@@ -2,11 +2,11 @@ package com.yaobanTech.springcloud.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.yaobanTech.springcloud.domain.BizRoute;
+import com.yaobanTech.springcloud.domain.BizSignPoint;
 import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.domain.enumDef.EnumMenu;
 import com.yaobanTech.springcloud.repository.BizRouteRepository;
 import com.yaobanTech.springcloud.repository.BizSignPointRepository;
-import com.yaobanTech.springcloud.service.RouteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
@@ -14,13 +14,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.criteria.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
-public class RouteServiceImpl implements RouteService {
+public class RouteServiceImpl {
     @Autowired
     @Lazy
     private BizRouteRepository bizRouteRepository;
@@ -32,12 +29,18 @@ public class RouteServiceImpl implements RouteService {
 
     public RespBean saveRoute(HashMap<String,Object> param) {
         BizRoute bizRoute = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizRoute.class);
-        if(bizRoute != null) {
+        if(bizRoute != null && !bizRoute.getBizSignPoints().isEmpty()) {
             try {
-                BizRoute route = bizRouteRepository.save(bizRoute);
-                if(!bizRoute.getBizSignPoints().isEmpty()){
-                    bizSignPointRepository.saveAll(bizRoute.getBizSignPoints());
+                List<BizSignPoint> pointList = bizRoute.getBizSignPoints();
+                for (int i = 0; i <pointList.size() ; i++) {
+                    pointList.get(i).setRouteId(bizRoute.getId());
+                    pointList.get(i).setEnabled(1);
                 }
+                List<BizSignPoint> list = bizSignPointRepository.saveAll(pointList);
+                bizRoute.setCreatedTime(new Date());
+                bizRoute.setEnabled(1);
+                BizRoute route = bizRouteRepository.save(bizRoute);
+
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("保存失败！");
@@ -45,7 +48,7 @@ public class RouteServiceImpl implements RouteService {
         }else{
             return RespBean.error("数据为空！");
         }
-        return RespBean.ok("保存成功！");
+        return RespBean.ok("保存成功！",bizRoute);
     }
 
     public RespBean updateRoute(Integer id,BizRoute bizRoute) {
