@@ -51,8 +51,8 @@ public class InspectController {
 
     @ApiOperation("修改计划任务详情")
     @GetMapping("/plan/updateInspectDetailById")
-    public RespBean updateInspectDetailById(String inspect_task_id){
-        return iInspectService.updateInspectDetailById(inspect_task_id);
+    public RespBean updateInspectDetailById(@RequestBody Map<String,Object> params){
+        return iInspectService.updateInspectDetailById(params);
     }
 
     @ApiOperation("获取任务的签到点列表")

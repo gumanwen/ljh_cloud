@@ -3,6 +3,7 @@ package com.yaobanTech.springcloud.service;
 import com.yaobanTech.springcloud.entity.Inspect;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.yaobanTech.springcloud.entity.utils.RespBean;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Map;
 
@@ -22,7 +23,7 @@ public interface IInspectService extends IService<Inspect> {
 
     RespBean getInspectDetailById(String inspect_task_id);
 
-    RespBean updateInspectDetailById(String inspect_task_id);
+    RespBean updateInspectDetailById(Map<String,Object> params);
 
     RespBean addTempTask(Map<String, Object> params);
 

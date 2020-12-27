@@ -37,10 +37,14 @@ spring:
           uri: lb://auth2Service #负载均衡 动态路由
           predicates:
             - Path=/oauth/**
-        - id: ms-activiti
+        - id: cs-activiti
           uri: lb://activitiService #负载均衡 动态路由
           predicates:
             - Path=/api/activiti/**
+        - id: cs-file
+          uri: lb://fileService #负载均衡 动态路由
+          predicates:
+            - Path=/api/file/**
         - id: ms-route
           uri: lb://routeService #负载均衡 动态路由
           predicates:

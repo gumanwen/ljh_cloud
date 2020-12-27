@@ -147,14 +147,18 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
 
     @Override
     @Transactional
-    public RespBean updateInspectDetailById(String inspect_task_id) {
-        if(FieldUtils.isStringNotEmpty(inspect_task_id)){
+    public RespBean updateInspectDetailById(Map<String, Object> params) {
+        if(FieldUtils.isObjectNotEmpty(params)){
+            Inspect inspect = JSONObject.parseObject((String)params.get("form")).toJavaObject(Inspect.class);
             //创建对象
-            Inspect inspect = new Inspect();
-            inspectMapper.updateById(inspect);
-            return RespBean.ok("修改成功！").setObj(inspect);
+            if(FieldUtils.isStringNotEmpty(inspect.getInspectTaskId())){
+                inspectMapper.updateById(inspect);
+                return RespBean.ok("修改成功！").setObj(inspect);
+            }else{
+                return RespBean.error("缺少任务编号！");
+            }
         }else{
-            return RespBean.error("缺少任务编号");
+            return RespBean.error("map参数为空!");
         }
     }
 
