@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yaobanTech.springcloud.mapper.UserMapper">
+
+    <resultMap id="BaseResultMap" type="com.yaobanTech.springcloud.pojos.User">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="CHAR"/>
+        <result column="telephone" property="telephone" jdbcType="VARCHAR"/>
+        <result column="address" property="address" jdbcType="VARCHAR"/>
+        <result column="enabled" property="enabled" jdbcType="BIT"/>
+        <result column="username" property="username" jdbcType="VARCHAR"/>
+        <result column="password" property="password" jdbcType="VARCHAR"/>
+        <result column="role" property="role" jdbcType="VARCHAR"/>
+        <result column="userface" property="userface" jdbcType="VARCHAR"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+    <!--查询用户-->
+    <select id="loadUserByUsername" resultMap="BaseResultMap">
+        select * from SEC_USER where username=#{username}
+    </select>
+    <insert id="newRole" parameterType="Map">
+        insert into SEC_ROLE
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="role_name != null">
+                role_name,
+            </if>
+            <if test="role_code != null">
+                role_code,
+            </if>
+            <if test="create_date != null">
+                create_date,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="role_name != null">
+                #{role_name,jdbcType=VARCHAR},
+            </if>
+            <if test="role_code != null">
+                #{role_code,jdbcType=VARCHAR},
+            </if>
+            <if test="create_date != null">
+                CONVERT(varchar,GETDATE(),20),
+            </if>
+        </trim>
+    </insert>
+    <select id="selectZJ"  resultType="int">
+        SELECT IDENT_CURRENT('SEC_ROLE') AS id
+    </select>
+    <insert id="insertRoleAndMenu" parameterType="java.util.List">
+        insert into SEC_ROLE_MENU (role_id,menu_id)
+        values
+        <foreach collection="temp" item="item" index="index" separator=",">
+            (#{item.role_id},#{item.menu_id})
+        </foreach>
+    </insert>
+    <update id="modifyRole" parameterType="Map">
+        update SEC_ROLE
+        <trim prefix="set" suffixOverrides=",">
+            <if test="role_name!=null">role_name= #{ role_name },</if>
+            <if test="role_code!=null">role_code= #{ role_code },</if>
+            <if test="role_name!=null">create_date= CONVERT(varchar,GETDATE(),20),</if>
+        </trim>
+        where id =#{ id }
+    </update>
+    <delete id="deleteMenuByRole" parameterType="Map">
+        delete from SEC_ROLE_MENU where role_id=#{role_id}
+    </delete>
+    <insert id="insertUserWater" parameterType="Map">
+        insert into BIZ_WATER_DETAIL
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!= null">
+                id,
+            </if>
+            <if test="water_detail_id != null">
+                water_detail_id,
+            </if>
+            <if test="user_id != null">
+                user_id,
+            </if>
+            <if test="node_id != null">
+                node_id,
+            </if>
+            <if test="meter_id != null">
+                meter_id,
+            </if>
+            <if test="water_add != null">
+                water_add,
+            </if>
+            <if test="watermeter_id != null">
+                watermeter_id,
+            </if>
+            <if test="meter_size != null">
+                meter_size,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="subProjectId!= null">
+                subProjectId,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test=" id != null">
+                #{ id,jdbcType=VARCHAR},
+            </if>
+            <if test="water_detail_id != null">
+                #{water_detail_id,jdbcType=VARCHAR},
+            </if>
+            <if test="user_id  != null">
+                #{user_id ,jdbcType=VARCHAR},
+            </if>
+            <if test="node_id  != null">
+                #{node_id ,jdbcType=VARCHAR},
+            </if>
+            <if test="meter_id != null">
+                #{meter_id,jdbcType=VARCHAR},
+            </if>
+            <if test="water_add!= null">
+                #{water_add,jdbcType=INTEGER},
+            </if>
+            <if test="watermeter_id  != null">
+                #{watermeter_id ,jdbcType=FLOAT},
+            </if>
+            <if test="meter_size != null">
+                #{meter_size,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="subProjectId != null">
+                #{subProjectId,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <select id="selectUserZJ" resultType="int">
+        SELECT IDENT_CURRENT('SEC_USER') AS id
+    </select>
+    <insert id="insertUserAndRole" parameterType="java.util.List">
+        insert into SEC_USER_ROLE (user_id,role_id)
+        values
+        <foreach collection="temp" item="item" index="index" separator=",">
+            (#{item.user_id},#{item.role_id})
+        </foreach>
+    </insert>
+    <select id="selectRoleByUser" resultType="java.util.Map">
+        select * from SEC_ROLE a  left join SEC_USER_ROLE b on a.id =b.role_id where b.user_id= #{id}
+    </select>
+    <delete id="deleteUser" parameterType="Map">
+        delete from sec_user where id =#{id}
+    </delete>
+    <delete id="deleteUserAndRole" parameterType="Map">
+        delete from SEC_USER_ROLE where user_id =#{id}
+    </delete>
+    <select id="getAllOrgs" resultType="java.util.Map">
+        SELECT a.* FROM SEC_ORG a left join SEC_ORG b on a.pid =b.id where b.pid=1
+    </select>
+    <insert id="insertUserAndOrg" parameterType="java.util.List">
+        insert into SEC_USER_ORG (user_id,org_id)
+        values
+        <foreach collection="orgtemp" item="item" index="index" separator=",">
+            (#{item.user_id},#{item.org_id})
+        </foreach>
+    </insert>
+    <select id="selectOrgByUser" resultType="java.util.Map">
+        select a.* from SEC_ORG a  left join SEC_USER_ORG b on a.id =b.org_id where b.user_id= #{id}
+    </select>
+    <select id="selectUserByDept" resultType="java.util.Map">
+        select a.* from  SEC_USER a left join SEC_USER_ORG b on a.id =b.user_id left join SEC_ORG c on b.org_id =c.id where c.org_name=#{department}
+    </select>
+    <update id="modifyUser" parameterType="Map">
+        update SEC_USER
+        <trim prefix="set" suffixOverrides=",">
+            <if test="name!=null">name= #{ name },</if>
+            <if test="username!=null">username= #{ username },</if>
+            <if test="password!=null">password= #{password},</if>
+            <if test="role!=null">role= #{ role },</if>
+            <if test="staff_code!=null">staff_code= #{ staff_code },</if>
+            <if test="name!=null">create_date = CONVERT(varchar,GETDATE(),20),</if>
+            <if test="enabled!=null">enabled= #{ enabled },</if>
+            <if test="remark!=null">remark= #{remark},</if>
+        </trim>
+        where id =#{ id }
+    </update>
+    <select id="getUserMenusByRole" resultType="java.util.Map">
+        select A.* from sec_menu a left join SEC_ROLE_MENU b on a.id = b.menu_id left join sec_role c on b.role_id =c.id left join  sec_user_role d on c.id =d.role_id left join sec_user e on d.user_id =e.id WHERE e.username =#{name} and a.grade=#{grade}
+    </select>
+    <select id="selectRoleCodeByUser" resultType="java.util.Map">
+        select * from SEC_ROLE A LEFT JOIN SEC_USER_ROLE B ON A.ID =B.ROLE_ID WHERE B.USER_ID=#{user_id}
+    </select>
+    <select id="selectRoleByRoleId" resultType="java.util.Map">
+        select * from SEC_ROLE where id =#{id}
+    </select>
+    <delete id="deleteRole" parameterType="Map">
+        delete from sec_role where id =#{id}
+    </delete>
+    <delete id="deleteRoleAndMenu" parameterType="Map">
+        delete from sec_role_menu where role_id =#{id}
+    </delete>
+    <select id="getOrgList" resultType="java.util.HashMap">
+        select id ,org_name as title from SEC_ORG where pid =1
+    </select>
+    <select id="getSecondOrgList" resultType="java.util.HashMap">
+        select id ,org_name as title from SEC_ORG where pid =#{id}
+    </select>
+    <select id="getAllRoles" resultType="java.util.Map">
+        select * from sec_role
+    </select>
+    <select id="selectRoles" resultType="java.util.Map">
+        select * from sec_role
+    </select>
+    <select id="selectMenuByRole" resultType="java.util.Map">
+        select * from sec_menu a  left join sec_role_menu b on a.id =b.menu_id where b.role_id= #{id}
+    </select>
+    <insert id="newFirstLevelMenu" parameterType="Map">
+        insert into SEC_MENU
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="grade != null">
+                grade,
+            </if>
+            <if test="pid != null">
+                pid,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="code != null">
+                code,
+            </if>
+            <if test="url != null">
+                url,
+            </if>
+            <if test="icon != null">
+                icon,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="grade != null">
+                #{grade,jdbcType=VARCHAR},
+            </if>
+            <if test="pid != null">
+                #{pid,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null">
+                #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="url != null">
+                #{url,jdbcType=VARCHAR},
+            </if>
+            <if test="icon != null">
+                #{icon,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="modifyFirstLevelMenu" parameterType="Map">
+        update SEC_MENU
+        <trim prefix="set" suffixOverrides=",">
+            <if test="grade!=null">grade= #{ grade },</if>
+            <if test="pid!=null">pid= #{ pid },</if>
+            <if test="name!=null">name= #{ name },</if>
+            <if test="code!=null">code= #{ code },</if>
+            <if test="url!=null">url= #{ url },</if>
+            <if test="icon!=null">icon= #{ icon },</if>
+            <if test="remark!=null">remark= #{ remark },</if>
+        </trim>
+        where id =#{ id }
+    </update>
+    <delete id="deleteFirstLevelMenu" parameterType="Map">
+        delete from SEC_MENU where id = #{id}
+    </delete>
+    <select id="getMenuList" resultType="java.util.Map">
+        select * from SEC_MENU where grade =#{grade}
+    </select>
+</mapper>

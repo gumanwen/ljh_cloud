@@ -1,0 +1,14 @@
+apply plugin: 'org.springframework.boot'
+
+//自定义打包配置
+
+//依赖
+dependencies {
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-gateway', version: '2.2.2.RELEASE'
+    // https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-boot-starter
+    compile group: 'com.baomidou', name: 'mybatis-plus-boot-starter', version: '3.3.2'
+    // https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-generator
+    compile group: 'com.baomidou', name: 'mybatis-plus-generator', version: '3.3.2'
+    // https://mvnrepository.com/artifact/org.freemarker/freemarker
+    compile group: 'org.freemarker', name: 'freemarker', version: '2.3.30'
+}

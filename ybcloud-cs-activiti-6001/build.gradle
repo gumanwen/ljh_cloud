@@ -1,0 +1,29 @@
+apply plugin: 'org.springframework.boot'
+
+//自定义打包配置
+
+//依赖
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    // https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-boot-starter
+    compile group: 'com.baomidou', name: 'mybatis-plus-boot-starter', version: '3.3.2'
+    // https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-generator
+    compile group: 'com.baomidou', name: 'mybatis-plus-generator', version: '3.3.2'
+    // https://mvnrepository.com/artifact/org.freemarker/freemarker
+    compile group: 'org.freemarker', name: 'freemarker', version: '2.3.30'
+    // https://mvnrepository.com/artifact/org.activiti/activiti-engine
+    compile group: 'org.activiti', name: 'activiti-engine', version: '7.0.0.Beta1'
+    // https://mvnrepository.com/artifact/org.activiti/activiti-spring
+    compile group: 'org.activiti', name: 'activiti-spring', version: '7.0.0.Beta1'
+    // https://mvnrepository.com/artifact/org.activiti/activiti-bpmn-model
+    compile group: 'org.activiti', name: 'activiti-bpmn-model', version: '7.0.0.Beta1'
+    // https://mvnrepository.com/artifact/org.activiti/activiti-json-converter
+    compile group: 'org.activiti', name: 'activiti-json-converter', version: '7.0.0.Beta1'
+    // https://mvnrepository.com/artifact/org.activiti/activiti-bpmn-converter
+    compile group: 'org.activiti', name: 'activiti-bpmn-converter', version: '7.0.0.Beta1'
+    // https://mvnrepository.com/artifact/org.activiti/activiti-bpmn-layout
+    testCompile group: 'org.activiti', name: 'activiti-bpmn-layout', version: '7.0.0.Beta1'
+    // https://mvnrepository.com/artifact/org.activiti.cloud/activiti-cloud-services-api
+    compile group: 'org.activiti.cloud', name: 'activiti-cloud-services-api', version: '7.0.0.Beta1'
+
+}
