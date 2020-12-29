@@ -1,4 +1,4 @@
-package com.yaobanTech.springcloud.config.oauth2;
+package com.yaobanTech.springcloud.config.oauth2.jwt;
 
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

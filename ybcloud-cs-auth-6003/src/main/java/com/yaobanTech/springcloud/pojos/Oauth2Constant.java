@@ -13,6 +13,6 @@ public class Oauth2Constant {
     /**
      * JWT_SIGNING_KEY
      */
-    public static final String JWT_SIGNING_KEY = "jwtsigningkey";
+    public static final String JWT_SIGNING_KEY = "ybcloud";
 
 }

@@ -8,4 +8,5 @@ include 'ybCloud-ms-route-8001'
 include 'ybCloud-ms-inspect-8003'
 include 'ybcloud-cs-auth-6003'
 include 'ybcloud-cs-file-6005'
+include 'ybcloud-cs-auth-6002'
 

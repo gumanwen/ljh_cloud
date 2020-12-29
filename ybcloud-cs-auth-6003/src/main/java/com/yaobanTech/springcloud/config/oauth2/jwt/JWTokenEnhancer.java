@@ -1,4 +1,4 @@
-package com.yaobanTech.springcloud.config.oauth2;
+package com.yaobanTech.springcloud.config.oauth2.jwt;
 
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;

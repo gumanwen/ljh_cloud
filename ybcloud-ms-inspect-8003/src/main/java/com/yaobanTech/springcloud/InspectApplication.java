@@ -15,7 +15,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableCaching//启动缓存
 @EnableTransactionManagement//启动事务管理RouteService
 @MapperScan("com.yaobanTech.springcloud.mapper")
-@EnableFeignClients(basePackages = "com.yaobanTech.springcloud.service.feign")
+@EnableFeignClients
 public class  InspectApplication {
     public static void main(String[] args) {
         SpringApplication.run(InspectApplication.class, args);

@@ -7,6 +7,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.text.ParseException;
 import java.util.Map;
 
 /**
@@ -25,54 +27,74 @@ public class InspectController {
     @Autowired
     private IInspectService iInspectService;
 
-    @ApiOperation("获取计划任务列表")
+    @ApiOperation("app & web:获取计划任务列表")
     @GetMapping("/plan/getAllInspect")
-    public RespBean getPlanInspect(String type){
+    public RespBean getPlanInspect(String type) {
         return iInspectService.getPlanInspect(type);
     }
 
-    @ApiOperation("获取临时任务列表")
+    @ApiOperation("web:根据计划编号获取计划任务列表")
+    @GetMapping("/plan/getAllInspectByPlanId")
+    public RespBean getAllInspectByPlanId(@RequestParam Integer planId) {
+        return iInspectService.getAllInspectByPlanId(planId);
+    }
+
+    @ApiOperation("app：获取临时任务列表")
     @GetMapping("/plan/getTempInspect")
-    public RespBean getTempInspect(String type){
+    public RespBean getTempInspect(String type) {
         return iInspectService.getTempInspect(type);
     }
 
-    @ApiOperation("新增临时任务")
-    @PostMapping("/temp/addTempTask")
-    public RespBean addTempTask(@RequestBody Map<String,Object> params){
-        return iInspectService.addTempTask(params);
+    @ApiOperation("web：新增临时任务")
+    @GetMapping("/temp/addTempTask")
+    public RespBean addTempTask(Integer routeId,String  routeName ,String inspector) {
+        return iInspectService.addTempTask(routeId,routeName,inspector);
     }
 
-    @ApiOperation("获取计划任务详情")
+    @ApiOperation("web：新增计划任务")
+    @PostMapping("/temp/addPlanTask")
+    public RespBean addPlanTask(Integer routeId,String  routeName ,Integer planId,String planName) throws ParseException {
+        return iInspectService.addPlanTask(routeId,routeName,planId,planName);
+    }
+
+    @ApiOperation("app & web：获取计划任务详情")
     @GetMapping("/plan/getInspectDetailById")
-    public RespBean getInspectDetailById(String inspect_task_id){
+    public RespBean getInspectDetailById(String inspect_task_id) throws IllegalAccessException {
         return iInspectService.getInspectDetailById(inspect_task_id);
     }
 
-    @ApiOperation("修改计划任务详情")
-    @GetMapping("/plan/updateInspectDetailById")
-    public RespBean updateInspectDetailById(@RequestBody Map<String,Object> params){
+    @ApiOperation("app & web：修改计划任务详情")
+    @PostMapping("/plan/updateInspectDetailById")
+    public RespBean updateInspectDetailById(@RequestBody Map<String, Object> params) {
         return iInspectService.updateInspectDetailById(params);
     }
 
-    @ApiOperation("获取任务的签到点列表")
+    @ApiOperation("app：获取任务的签到点列表")
     @GetMapping("/plan/getCheckInPoints")
-    public RespBean getCheckInPoints(Integer planId){
+    public RespBean getCheckInPoints(Integer routeId) {
         //调用route的rest接口
-        return iInspectService.getCheckInPoints(planId);
+        return iInspectService.getCheckInPoints(routeId);
     }
 
-    @ApiOperation("获取签到点详情")
+    @ApiOperation("app：获取签到点详情")
     @GetMapping("/point/getPointDetail")
-    public RespBean getPointDetail(Integer id){
+    public RespBean getPointDetail(Integer id) {
         //调用route的rest接口
         return iInspectService.getPointDetail(id);
     }
 
-    @ApiOperation("修改签到点详情")
-    @PutMapping("/point/updatePoint")
-    public RespBean updatePoint(@RequestBody Map<String,Object> params){
+    @ApiOperation("app：修改签到点详情")
+    @PostMapping("/point/updatePoint")
+    public RespBean updatePoint(@RequestBody Map<String, Object> params) {
         //调用route的rest接口
         return iInspectService.updatePoint(params);
     }
+
+    @ApiOperation("openfeign：保存计划之后自动生成任务")
+    @PostMapping("/task/autoCreate")
+    public RespBean autoCreate(@RequestBody Map<String, Object> params) throws ParseException {
+        //调用route的rest接口
+        return iInspectService.autoCreate(params);
+    }
 }
+

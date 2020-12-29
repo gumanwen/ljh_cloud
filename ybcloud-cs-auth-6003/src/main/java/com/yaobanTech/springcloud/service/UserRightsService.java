@@ -5,11 +5,16 @@ import com.yaobanTech.springcloud.mapper.UserMapper;
 import com.yaobanTech.springcloud.pojos.RespBean;
 import com.yaobanTech.springcloud.utils.FieldUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
+import org.springframework.security.oauth2.provider.endpoint.TokenEndpoint;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +24,8 @@ import java.util.Map;
 public class UserRightsService {
     @Autowired
     private UserMapper userMapper;
-
+    @Autowired
+    TokenEndpoint tokenEndPoint;
     @Autowired
     private PasswordEncoder bCryptPasswordEncoder;
 
@@ -379,5 +385,28 @@ public class UserRightsService {
             }
         }
         return RespBean.ok("所有菜单").setObj(firstMenuList);
+    }
+
+    public RespBean login( Map<String, String> param) throws HttpRequestMethodNotSupportedException {
+        Principal principal =null;
+        if(FieldUtils.isObjectNotEmpty(param)){
+            String username = param.get("username");
+            String password = param.get("password");
+            String grant_type ="password";
+            String scope ="all";
+            String client_id ="demo-client";
+            String client_secret ="demo-secret";
+            Map<String, String> parameters = new HashMap<String, String>();
+            parameters.put("client_id", client_id);
+            parameters.put("client_secret", client_secret);
+            parameters.put("grant_type", grant_type);
+            parameters.put("username", username);
+            parameters.put("password", password);
+            // 直接调用 /oauth/token 映射的方法，不在通过url调用获取token
+            ResponseEntity<OAuth2AccessToken> result = tokenEndPoint.getAccessToken(principal, parameters);
+            return RespBean.ok("").setObj(result);
+        }else{
+            return RespBean.error("缺少账号密码");
+        }
     }
 }

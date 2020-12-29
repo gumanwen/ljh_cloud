@@ -1,3 +1,4 @@
+/*
 package com.yaobanTech.springcloud.config.oauth2;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.R
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 
+*/
 /**
  * ********在实际项目中此资源服务可以单独提取到资源服务项目中使用********
  *
@@ -18,7 +20,8 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
  *
  * @author
  * @date 2020-09-04
- */
+ *//*
+
 @Configuration
 @EnableResourceServer
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -27,20 +30,24 @@ public class ResServerConfig extends ResourceServerConfigurerAdapter{
     @Autowired
     private TokenStore jwtTokenStore;
 
-    /**
+    */
+/**
      * 同认证授权服务配置jwtTokenStore - 单独剥离服务需要开启注释
      * @return
-     */
+     *//*
+
 //	@Bean
 //	public TokenStore jwtTokenStore() {
 //		return new JwtTokenStore(jwtAccessTokenConverter());
 //	}
 
-    /**
+    */
+/**
      * 同认证授权服务配置jwtAccessTokenConverter  - 单独剥离服务需要开启注释
      * 需要和认证授权服务设置的jwt签名相同: "demo"
      * @return
-     */
+     *//*
+
 //	@Bean
 //	public JwtAccessTokenConverter jwtAccessTokenConverter() {
 //		JwtAccessTokenConverter accessTokenConverter = new JwtAccessTokenConverter();
@@ -54,17 +61,20 @@ public class ResServerConfig extends ResourceServerConfigurerAdapter{
         resources.tokenStore(jwtTokenStore);
     }
 
-    /**
+    */
+/**
      * 配置受OAuth2保护的URL资源。
      * 注意:必须配置sessionManagement(),否则访问受护资源请求不会被OAuth2的拦截器
      * 		ClientCredentialsTokenEndpointFilter与OAuth2AuthenticationProcessingFilter拦截,
      * 		也就是说,没有配置的话,资源没有受到OAuth2的保护。
      * @param http
      * @throws Exception
-     */
+     *//*
+
     @Override
     public void configure(HttpSecurity http) throws Exception {
-    	/*
+    	*/
+/*
     	 注意：
     	 1、必须先加上：.requestMatchers().antMatchers(...)，表示对资源进行保护，也就是说，在访问前要进行OAuth认证。
     	 2、接着：访问受保护的资源时，要具有哪里权限。
@@ -74,7 +84,8 @@ public class ResServerConfig extends ResourceServerConfigurerAdapter{
     	 requestMatchers()部分说明：
     	 Invoking requestMatchers() will not override previous invocations of ::
     	 mvcMatcher(String)}, requestMatchers(), antMatcher(String), regexMatcher(String), and requestMatcher(RequestMatcher).
-    	 */
+    	 *//*
+
         http
                 // Since we want the protected resources to be accessible in the UI as well we need
                 // session creation to be allowed (it's disabled by default in 2.0.6)
@@ -90,3 +101,4 @@ public class ResServerConfig extends ResourceServerConfigurerAdapter{
     }
 }
 
+*/

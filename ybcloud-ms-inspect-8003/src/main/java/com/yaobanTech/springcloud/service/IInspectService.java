@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.yaobanTech.springcloud.entity.utils.RespBean;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.text.ParseException;
 import java.util.Map;
 
 /**
@@ -21,16 +22,22 @@ public interface IInspectService extends IService<Inspect> {
 
     RespBean getTempInspect(String type);
 
-    RespBean getInspectDetailById(String inspect_task_id);
+    RespBean getInspectDetailById(String inspect_task_id) throws IllegalAccessException;
 
     RespBean updateInspectDetailById(Map<String,Object> params);
 
-    RespBean addTempTask(Map<String, Object> params);
+    RespBean addTempTask(Integer routeId,String  routeName ,String inspector);
 
-    RespBean getCheckInPoints(Integer plan_id);
+    RespBean addPlanTask(Integer routeId,String  routeName ,Integer planId,String planName) throws ParseException;
+
+    RespBean getCheckInPoints(Integer routeId);
 
     RespBean getPointDetail(Integer id);
 
     RespBean updatePoint(Map<String, Object> params);
+
+    RespBean getAllInspectByPlanId(Integer planId);
+
+    RespBean autoCreate(Map<String, Object> params) throws ParseException;
 
 }

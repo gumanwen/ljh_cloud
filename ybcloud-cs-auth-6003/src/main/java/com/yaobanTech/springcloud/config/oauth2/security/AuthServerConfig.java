@@ -1,8 +1,9 @@
-package com.yaobanTech.springcloud.config.oauth2;
+package com.yaobanTech.springcloud.config.oauth2.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
@@ -19,10 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * OAuth2的授权服务:主要作用是OAuth2的客户端进行认证与授权
- *
- * @author
- * @date 2020-09-04
+ * OAuth2的授权服务配置:主要作用是OAuth2的客户端进行认证与授权
  */
 @Configuration
 @EnableAuthorizationServer
@@ -49,7 +47,7 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter{
 
     /**
      * 配置OAuth2的客户端信息：clientId、client_secret、authorization_type、redirect_url等。
-     * 实际保存在数据库中,建表语句在resource下data中
+     * 实际保存在数据库中 ：OAUTH_CLIENT_DETAILS
      * @param clients
      * @throws Exception
      */
@@ -87,7 +85,9 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter{
                  */
                 .authenticationManager(authenticationManager)
                 .tokenEnhancer(enhancerChain)
-                .accessTokenConverter(jwtAccessTokenConverter);
+                .accessTokenConverter(jwtAccessTokenConverter)
+                .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST); //设置允许get,post
+
     }
 
     @Override

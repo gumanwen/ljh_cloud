@@ -1,5 +1,4 @@
-package com.yaobanTech.springcloud.config.oauth2;
-
+package com.yaobanTech.springcloud.config.oauth2.jwt;
 import com.yaobanTech.springcloud.pojos.Oauth2Constant;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,12 +8,7 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
 /**
- * JwtTokenConfig配置类
- * 使用TokenStore将引入JwtTokenStore
- *
- * 注：Spring-Sceurity使用TokenEnhancer和JwtAccessConverter增强jwt令牌
- * @author
- * @date 2020-09-04
+ * 使用Jwt存储token的配置
  */
 @Configuration
 public class JwtTokenConfig {

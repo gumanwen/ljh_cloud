@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
-@Api(value = "权限Controller" , tags = "用户权限--接口")
+@Api(value = "管理人员Controller" , tags = "管理人员--接口")
 @RestController
 @RequestMapping("/api/userRight")
 public class UserRightsController {

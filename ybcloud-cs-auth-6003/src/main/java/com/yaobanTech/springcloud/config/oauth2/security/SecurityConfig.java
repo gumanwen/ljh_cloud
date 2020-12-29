@@ -1,4 +1,4 @@
-package com.yaobanTech.springcloud.config.oauth2;
+package com.yaobanTech.springcloud.config.oauth2.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -45,12 +45,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .requireCsrfProtectionMatcher(new AntPathRequestMatcher("/oauth/authorize"))
                 .requireCsrfProtectionMatcher(new AntPathRequestMatcher("/oauth/token"))
                 .disable()
-                .formLogin() //登记界面，默认是permit All
-                .and()
-                .authorizeRequests().antMatchers("/","/home").permitAll() //不用身份认证可以访问
-                .and()
-                .authorizeRequests().anyRequest().authenticated() //其它的请求要求必须有身份认证
-                .and();
+                .authorizeRequests().antMatchers("/","/home","/user").permitAll(); //不用身份认证可以访问
+
     }
 
 }

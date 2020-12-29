@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 public class TestMp {
     @Test
     public void test(){
-        // 代码生成器
+        /*// 代码生成器
         AutoGenerator mpg = new AutoGenerator();
 
         // 全局配置
@@ -16,6 +16,10 @@ public class TestMp {
         gc.setAuthor("lijh");
         gc.setOpen(false);
         // gc.setSwagger2(true); 实体属性 Swagger2 注解
-        mpg.setGlobalConfig(gc);
+        mpg.setGlobalConfig(gc);*/
+
+
+        int nums = Integer.valueOf((int) Math.floor(31/3));
+        System.out.println(nums);
     }
 }
