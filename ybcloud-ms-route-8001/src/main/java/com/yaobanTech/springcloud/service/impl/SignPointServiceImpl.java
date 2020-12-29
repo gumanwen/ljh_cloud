@@ -1,7 +1,6 @@
 package com.yaobanTech.springcloud.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.yaobanTech.springcloud.domain.BizRoute;
 import com.yaobanTech.springcloud.domain.BizSignPoint;
 import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.repository.BizSignPointRepository;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class SignPointServiceImpl {
@@ -19,7 +17,8 @@ public class SignPointServiceImpl {
     @Lazy
     private BizSignPointRepository signPointRepository;
 
-    public RespBean saveSignPoint(BizSignPoint bizSignPoint) {
+    public RespBean saveSignPoint(HashMap<String,Object> param) {
+        BizSignPoint bizSignPoint = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizSignPoint.class);
         if(bizSignPoint != null) {
             try {
                 BizSignPoint signPoint = signPointRepository.save(bizSignPoint);
@@ -67,11 +66,11 @@ public class SignPointServiceImpl {
     }
 
     public RespBean findSignPoint(Integer id) {
-
-        Optional<BizSignPoint> byId = null;
+        BizSignPoint byId = null;
         if(id != null) {
             try {
-                byId = signPointRepository.findById(id);
+                 byId = signPointRepository.findSignPointById(id);
+
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("查询失败！");
@@ -86,7 +85,7 @@ public class SignPointServiceImpl {
         List<BizSignPoint> list = null;
         if(routeId != null) {
             try {
-                 list = signPointRepository.findByRouteId(routeId);
+                 list = signPointRepository.findSignPointListByRouteId(routeId);
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("查询失败！");

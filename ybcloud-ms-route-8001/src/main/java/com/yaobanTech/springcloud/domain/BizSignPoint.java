@@ -77,6 +77,79 @@ public class BizSignPoint  implements Serializable {
 	@Column(name = "location" )
 	private String location;
 
+	/**
+	 * 管径
+	 */
+	@Column(name = "pipe_diameter" )
+	private String pipeDiameter;
+
+	/**
+	 * 备注
+	 */
+	@Column(name = "memo" )
+	private String memo;
+
+	/**
+	 * 现场情况
+	 */
+	@Column(name = "site_conditions" )
+	private String siteConditions;
+
+	/**
+	 * 现场情况说明
+	 */
+	@Column(name = "site_conditions_desc" )
+	private String siteConditionsDesc;
+
+	/**
+	 * 隐患地点
+	 */
+	@Column(name = "hidden_danger_address" )
+	private String hiddenDangerAddress;
+
+	/**
+	 * 隐患原因
+	 */
+	@Column(name = "hidden_danger_reason" )
+	private String hiddenDangerReason;
+
+	/**
+	 * 排放地点
+	 */
+	@Column(name = "discharge_address" )
+	private String dischargeAddress;
+
+	/**
+	 * 排放时长
+	 */
+	@Column(name = "discharge_time_last" )
+	private String dischargeTimeLast;
+
+	/**
+	 * 排放时间
+	 */
+	@Column(name = "discharge_time" )
+	private String dischargeTime;
+
+	/**
+	 * 估算排水量
+	 */
+	@Column(name = "estimated_discharge" )
+	private String estimatedDischarge;
+
+	/**
+	 * 路线类型
+	 */
+	@Column(name = "route_type" )
+	private String routeType;
+
+	/**
+	 * 定点巡查类型
+	 */
+	@Column(name = "point_inspection_type" )
+	private String pointInspectionType;
+
+
 	public Integer getId() {
 		return id;
 	}
@@ -160,7 +233,107 @@ public class BizSignPoint  implements Serializable {
 	public BizSignPoint() {
 	}
 
-	public BizSignPoint(Integer id, String signPointCode, String currentChoosedAddress, String troubleCode, String troubleReason, String hiddenDangerType, String handleSuggestion, Integer enabled, Integer routeId, String location) {
+	public static long getSerialVersionUID() {
+		return serialVersionUID;
+	}
+
+	public String getPipeDiameter() {
+		return pipeDiameter;
+	}
+
+	public void setPipeDiameter(String pipeDiameter) {
+		this.pipeDiameter = pipeDiameter;
+	}
+
+	public String getMemo() {
+		return memo;
+	}
+
+	public void setMemo(String memo) {
+		this.memo = memo;
+	}
+
+	public String getSiteConditions() {
+		return siteConditions;
+	}
+
+	public void setSiteConditions(String siteConditions) {
+		this.siteConditions = siteConditions;
+	}
+
+	public String getSiteConditionsDesc() {
+		return siteConditionsDesc;
+	}
+
+	public void setSiteConditionsDesc(String siteConditionsDesc) {
+		this.siteConditionsDesc = siteConditionsDesc;
+	}
+
+	public String getHiddenDangerAddress() {
+		return hiddenDangerAddress;
+	}
+
+	public void setHiddenDangerAddress(String hiddenDangerAddress) {
+		this.hiddenDangerAddress = hiddenDangerAddress;
+	}
+
+	public String getHiddenDangerReason() {
+		return hiddenDangerReason;
+	}
+
+	public void setHiddenDangerReason(String hiddenDangerReason) {
+		this.hiddenDangerReason = hiddenDangerReason;
+	}
+
+	public String getDischargeAddress() {
+		return dischargeAddress;
+	}
+
+	public void setDischargeAddress(String dischargeAddress) {
+		this.dischargeAddress = dischargeAddress;
+	}
+
+	public String getDischargeTimeLast() {
+		return dischargeTimeLast;
+	}
+
+	public void setDischargeTimeLast(String dischargeTimeLast) {
+		this.dischargeTimeLast = dischargeTimeLast;
+	}
+
+	public String getDischargeTime() {
+		return dischargeTime;
+	}
+
+	public void setDischargeTime(String dischargeTime) {
+		this.dischargeTime = dischargeTime;
+	}
+
+	public String getEstimatedDischarge() {
+		return estimatedDischarge;
+	}
+
+	public void setEstimatedDischarge(String estimatedDischarge) {
+		this.estimatedDischarge = estimatedDischarge;
+	}
+
+	public String getRouteType() {
+		return routeType;
+	}
+
+	public void setRouteType(String routeType) {
+		this.routeType = routeType;
+	}
+
+	public String getPointInspectionType() {
+		return pointInspectionType;
+	}
+
+	public void setPointInspectionType(String pointInspectionType) {
+		this.pointInspectionType = pointInspectionType;
+	}
+
+	public BizSignPoint(Integer id, String signPointCode, String currentChoosedAddress, String troubleCode, String troubleReason, String hiddenDangerType, String handleSuggestion, Integer enabled, Integer routeId, String location, String pipeDiameter, String memo, String siteConditions, String siteConditionsDesc, String hiddenDangerAddress, String hiddenDangerReason, String dischargeAddress, String dischargeTimeLast, String dischargeTime, String estimatedDischarge, String routeType, String pointInspectionType) {
 		this.id = id;
 		this.signPointCode = signPointCode;
 		this.currentChoosedAddress = currentChoosedAddress;
@@ -171,6 +344,18 @@ public class BizSignPoint  implements Serializable {
 		this.enabled = enabled;
 		this.routeId = routeId;
 		this.location = location;
+		this.pipeDiameter = pipeDiameter;
+		this.memo = memo;
+		this.siteConditions = siteConditions;
+		this.siteConditionsDesc = siteConditionsDesc;
+		this.hiddenDangerAddress = hiddenDangerAddress;
+		this.hiddenDangerReason = hiddenDangerReason;
+		this.dischargeAddress = dischargeAddress;
+		this.dischargeTimeLast = dischargeTimeLast;
+		this.dischargeTime = dischargeTime;
+		this.estimatedDischarge = estimatedDischarge;
+		this.routeType = routeType;
+		this.pointInspectionType = pointInspectionType;
 	}
 
 	@Override
@@ -186,6 +371,18 @@ public class BizSignPoint  implements Serializable {
 				", enabled=" + enabled +
 				", routeId=" + routeId +
 				", location='" + location + '\'' +
+				", pipeDiameter='" + pipeDiameter + '\'' +
+				", memo='" + memo + '\'' +
+				", siteConditions='" + siteConditions + '\'' +
+				", siteConditionsDesc='" + siteConditionsDesc + '\'' +
+				", hiddenDangerAddress='" + hiddenDangerAddress + '\'' +
+				", hiddenDangerReason='" + hiddenDangerReason + '\'' +
+				", dischargeAddress='" + dischargeAddress + '\'' +
+				", dischargeTimeLast='" + dischargeTimeLast + '\'' +
+				", dischargeTime='" + dischargeTime + '\'' +
+				", estimatedDischarge='" + estimatedDischarge + '\'' +
+
+
 				'}';
 	}
 }

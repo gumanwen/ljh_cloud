@@ -118,10 +118,28 @@ public class BizRoute  implements Serializable {
    	@Column(name = "point_inspection_type" )
 	private String pointInspectionType;
 
+   	/**
+	 * 隐患原因
+	 */
+   	@Column(name = "hidden_danger_reason" )
+	private String hiddenDangerReason;
+
+	/**
+	 * 超时原因
+	 */
+	@Column(name = "over_reason" )
+	private String overReason;
+
+	/**
+	 * 修改人
+	 */
+	@Column(name = "modify_by" )
+	private String modifyBy;
+
 	/**
 	 * 签到点
 	 */
-   	@OneToMany(targetEntity = BizSignPoint.class)
+   	@OneToMany(targetEntity = BizSignPoint.class,fetch = FetchType.EAGER)
 	@JoinColumn(name = "route_id",referencedColumnName = "id")
    	private List<BizSignPoint> bizSignPoints = new ArrayList<>();
 
@@ -145,6 +163,30 @@ public class BizRoute  implements Serializable {
 		this.location = location;
 		this.pointInspectionType = pointInspectionType;
 		this.bizSignPoints = bizSignPoints;
+	}
+
+	public String getHiddenDangerReason() {
+		return hiddenDangerReason;
+	}
+
+	public void setHiddenDangerReason(String hiddenDangerReason) {
+		this.hiddenDangerReason = hiddenDangerReason;
+	}
+
+	public String getOverReason() {
+		return overReason;
+	}
+
+	public void setOverReason(String overReason) {
+		this.overReason = overReason;
+	}
+
+	public String getModifyBy() {
+		return modifyBy;
+	}
+
+	public void setModifyBy(String modifyBy) {
+		this.modifyBy = modifyBy;
 	}
 
 	public static long getSerialVersionUID() {

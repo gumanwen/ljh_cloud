@@ -1,8 +1,10 @@
 package com.yaobanTech.springcloud.repository;
 
 import com.yaobanTech.springcloud.domain.BizPlan;
+import com.yaobanTech.springcloud.domain.Selection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -11,10 +13,21 @@ import java.util.List;
 @Repository
 public interface BizPlanRepository extends JpaRepository<BizPlan,Integer>, JpaSpecificationExecutor<BizPlan> {
 
-    @Query("update BizPlan t set t.enabled = '0' where t.id = ?1")
+    @Modifying
+    @Query("update BizPlan t set t.enabled = 0 where t.id = ?1")
     void deletePlan(Integer id);
 
     @Query("select t.routeId from  BizPlan t where t.id = ?1")
     Integer findRouteId(Integer planId);
+
+    @Query("from BizPlan t where t.enabled = 1")
+    List<BizPlan> findList();
+
+    @Query("from BizPlan t where id = ?1  and t.enabled = 1")
+    BizPlan findDetail(Integer id);
+
+    @Query(value = "select id,plan_name from biz_plan where enabled = 1",nativeQuery = true)
+    List<Selection> findSelection();
+
 
 }
