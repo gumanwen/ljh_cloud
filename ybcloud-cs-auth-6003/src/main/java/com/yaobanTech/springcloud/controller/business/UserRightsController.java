@@ -11,7 +11,8 @@ import java.util.Map;
 
 @Api(value = "管理人员Controller" , tags = "管理人员--接口")
 @RestController
-@RequestMapping("/api/userRight")
+//@CrossOrigin
+@RequestMapping("/user/userRight")
 public class UserRightsController {
 
     @Autowired
@@ -113,5 +114,11 @@ public class UserRightsController {
     @GetMapping("getMenusByRole")
     public RespBean getMenusByRole(@RequestParam  String name){
         return userRightsService.getMenusByRole(name);
+    }
+
+    @ApiOperation(value ="根据角色查询用户")
+    @GetMapping("selectUserByRole")
+    public RespBean selectUserByRole(@RequestParam  String role){
+        return userRightsService.selectUserByRole(role);
     }
 }

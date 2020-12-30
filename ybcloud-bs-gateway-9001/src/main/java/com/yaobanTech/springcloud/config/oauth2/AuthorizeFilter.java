@@ -1,4 +1,3 @@
-
 package com.yaobanTech.springcloud.config.oauth2;
 
 import com.yaobanTech.springcloud.utils.JwtUtil;
@@ -13,18 +12,16 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-
 /**
  * 鉴权过滤器 验证token
  */
-
-
 @Component
 public class AuthorizeFilter implements GlobalFilter, Ordered {
     private static final String AUTHORIZE_TOKEN = "Authorization";
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+
         //1. 获取请求
         ServerHttpRequest request = exchange.getRequest();
         //2. 则获取响应
@@ -64,3 +61,5 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
         return 0;
     }
 }
+
+

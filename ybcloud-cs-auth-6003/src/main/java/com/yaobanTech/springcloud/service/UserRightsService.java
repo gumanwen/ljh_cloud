@@ -409,4 +409,13 @@ public class UserRightsService {
             return RespBean.error("缺少账号密码");
         }
     }
+
+    public RespBean selectUserByRole(String role) {
+        if(FieldUtils.isStringNotEmpty(role)){
+            List<HashMap<String,String>> list = userMapper.selectUserByRole(role);
+            return RespBean.ok("").setObj(list);
+        }else{
+            return RespBean.error("缺少角色代码！");
+        }
+    }
 }

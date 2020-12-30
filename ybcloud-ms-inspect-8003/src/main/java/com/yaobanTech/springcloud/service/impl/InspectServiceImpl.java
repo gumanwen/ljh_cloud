@@ -3,6 +3,7 @@ package com.yaobanTech.springcloud.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.yaobanTech.springcloud.entity.Inspect;
 import com.yaobanTech.springcloud.entity.utils.RedisGeneratorCode;
@@ -336,12 +337,41 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
     @Override
     @Transactional
     public RespBean send(Map<String, Object> params) {
-       /* List<PersonRate> list  = new ArrayList<>();
-        JSONArray jsonArray=JSONArray.parseArray((String) params.get("form"));
-        for(Object object : jsonArray){
-            //通过下标获取json数组中的数据
-            list.add(JSON.toJavaObject((JSON) object,PersonRate.class));
-        }*/
-        return null;
+        if(FieldUtils.isObjectNotEmpty(params) && FieldUtils.isObjectNotEmpty(params.get("form"))) {
+            Map map = new HashMap();
+            map = (Map) params.get("form");
+            String inspector = null;
+            if (FieldUtils.isObjectNotEmpty(map.get("inspector"))) {
+                inspector = (String) map.get("inspector");
+                if (FieldUtils.isObjectNotEmpty(map.get("inspect_task_id"))) {
+                    List<Inspect> list = new ArrayList<>();
+                    List<HashMap<String,Object>> tasklist= (ArrayList) map.get("inspect_task_id");
+                    if(tasklist.size()>0){
+                        for(int i=0;i<tasklist.size();i++){
+                            list.add(JSON.parseObject(JSON.toJSONString(tasklist.get(i)), new TypeReference<Inspect>() { }));
+                        }
+                    }
+                    if(list.size()>0){
+                        for(int i =0;i<list.size();i++){
+                            Map<String,Object> taskMap = new HashMap<>();
+                            Map<String, Object> variable = new HashMap<String, Object>();
+                            variable.put("ROLE_BZY",inspector);
+                            variable.put("ROLE_BZZ","bzz" );
+                            taskMap.put("key","inspect");
+                            taskMap.put("businessKey",list.get(i).getInspectTaskId());
+                            taskMap.put("variable",variable);
+                            activitiService.startProcess(taskMap);
+                        }
+                    }
+                    return RespBean.ok("派发给"+inspector+list.size()+"个任务！，派发成功！").setObj("");
+                }else{
+                    return RespBean.error("缺少参数！");
+                }
+            } else {
+                return RespBean.error("缺少参数！");
+            }
+        }else{
+            return RespBean.error("缺少参数！");
+        }
     }
 }
