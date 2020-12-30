@@ -1,6 +1,5 @@
 package com.yaobanTech.springcloud.controller;
 
-import com.yaobanTech.springcloud.domain.BizSignPoint;
 import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.service.impl.SignPointServiceImpl;
 import io.swagger.annotations.Api;
@@ -25,26 +24,26 @@ public class SignPointController {
     private SignPointServiceImpl signPointService;
 
     @ApiOperation("保存签到点")
-    @PostMapping()
-    public RespBean saveSignPoint(@RequestBody BizSignPoint signPoint){
-        return signPointService.saveSignPoint(signPoint);
+    @PostMapping("add")
+    public RespBean saveSignPoint(@RequestBody HashMap<String,Object> param){
+        return signPointService.saveSignPoint(param);
     }
 
     @ApiOperation("修改签到点")
-    @PutMapping()
+    @PostMapping("modify")
     public RespBean updateSignPoint( @RequestBody HashMap<String,Object> param){
         return signPointService.updateSignPoint(param);
     }
 
     @ApiOperation("删除签到点")
-    @DeleteMapping("{id}")
-    public RespBean deleteSignPoint(@PathVariable("id") Integer id){
+    @GetMapping("remove")
+    public RespBean deleteSignPoint(@RequestParam Integer id){
         return signPointService.deleteSignPoint(id);
     }
 
     @ApiOperation("查询签到点详情")
-    @GetMapping("{id}")
-    public RespBean findSignPoint(@PathVariable("id") Integer id){
+    @GetMapping("findSignPoint")
+    public RespBean findSignPoint(@RequestParam Integer id){
         return signPointService.findSignPoint(id);
     }
 

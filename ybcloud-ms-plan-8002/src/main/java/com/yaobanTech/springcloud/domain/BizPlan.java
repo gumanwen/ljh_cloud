@@ -1,5 +1,8 @@
 package com.yaobanTech.springcloud.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -30,17 +33,6 @@ public class BizPlan  implements Serializable {
    	@Column(name = "plan_name" )
 	private String planName;
 
-	/**
-	 * 用水管理所
-	 */
-   	@Column(name = "water_management_office" )
-	private String waterManagementOffice;
-
-	/**
-	 * 路线名称
-	 */
-   	@Column(name = "route_name" )
-	private String routeName;
 
 	/**
 	 * 计划类型
@@ -51,12 +43,22 @@ public class BizPlan  implements Serializable {
 	/**
 	 * 开始时间
 	 */
+	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(
+			pattern = "yyyy-MM-dd HH:mm:ss",
+			timezone = "GMT+8"
+	)
    	@Column(name = "start_time" )
 	private Date startTime;
 
 	/**
 	 * 结束时间
 	 */
+	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(
+			pattern = "yyyy-MM-dd HH:mm:ss",
+			timezone = "GMT+8"
+	)
    	@Column(name = "end_time" )
 	private Date endTime;
 
@@ -69,6 +71,11 @@ public class BizPlan  implements Serializable {
 	/**
 	 * 计划制定时间
 	 */
+	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(
+			pattern = "yyyy-MM-dd HH:mm:ss",
+			timezone = "GMT+8"
+	)
    	@Column(name = "plan_created_time" )
 	private Date planCreatedTime;
 
@@ -102,53 +109,12 @@ public class BizPlan  implements Serializable {
    	@Column(name = "task_desc" )
 	private String taskDesc;
 
-	/**
-	 * 路线类型
-	 */
-   	@Column(name = "route_type" )
-	private String routeType;
-
-	/**
-	 * 签到点数量
-	 */
-   	@Column(name = "sign_in" )
-	private Integer signIn;
 
 	/**
 	 * 区域
 	 */
    	@Column(name = "area" )
 	private String area;
-
-	/**
-	 * 管径
-	 */
-   	@Column(name = "pipe_diameter" )
-	private Double pipeDiameter;
-
-	/**
-	 * 定点巡查类型
-	 */
-   	@Column(name = "fixed_point_inspection_type" )
-	private String fixedPointInspectionType;
-
-	/**
-	 * 计划巡查里程
-	 */
-   	@Column(name = "plan_inspection_mileage" )
-	private Double planInspectionMileage;
-
-	/**
-	 * 路线制定人
-	 */
-   	@Column(name = "route_created_by" )
-	private String routeCreatedBy;
-
-	/**
-	 * 隐患原因
-	 */
-   	@Column(name = "hidden_danger_reason" )
-	private String hiddenDangerReason;
 
 	/**
 	 * 备注
@@ -163,7 +129,7 @@ public class BizPlan  implements Serializable {
 	private Integer enabled;
 
    	/**
-	 * 是否有效
+	 * 路线表id
 	 */
    	@Column(name = "route_id" )
 	private Integer routeId;
@@ -171,17 +137,21 @@ public class BizPlan  implements Serializable {
 	/**
 	 * 关键字
 	 */
-	@Column(name = "key" )
-	private String key;
+	@Column(name = "main_key" )
+	private String mainKey;
+
+	/**
+	 * 问题编号
+	 */
+	@Column(name = "trouble_code" )
+	private String troubleCode;
 
 	public BizPlan() {
 	}
 
-	public BizPlan(Integer id, String planName, String waterManagementOffice, String routeName, String planType, Date startTime, Date endTime, String planCreatedBy, Date planCreatedTime, String planStatus, String actProcess, String planProcess, String planPorid, String taskDesc, String routeType, Integer signIn, String area, Double pipeDiameter, String fixedPointInspectionType, Double planInspectionMileage, String routeCreatedBy, String hiddenDangerReason, String memo, Integer enabled, Integer routeId) {
+	public BizPlan(Integer id, String planName, String planType, Date startTime, Date endTime, String planCreatedBy, Date planCreatedTime, String planStatus, String actProcess, String planProcess, String planPorid, String taskDesc, String area, String memo, Integer enabled, Integer routeId, String mainKey, String troubleCode) {
 		this.id = id;
 		this.planName = planName;
-		this.waterManagementOffice = waterManagementOffice;
-		this.routeName = routeName;
 		this.planType = planType;
 		this.startTime = startTime;
 		this.endTime = endTime;
@@ -192,25 +162,12 @@ public class BizPlan  implements Serializable {
 		this.planProcess = planProcess;
 		this.planPorid = planPorid;
 		this.taskDesc = taskDesc;
-		this.routeType = routeType;
-		this.signIn = signIn;
 		this.area = area;
-		this.pipeDiameter = pipeDiameter;
-		this.fixedPointInspectionType = fixedPointInspectionType;
-		this.planInspectionMileage = planInspectionMileage;
-		this.routeCreatedBy = routeCreatedBy;
-		this.hiddenDangerReason = hiddenDangerReason;
 		this.memo = memo;
 		this.enabled = enabled;
 		this.routeId = routeId;
-	}
-
-	public String getKey() {
-		return key;
-	}
-
-	public void setKey(String key) {
-		this.key = key;
+		this.mainKey = mainKey;
+		this.troubleCode = troubleCode;
 	}
 
 	public static long getSerialVersionUID() {
@@ -231,22 +188,6 @@ public class BizPlan  implements Serializable {
 
 	public void setPlanName(String planName) {
 		this.planName = planName;
-	}
-
-	public String getWaterManagementOffice() {
-		return waterManagementOffice;
-	}
-
-	public void setWaterManagementOffice(String waterManagementOffice) {
-		this.waterManagementOffice = waterManagementOffice;
-	}
-
-	public String getRouteName() {
-		return routeName;
-	}
-
-	public void setRouteName(String routeName) {
-		this.routeName = routeName;
 	}
 
 	public String getPlanType() {
@@ -329,68 +270,12 @@ public class BizPlan  implements Serializable {
 		this.taskDesc = taskDesc;
 	}
 
-	public String getRouteType() {
-		return routeType;
-	}
-
-	public void setRouteType(String routeType) {
-		this.routeType = routeType;
-	}
-
-	public Integer getSignIn() {
-		return signIn;
-	}
-
-	public void setSignIn(Integer signIn) {
-		this.signIn = signIn;
-	}
-
 	public String getArea() {
 		return area;
 	}
 
 	public void setArea(String area) {
 		this.area = area;
-	}
-
-	public Double getPipeDiameter() {
-		return pipeDiameter;
-	}
-
-	public void setPipeDiameter(Double pipeDiameter) {
-		this.pipeDiameter = pipeDiameter;
-	}
-
-	public String getFixedPointInspectionType() {
-		return fixedPointInspectionType;
-	}
-
-	public void setFixedPointInspectionType(String fixedPointInspectionType) {
-		this.fixedPointInspectionType = fixedPointInspectionType;
-	}
-
-	public Double getPlanInspectionMileage() {
-		return planInspectionMileage;
-	}
-
-	public void setPlanInspectionMileage(Double planInspectionMileage) {
-		this.planInspectionMileage = planInspectionMileage;
-	}
-
-	public String getRouteCreatedBy() {
-		return routeCreatedBy;
-	}
-
-	public void setRouteCreatedBy(String routeCreatedBy) {
-		this.routeCreatedBy = routeCreatedBy;
-	}
-
-	public String getHiddenDangerReason() {
-		return hiddenDangerReason;
-	}
-
-	public void setHiddenDangerReason(String hiddenDangerReason) {
-		this.hiddenDangerReason = hiddenDangerReason;
 	}
 
 	public String getMemo() {
@@ -417,13 +302,27 @@ public class BizPlan  implements Serializable {
 		this.routeId = routeId;
 	}
 
+	public String getMainKey() {
+		return mainKey;
+	}
+
+	public void setMainKey(String mainKey) {
+		this.mainKey = mainKey;
+	}
+
+	public String getTroubleCode() {
+		return troubleCode;
+	}
+
+	public void setTroubleCode(String troubleCode) {
+		this.troubleCode = troubleCode;
+	}
+
 	@Override
 	public String toString() {
 		return "BizPlan{" +
 				"id=" + id +
 				", planName='" + planName + '\'' +
-				", waterManagementOffice='" + waterManagementOffice + '\'' +
-				", routeName='" + routeName + '\'' +
 				", planType='" + planType + '\'' +
 				", startTime=" + startTime +
 				", endTime=" + endTime +
@@ -434,17 +333,12 @@ public class BizPlan  implements Serializable {
 				", planProcess='" + planProcess + '\'' +
 				", planPorid='" + planPorid + '\'' +
 				", taskDesc='" + taskDesc + '\'' +
-				", routeType='" + routeType + '\'' +
-				", signIn=" + signIn +
 				", area='" + area + '\'' +
-				", pipeDiameter=" + pipeDiameter +
-				", fixedPointInspectionType='" + fixedPointInspectionType + '\'' +
-				", planInspectionMileage=" + planInspectionMileage +
-				", routeCreatedBy='" + routeCreatedBy + '\'' +
-				", hiddenDangerReason='" + hiddenDangerReason + '\'' +
 				", memo='" + memo + '\'' +
 				", enabled=" + enabled +
 				", routeId=" + routeId +
+				", mainKey='" + mainKey + '\'' +
+				", troubleCode='" + troubleCode + '\'' +
 				'}';
 	}
 }

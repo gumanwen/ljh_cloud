@@ -26,7 +26,14 @@ public enum EnumMenu {
 	COMPLETE("13", "'已完成'","计划类型"),
 	APPROVALED("14", "'已审核'","计划类型"),
 	UNPASS("15", "'审核不通过'","计划类型"),
-	DELETE("16", "'已删除'","计划类型");
+	DELETE("16", "'已删除'","计划类型"),
+
+	INSTWO("17", "2天一巡","计划周期"),
+	INSTRREE("18", "3天一巡","计划周期"),
+	INSSEVEN("19", "7天一巡","计划周期"),
+
+	USED("20", "启用","计划状态"),
+	UNUSED("21", "禁用","计划状态");
 
 	private String code;    //枚举值
 	private String desc;    //枚举描述
@@ -62,13 +69,13 @@ public enum EnumMenu {
 		this.mode = mode;
 	}
 
-	public static EnumMenu getEnumByKey(String code) {
+	public static String getEnumByKey(String code) {
 		if (null == code) {
 			return null;
 		}
 		for (EnumMenu temp : EnumMenu.values()) {
 			if (temp.getCode() == code) {
-				return temp;
+				return temp.getDesc();
 			}
 		}
 		return null;

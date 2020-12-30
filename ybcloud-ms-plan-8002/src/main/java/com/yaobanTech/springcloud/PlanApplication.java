@@ -7,7 +7,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@EnableFeignClients
+@EnableFeignClients(basePackages = "com.yaobanTech.springcloud.service")
 public class PlanApplication {
     public static void main(String[] args) {
         SpringApplication.run(PlanApplication.class, args);

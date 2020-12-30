@@ -14,5 +14,11 @@ public interface BizSignPointRepository extends JpaRepository<BizSignPoint,Integ
     @Query("update BizSignPoint t set t.enabled = '0' where t.id = ?1")
     BizSignPoint deleteSignPoint(Integer id);
 
-    List<BizSignPoint> findByRouteId(Integer routeId);
+    @Query(value = "SELECT a.*,b.route_type,b.point_inspection_type from biz_sign_point a LEFT JOIN biz_route b on a.route_id = b.id where a.id = ?1",nativeQuery = true)
+    //@Query(value = "SELECT new com.yaobanTech.springcloud.domain.RoutePoint(b,a) from BizSignPoint a,BizRoute b where a.routeId=b.id and a.id=?1")
+    BizSignPoint findSignPointById(Integer id);
+
+    @Query(value = "SELECT a.*,b.route_type,b.point_inspection_type from biz_sign_point a LEFT JOIN biz_route b on a.route_id = b.id where b.id = ?1",nativeQuery = true)
+    List<BizSignPoint> findSignPointListByRouteId(Integer routeId);
+
 }
