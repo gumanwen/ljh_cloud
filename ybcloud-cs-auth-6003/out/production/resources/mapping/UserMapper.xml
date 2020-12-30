@@ -274,4 +274,7 @@
     <select id="getMenuList" resultType="java.util.Map">
         select * from SEC_MENU where grade =#{grade}
     </select>
+    <select id="selectUserByRole" resultType="java.util.HashMap">
+        select a.* from SEC_USER a left join SEC_USER_ROLE b on a.id =b.user_id left join SEC_ROLE c on b.role_id=c.id where c.role_code=#{role}
+    </select>
 </mapper>

@@ -37,7 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @Api(value = "权限Controller" , tags = "用户权限--接口")
 @RestController
-@CrossOrigin
+//@CrossOrigin
 @RequestMapping("/user")
 public class UserController {
 
