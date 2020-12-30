@@ -88,8 +88,8 @@ configure(subprojects) {
  * 关闭父项目的打包功能
  */
 bootJar{
-    enabled=false
+    enabled=true
 }
 jar{
-    enabled=false
+    enabled=true
 }
