@@ -17,8 +17,6 @@ import java.util.HashMap;
 @RequestMapping("/api/route/signPoint")
 public class SignPointController {
 
-   /* @Value("${content}")
-    private String content;*/
     @Autowired
     @Lazy
     private SignPointServiceImpl signPointService;
@@ -51,5 +49,11 @@ public class SignPointController {
     @GetMapping("findList")
     public RespBean findList(@RequestParam Integer routeId){
         return signPointService.findList(routeId);
+    }
+
+    @ApiOperation("查询已签到签到列表")
+    @GetMapping("findSignedList")
+    public RespBean findSignedList(@RequestParam Integer routeId){
+        return signPointService.findSignedList(routeId);
     }
 }
