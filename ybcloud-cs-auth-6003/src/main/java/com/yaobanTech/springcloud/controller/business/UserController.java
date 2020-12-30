@@ -2,25 +2,19 @@ package com.yaobanTech.springcloud.controller.business;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
-
 import com.yaobanTech.springcloud.pojos.RespBean;
 import com.yaobanTech.springcloud.service.UserRightsService;
 import io.jsonwebtoken.Jwts;
-import io.netty.util.internal.StringUtil;
 import io.swagger.annotations.Api;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.endpoint.TokenEndpoint;
 import org.springframework.util.Base64Utils;
 import org.springframework.util.LinkedMultiValueMap;
@@ -28,7 +22,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
-
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -38,7 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @Api(value = "权限Controller" , tags = "用户权限--接口")
 @RestController
-@RequestMapping("/oauth")
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired

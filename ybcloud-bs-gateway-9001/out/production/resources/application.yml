@@ -23,6 +23,7 @@ spring:
     nacos:
       discovery:
         server-addr: 192.168.50.91:8848
+        ip: 192.168.50.167
       config:
         server-addr: 192.168.50.91:8848
         file-extension: properties
@@ -33,10 +34,6 @@ spring:
         locator:
           enabled: true #动态路由
       routes:
-        - id: cs-auth
-          uri: lb://auth2Service #负载均衡 动态路由
-          predicates:
-            - Path=/ou/**
         - id: cs-auth
           uri: lb://auth2Service #负载均衡 动态路由
           predicates:

@@ -20,4 +20,7 @@ public interface RouteService {
 
     @GetMapping("/api/route/way/findDetail")
     RespBean findDetail(@RequestParam("id")Integer id);
+
+    @GetMapping("/api/route/way/findSelection")
+    RespBean findSelection();
 }

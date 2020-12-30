@@ -1,5 +1,7 @@
 package com.yaobanTech.springcloud.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.yaobanTech.springcloud.entity.Inspect;
@@ -190,7 +192,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
 
     @Override
     @Transactional
-    public RespBean addTempTask(Integer routeId,String  routeName ,String inspector) {
+    public RespBean addTempTask(Integer routeId,String  routeName ,String inspector,String beginTime,String endTime) {
         Inspect inspect = new Inspect();
         if(FieldUtils.isObjectNotEmpty(routeId)){
             inspect.setRouteId(routeId);
@@ -198,6 +200,8 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
             inspect_task_id = redisGeneratorCode.createGenerateCode("临时任务","LS",true,4);
             inspect.setInspectTaskId(inspect_task_id);
             inspect.setTaskType("临时任务");
+            inspect.setBeginTime(beginTime);
+            inspect.setDeadTime(endTime);
             int id = inspectMapper.insert(inspect);
             return RespBean.ok("保存成功！"+ id );
         }else{
@@ -217,21 +221,26 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
             String cycleStr = (String) map.get("cycle");;
             Integer cycle = Integer.valueOf(cycleStr.substring(0,1));
             int days = DateUtils.daysBetween(start,end);
-            int nums = (int) Math.floor(days/cycle);
-            if(nums>1){
-                for(int i=0;i<nums;i++){
-                    Inspect inspect = new Inspect();
-                    String inspect_task_id = "";
-                    inspect_task_id = redisGeneratorCode.createGenerateCode("临时任务","LS",true,4);
-                    inspect.setInspectTaskId(inspect_task_id);
-                    inspect.setBeginTime(dateFormat.format(DateUtils.daysAdd(start,3*i)));
-                    inspect.setDeadTime(dateFormat.format(DateUtils.daysAdd(end,3*(i+1))));
-                    inspect.setPlanId(planId);
-                    inspect.setRouteId(routeId);
-                    inspectMapper.insert(inspect);
+            if(FieldUtils.isObjectNotEmpty(cycle) && FieldUtils.isObjectNotEmpty(start) && FieldUtils.isObjectNotEmpty(end)){
+                int nums = (int) Math.floor(days/cycle);
+                if(nums>1){
+                    for(int i=0;i<nums;i++){
+                        Inspect inspect = new Inspect();
+                        String inspect_task_id = "";
+                        inspect_task_id = redisGeneratorCode.createGenerateCode("临时任务","LS",true,4);
+                        inspect.setInspectTaskId(inspect_task_id);
+                        inspect.setBeginTime(dateFormat.format(DateUtils.daysAdd(start,3*i)));
+                        inspect.setDeadTime(dateFormat.format(DateUtils.daysAdd(end,3*(i+1))));
+                        inspect.setPlanId(planId);
+                        inspect.setRouteId(routeId);
+                        inspectMapper.insert(inspect);
+                    }
                 }
+                return RespBean.ok("生成任务完成！");
+            }else{
+                return RespBean.error("计划开始时间，计划结束时间或计划周期不完整，创建不了任务！");
             }
-            return RespBean.ok("生成任务完成！");
+
         }else{
             return RespBean.error("参数为空！");
         }
@@ -322,5 +331,17 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         }else{
             return RespBean.error("参数为空！");
         }
+    }
+
+    @Override
+    @Transactional
+    public RespBean send(Map<String, Object> params) {
+       /* List<PersonRate> list  = new ArrayList<>();
+        JSONArray jsonArray=JSONArray.parseArray((String) params.get("form"));
+        for(Object object : jsonArray){
+            //通过下标获取json数组中的数据
+            list.add(JSON.toJavaObject((JSON) object,PersonRate.class));
+        }*/
+        return null;
     }
 }

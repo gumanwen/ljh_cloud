@@ -18,12 +18,11 @@ spring:
       validation-timeout: 3000
       login-timeout: 5
   application:
-    name: auth2Service
+    name: secService
   cloud:
     nacos:
       discovery:
         server-addr: 192.168.50.91:8848
-        ip: 192.168.50.167
       config:
         server-addr: 192.168.50.91:8848
         file-extension: properties
@@ -51,7 +50,7 @@ mybatis-plus:
   configuration:
     call-setters-on-nulls: true
 server:
-  port: 6003
+  port: 6004
 management:
   endpoint:
     health:

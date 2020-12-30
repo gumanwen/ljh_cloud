@@ -26,7 +26,7 @@ public interface IInspectService extends IService<Inspect> {
 
     RespBean updateInspectDetailById(Map<String,Object> params);
 
-    RespBean addTempTask(Integer routeId,String  routeName ,String inspector);
+    RespBean addTempTask(Integer routeId,String  routeName ,String inspector,String beginTime,String endTime);
 
     RespBean addPlanTask(Integer routeId,String  routeName ,Integer planId,String planName) throws ParseException;
 
@@ -40,4 +40,5 @@ public interface IInspectService extends IService<Inspect> {
 
     RespBean autoCreate(Map<String, Object> params) throws ParseException;
 
+    RespBean send(Map<String, Object> params);
 }

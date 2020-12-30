@@ -3,11 +3,14 @@ package com.yaobanTech.springcloud.controller;
 
 import com.yaobanTech.springcloud.entity.utils.RespBean;
 import com.yaobanTech.springcloud.service.IInspectService;
+import com.yaobanTech.springcloud.service.feign.PlanService;
+import com.yaobanTech.springcloud.service.feign.RouteService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.text.ParseException;
 import java.util.Map;
 
@@ -23,6 +26,11 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/inspect")
 public class InspectController {
+    @Resource
+    private RouteService routeService;
+
+    @Resource
+    private PlanService planService;
 
     @Autowired
     private IInspectService iInspectService;
@@ -47,8 +55,8 @@ public class InspectController {
 
     @ApiOperation("web：新增临时任务")
     @GetMapping("/temp/addTempTask")
-    public RespBean addTempTask(Integer routeId,String  routeName ,String inspector) {
-        return iInspectService.addTempTask(routeId,routeName,inspector);
+    public RespBean addTempTask(Integer routeId,String  routeName ,String inspector,String beginTime,String endTime) {
+        return iInspectService.addTempTask(routeId,routeName,inspector,beginTime,endTime);
     }
 
     @ApiOperation("web：新增计划任务")
@@ -95,6 +103,25 @@ public class InspectController {
     public RespBean autoCreate(@RequestBody Map<String, Object> params) throws ParseException {
         //调用route的rest接口
         return iInspectService.autoCreate(params);
+    }
+
+    @ApiOperation("web：发起")
+    @PostMapping("/task/send")
+    public RespBean send(@RequestBody Map<String, Object> params) {
+        //调用route的rest接口
+        return iInspectService.send(params);
+    }
+
+    @ApiOperation("web：获取路线下拉列表")
+    @GetMapping("/route/findSelection")
+    public RespBean findSelection() {
+        return routeService.findSelection();
+    }
+
+    @ApiOperation("web：获取计划下拉列表")
+    @GetMapping("/plan/findSelection")
+    public RespBean findplanSelection() {
+        return planService.findSelection();
     }
 }
 

@@ -1,4 +1,3 @@
-/*
 
 package com.yaobanTech.springcloud.config.oauth2;
 
@@ -15,10 +14,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-*/
 /**
  * 鉴权过滤器 验证token
- *//*
+ */
 
 
 @Component
@@ -32,7 +30,7 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
         //2. 则获取响应
         ServerHttpResponse response = exchange.getResponse();
         //3. 如果是登录请求则放行
-        if (request.getURI().getPath().contains("/oauth")) {
+        if (request.getURI().getPath().contains("/user")) {
             return chain.filter(exchange);
         }
         //4. 获取请求头
@@ -67,4 +65,3 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
         return 0;
     }
 }
-*/
