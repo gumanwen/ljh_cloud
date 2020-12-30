@@ -3,7 +3,6 @@ package com.yaobanTech.springcloud.service;
 import com.alibaba.fastjson.JSONObject;
 import com.yaobanTech.springcloud.domain.BizPlan;
 import com.yaobanTech.springcloud.domain.RespBean;
-import com.yaobanTech.springcloud.domain.Selection;
 import com.yaobanTech.springcloud.domain.enumDef.EnumMenu;
 import com.yaobanTech.springcloud.repository.BizPlanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +10,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +27,8 @@ public class PlanService {
     @Lazy
     private InspectService inspectService;
 
+    SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     public RespBean savePlan(HashMap<String,Object> param) {
         BizPlan bizPlan = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizPlan.class);
         if(bizPlan != null) {
@@ -34,13 +36,14 @@ public class PlanService {
                 bizPlan.setEnabled(1);
                 BizPlan plan = bizPlanRepository.save(bizPlan);
                 String code = bizPlan.getPlanPorid();
-                String desc = EnumMenu.getEnumByKey(code).getDesc();
+                EnumMenu key = EnumMenu.getEnumByKey(code);
+                String desc = key.getDesc();
                 String period = desc.substring(0, 1);
                 HashMap<String,Object> map = new HashMap<>();
                 map.put("routeId",bizPlan.getRouteId());
                 map.put("planId",bizPlan.getId());
-                map.put("startTime",bizPlan.getStartTime());
-                map.put("endTime",bizPlan.getEndTime());
+                map.put("startTime",dateFormat.format(bizPlan.getStartTime()));
+                map.put("endTime",dateFormat.format(bizPlan.getEndTime()));
                 map.put("period",period);
                 inspectService.sendInspectInfo(map);
             } catch (Exception
@@ -104,7 +107,7 @@ public class PlanService {
     }
 
     public RespBean findSelection(){
-        List<Selection> selection = bizPlanRepository.findSelection();
+        List<HashMap<String,Object>> selection = bizPlanRepository.findSelection();
         return RespBean.ok("查询成功！",selection);
     }
 

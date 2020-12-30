@@ -70,7 +70,7 @@ public enum EnumMenu {
 			return null;
 		}
 		for (EnumMenu temp : EnumMenu.values()) {
-			if (temp.getCode() == code) {
+			if (temp.getCode().equals(code)) {
 				return temp;
 			}
 		}

@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.yaobanTech.springcloud.domain.BizRoute;
 import com.yaobanTech.springcloud.domain.BizSignPoint;
 import com.yaobanTech.springcloud.domain.RespBean;
-import com.yaobanTech.springcloud.domain.Selection;
 import com.yaobanTech.springcloud.domain.enumDef.EnumMenu;
 import com.yaobanTech.springcloud.repository.BizRouteRepository;
 import com.yaobanTech.springcloud.repository.BizSignPointRepository;
@@ -18,7 +17,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.util.*;
 
@@ -153,7 +151,7 @@ public class RouteServiceImpl {
     }
 
     public RespBean findSelection(){
-        List<Selection> selection = bizRouteRepository.findSelection();
+        List<HashMap<String, Object>> selection = bizRouteRepository.findSelection();
         return RespBean.ok("查询成功！",selection);
     }
 
