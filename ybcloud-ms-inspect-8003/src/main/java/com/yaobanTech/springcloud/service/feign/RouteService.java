@@ -23,4 +23,7 @@ public interface RouteService {
 
     @GetMapping("/api/route/way/findSelection")
     RespBean findSelection();
+
+    @GetMapping("/api/route/signPoint/findSignedList")
+    RespBean findSignedList(@RequestParam("routeId") Integer routeId);
 }

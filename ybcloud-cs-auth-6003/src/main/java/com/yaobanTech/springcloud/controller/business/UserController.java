@@ -3,9 +3,14 @@ package com.yaobanTech.springcloud.controller.business;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+
+import com.yaobanTech.springcloud.pojos.JwtUser;
 import com.yaobanTech.springcloud.pojos.RespBean;
+import com.yaobanTech.springcloud.pojos.User;
 import com.yaobanTech.springcloud.service.UserRightsService;
+import com.yaobanTech.springcloud.service.UserService;
 import io.jsonwebtoken.Jwts;
 import io.swagger.annotations.Api;
 import org.apache.commons.lang.StringUtils;
@@ -15,6 +20,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.provider.endpoint.TokenEndpoint;
 import org.springframework.util.Base64Utils;
 import org.springframework.util.LinkedMultiValueMap;
@@ -31,6 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @Api(value = "权限Controller" , tags = "用户权限--接口")
 @RestController
+@CrossOrigin
 @RequestMapping("/user")
 public class UserController {
 
@@ -42,6 +49,8 @@ public class UserController {
     TokenEndpoint tokenEndPoint;
     @Autowired
     private RestTemplate restTemplate;
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/getCurrentUser")
     public Object getCurrentUser(HttpServletRequest request) {
@@ -94,9 +103,18 @@ public class UserController {
         //AuthToken authToken = new AuthToken().setAccessToken((String) map.get("access_token")).setRefreshToken((String) map.get("refresh_token")).setJwtToken((String) map.get("jti"));
         //3.将jti作为redis中的key,将jwt作为redis中的value进行数据的存放
         //stringRedisTemplate.boundValueOps(authToken.getJwtToken()).set(authToken.getAccessToken(), ttl, TimeUnit.SECONDS);
-        HashMap<String,String> result = new HashMap<>();
+        HashMap<String,Object> result = new HashMap<>();
+        JwtUser u = userService.loadUserByUsername(username);
+        Iterator iterator = u.getAuthorities().iterator();
+        Object object =null;
+        while(iterator.hasNext()) {
+            object = iterator.next();
+            //这里的Object就是你专的集合里的数据类型，不知道可以属object.getClass看看
+        }
         result.put("username",username);
-        result.put("token", (String) map.get("access_token"));
+        result.put("userId",u.getId());
+        result.put("roles", String.valueOf(object));
+        result.put("token", map.get("access_token"));
         return RespBean.ok("登录成功！").setObj(result);
     }
     private String getHttpBasic(String clientId, String clientSecret) {

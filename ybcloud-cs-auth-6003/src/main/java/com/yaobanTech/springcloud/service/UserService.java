@@ -20,12 +20,11 @@ public class UserService implements UserDetailsService {
     private LinkedHashMap<Object, Object> part;
 
     public void save(User user) {
-
         userMapper.save(user);
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public JwtUser loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userMapper.loadUserByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException("用户名不存在!");
@@ -33,5 +32,6 @@ public class UserService implements UserDetailsService {
         //user.setRole(userMapper.getHrRolesById(user.getId()));
         return new JwtUser(user);
     }
+
 
 }

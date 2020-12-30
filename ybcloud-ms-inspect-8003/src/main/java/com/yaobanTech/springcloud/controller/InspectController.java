@@ -123,5 +123,11 @@ public class InspectController {
     public RespBean findplanSelection() {
         return planService.findSelection();
     }
+
+    @ApiOperation("app:获取已签到列表")
+    @GetMapping("/point/getPointedList")
+    public RespBean getPointedList(@RequestParam("routeId") Integer routeId){
+        return routeService.findSignedList(routeId);
+    }
 }
 

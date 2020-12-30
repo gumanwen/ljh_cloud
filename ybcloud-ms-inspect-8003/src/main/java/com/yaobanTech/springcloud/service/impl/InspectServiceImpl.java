@@ -219,9 +219,9 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
             Date start = (Date) map.get("begin_time");
             Date end = (Date) map.get("end_time");
             String cycleStr = (String) map.get("cycle");;
-            Integer cycle = Integer.valueOf(cycleStr.substring(0,1));
             int days = DateUtils.daysBetween(start,end);
-            if(FieldUtils.isObjectNotEmpty(cycle) && FieldUtils.isObjectNotEmpty(start) && FieldUtils.isObjectNotEmpty(end)){
+            if(FieldUtils.isStringNotEmpty(cycleStr) && FieldUtils.isObjectNotEmpty(start) && FieldUtils.isObjectNotEmpty(end)){
+                Integer cycle = Integer.valueOf(cycleStr.substring(0,1));
                 int nums = (int) Math.floor(days/cycle);
                 if(nums>1){
                     for(int i=0;i<nums;i++){
