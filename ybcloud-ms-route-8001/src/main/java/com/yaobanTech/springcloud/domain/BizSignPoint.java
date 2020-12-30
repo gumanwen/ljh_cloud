@@ -1,7 +1,11 @@
 package com.yaobanTech.springcloud.domain;
 
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.SelectBeforeUpdate;
+
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @Description  
@@ -129,7 +133,7 @@ public class BizSignPoint  implements Serializable {
 	 * 排放时间
 	 */
 	@Column(name = "discharge_time" )
-	private String dischargeTime;
+	private Date dischargeTime;
 
 	/**
 	 * 估算排水量
@@ -149,6 +153,51 @@ public class BizSignPoint  implements Serializable {
 	@Column(name = "point_inspection_type" )
 	private String pointInspectionType;
 
+	/**
+	 * 签到点状态
+	 */
+	@Column(name = "sign_point_status" )
+	private String signPointStatus;
+
+	/**
+	 * 修改时间
+	 */
+	@Column(name = "modify_time" )
+	private Date modifyTime;
+
+	public BizSignPoint() {
+	}
+
+	public BizSignPoint(Integer id, String signPointCode, String currentChoosedAddress, String troubleCode, String troubleReason, String hiddenDangerType, String handleSuggestion, Integer enabled, Integer routeId, String location, String pipeDiameter, String memo, String siteConditions, String siteConditionsDesc, String hiddenDangerAddress, String hiddenDangerReason, String dischargeAddress, String dischargeTimeLast, Date dischargeTime, String estimatedDischarge, String routeType, String pointInspectionType, String signPointStatus, Date modifyTime) {
+		this.id = id;
+		this.signPointCode = signPointCode;
+		this.currentChoosedAddress = currentChoosedAddress;
+		this.troubleCode = troubleCode;
+		this.troubleReason = troubleReason;
+		this.hiddenDangerType = hiddenDangerType;
+		this.handleSuggestion = handleSuggestion;
+		this.enabled = enabled;
+		this.routeId = routeId;
+		this.location = location;
+		this.pipeDiameter = pipeDiameter;
+		this.memo = memo;
+		this.siteConditions = siteConditions;
+		this.siteConditionsDesc = siteConditionsDesc;
+		this.hiddenDangerAddress = hiddenDangerAddress;
+		this.hiddenDangerReason = hiddenDangerReason;
+		this.dischargeAddress = dischargeAddress;
+		this.dischargeTimeLast = dischargeTimeLast;
+		this.dischargeTime = dischargeTime;
+		this.estimatedDischarge = estimatedDischarge;
+		this.routeType = routeType;
+		this.pointInspectionType = pointInspectionType;
+		this.signPointStatus = signPointStatus;
+		this.modifyTime = modifyTime;
+	}
+
+	public static long getSerialVersionUID() {
+		return serialVersionUID;
+	}
 
 	public Integer getId() {
 		return id;
@@ -158,8 +207,16 @@ public class BizSignPoint  implements Serializable {
 		this.id = id;
 	}
 
+	public String getSignPointCode() {
+		return signPointCode;
+	}
+
+	public void setSignPointCode(String signPointCode) {
+		this.signPointCode = signPointCode;
+	}
+
 	public String getCurrentChoosedAddress() {
-		return this.currentChoosedAddress;
+		return currentChoosedAddress;
 	}
 
 	public void setCurrentChoosedAddress(String currentChoosedAddress) {
@@ -167,7 +224,7 @@ public class BizSignPoint  implements Serializable {
 	}
 
 	public String getTroubleCode() {
-		return this.troubleCode;
+		return troubleCode;
 	}
 
 	public void setTroubleCode(String troubleCode) {
@@ -175,7 +232,7 @@ public class BizSignPoint  implements Serializable {
 	}
 
 	public String getTroubleReason() {
-		return this.troubleReason;
+		return troubleReason;
 	}
 
 	public void setTroubleReason(String troubleReason) {
@@ -191,7 +248,7 @@ public class BizSignPoint  implements Serializable {
 	}
 
 	public String getHandleSuggestion() {
-		return this.handleSuggestion;
+		return handleSuggestion;
 	}
 
 	public void setHandleSuggestion(String handleSuggestion) {
@@ -220,21 +277,6 @@ public class BizSignPoint  implements Serializable {
 
 	public void setLocation(String location) {
 		this.location = location;
-	}
-
-	public String getSignPointCode() {
-		return signPointCode;
-	}
-
-	public void setSignPointCode(String signPointCode) {
-		this.signPointCode = signPointCode;
-	}
-
-	public BizSignPoint() {
-	}
-
-	public static long getSerialVersionUID() {
-		return serialVersionUID;
 	}
 
 	public String getPipeDiameter() {
@@ -301,11 +343,11 @@ public class BizSignPoint  implements Serializable {
 		this.dischargeTimeLast = dischargeTimeLast;
 	}
 
-	public String getDischargeTime() {
+	public Date getDischargeTime() {
 		return dischargeTime;
 	}
 
-	public void setDischargeTime(String dischargeTime) {
+	public void setDischargeTime(Date dischargeTime) {
 		this.dischargeTime = dischargeTime;
 	}
 
@@ -333,29 +375,20 @@ public class BizSignPoint  implements Serializable {
 		this.pointInspectionType = pointInspectionType;
 	}
 
-	public BizSignPoint(Integer id, String signPointCode, String currentChoosedAddress, String troubleCode, String troubleReason, String hiddenDangerType, String handleSuggestion, Integer enabled, Integer routeId, String location, String pipeDiameter, String memo, String siteConditions, String siteConditionsDesc, String hiddenDangerAddress, String hiddenDangerReason, String dischargeAddress, String dischargeTimeLast, String dischargeTime, String estimatedDischarge, String routeType, String pointInspectionType) {
-		this.id = id;
-		this.signPointCode = signPointCode;
-		this.currentChoosedAddress = currentChoosedAddress;
-		this.troubleCode = troubleCode;
-		this.troubleReason = troubleReason;
-		this.hiddenDangerType = hiddenDangerType;
-		this.handleSuggestion = handleSuggestion;
-		this.enabled = enabled;
-		this.routeId = routeId;
-		this.location = location;
-		this.pipeDiameter = pipeDiameter;
-		this.memo = memo;
-		this.siteConditions = siteConditions;
-		this.siteConditionsDesc = siteConditionsDesc;
-		this.hiddenDangerAddress = hiddenDangerAddress;
-		this.hiddenDangerReason = hiddenDangerReason;
-		this.dischargeAddress = dischargeAddress;
-		this.dischargeTimeLast = dischargeTimeLast;
-		this.dischargeTime = dischargeTime;
-		this.estimatedDischarge = estimatedDischarge;
-		this.routeType = routeType;
-		this.pointInspectionType = pointInspectionType;
+	public String getSignPointStatus() {
+		return signPointStatus;
+	}
+
+	public void setSignPointStatus(String signPointStatus) {
+		this.signPointStatus = signPointStatus;
+	}
+
+	public Date getModifyTime() {
+		return modifyTime;
+	}
+
+	public void setModifyTime(Date modifyTime) {
+		this.modifyTime = modifyTime;
 	}
 
 	@Override
@@ -379,10 +412,12 @@ public class BizSignPoint  implements Serializable {
 				", hiddenDangerReason='" + hiddenDangerReason + '\'' +
 				", dischargeAddress='" + dischargeAddress + '\'' +
 				", dischargeTimeLast='" + dischargeTimeLast + '\'' +
-				", dischargeTime='" + dischargeTime + '\'' +
+				", dischargeTime=" + dischargeTime +
 				", estimatedDischarge='" + estimatedDischarge + '\'' +
-
-
+				", routeType='" + routeType + '\'' +
+				", pointInspectionType='" + pointInspectionType + '\'' +
+				", signPointStatus='" + signPointStatus + '\'' +
+				", modifyTime=" + modifyTime +
 				'}';
 	}
 }

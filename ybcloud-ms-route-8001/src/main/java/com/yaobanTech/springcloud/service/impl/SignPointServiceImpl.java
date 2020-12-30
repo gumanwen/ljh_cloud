@@ -3,11 +3,13 @@ package com.yaobanTech.springcloud.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.yaobanTech.springcloud.domain.BizSignPoint;
 import com.yaobanTech.springcloud.domain.RespBean;
+import com.yaobanTech.springcloud.repository.BizSignPointMapper;
 import com.yaobanTech.springcloud.repository.BizSignPointRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -17,10 +19,16 @@ public class SignPointServiceImpl {
     @Lazy
     private BizSignPointRepository signPointRepository;
 
+    @Autowired
+    @Lazy
+    private BizSignPointMapper bizSignPointMapper;
+
     public RespBean saveSignPoint(HashMap<String,Object> param) {
         BizSignPoint bizSignPoint = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizSignPoint.class);
         if(bizSignPoint != null) {
             try {
+                bizSignPoint.setSignPointStatus("未签到");
+                bizSignPoint.setEnabled(1);
                 BizSignPoint signPoint = signPointRepository.save(bizSignPoint);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -37,7 +45,8 @@ public class SignPointServiceImpl {
             BizSignPoint bizSignPoint = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizSignPoint.class);
             if(bizSignPoint.getId() != null){
             try {
-                BizSignPoint signPoint = signPointRepository.save(bizSignPoint);
+                bizSignPoint.setModifyTime(new Date());
+                bizSignPointMapper.update(bizSignPoint);
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("修改失败！");
@@ -86,6 +95,21 @@ public class SignPointServiceImpl {
         if(routeId != null) {
             try {
                  list = signPointRepository.findSignPointListByRouteId(routeId);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return RespBean.error("查询失败！");
+            }
+        }else{
+            return RespBean.error("id为空！");
+        }
+        return RespBean.ok("查询成功！",list);
+    }
+
+    public RespBean findSignedList(Integer routeId) {
+        List<BizSignPoint> list = null;
+        if(routeId != null) {
+            try {
+                list = signPointRepository.findSignedList(routeId);
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("查询失败！");

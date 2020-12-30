@@ -137,6 +137,12 @@ public class BizRoute  implements Serializable {
 	private String modifyBy;
 
 	/**
+	 * 图片地址
+	 */
+	@Column(name = "addr" )
+	private String addr;
+
+	/**
 	 * 签到点
 	 */
    	@OneToMany(targetEntity = BizSignPoint.class,fetch = FetchType.EAGER)
@@ -163,6 +169,14 @@ public class BizRoute  implements Serializable {
 		this.location = location;
 		this.pointInspectionType = pointInspectionType;
 		this.bizSignPoints = bizSignPoints;
+	}
+
+	public String getAddr() {
+		return addr;
+	}
+
+	public void setAddr(String addr) {
+		this.addr = addr;
 	}
 
 	public String getHiddenDangerReason() {

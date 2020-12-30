@@ -66,13 +66,13 @@ public class RouteServiceImpl {
         BizRoute bizRoute = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizRoute.class);
         if(bizRoute.getId() != null && !bizRoute.getBizSignPoints().isEmpty()) {
             try {
-//                List<BizSignPoint> pointList = bizRoute.getBizSignPoints();
-//                for (int i = 0; i <pointList.size() ; i++) {
-//                    Integer id = pointList.get(i).getId();
-//                    if(id == null || "".equals(id)){
-//                        return RespBean.error("签到点ID为空,修改失败！");
-//                    }
-//                }
+                List<BizSignPoint> pointList = bizRoute.getBizSignPoints();
+                for (int i = 0; i <pointList.size() ; i++) {
+                    Integer id = pointList.get(i).getId();
+                    if(id == null || "".equals(id)){
+                        return RespBean.error("签到点ID为空,修改失败！");
+                    }
+                }
                 List<BizSignPoint> list = bizSignPointRepository.saveAll(bizRoute.getBizSignPoints());
                 BizRoute route = bizRouteRepository.save(bizRoute);
 
