@@ -1,6 +1,5 @@
 package com.yaobanTech.springcloud.controller;
 
-import com.yaobanTech.springcloud.domain.BizPlan;
 import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.service.InspectService;
 import com.yaobanTech.springcloud.service.PlanService;
@@ -11,6 +10,7 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 
 @RestController
@@ -29,8 +29,8 @@ public class PlanController {
 
     @ApiOperation("保存巡查计划")
     @PostMapping("add")
-    public RespBean savePlan(@RequestBody HashMap<String, Object> param) {
-        return planService.savePlan(param);
+    public RespBean savePlan(@RequestBody HashMap<String, Object> param, HttpServletRequest request) {
+        return planService.savePlan(param,request);
     }
 
     @ApiOperation("修改巡查计划")
@@ -60,8 +60,8 @@ public class PlanController {
 
     @ApiOperation("查询计划列表")
     @GetMapping("findAll")
-    public RespBean findAll() {
-        return planService.findAll();
+    public RespBean findAll(HttpServletRequest request) {
+        return planService.findAll(request);
     }
 
     @ApiOperation("查询计划详情")

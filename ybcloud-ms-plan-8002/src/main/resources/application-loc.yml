@@ -1,10 +1,10 @@
 #druid监控台配置信息，主要用作sql监控，还能用来监控url等
-druid:
-  allow:
-    ip: 127.0.0.1
-  login:
-    user_name: root
-    password: root
+#druid:
+#  allow:
+#    ip: 127.0.0.1
+#  login:
+#    user_name: root
+#    password: root
 spring:
   main:
     allow-bean-definition-overriding: true

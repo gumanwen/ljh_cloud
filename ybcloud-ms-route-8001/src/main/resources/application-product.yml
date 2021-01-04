@@ -1,10 +1,4 @@
 #druid监控台配置信息，主要用作sql监控，还能用来监控url等
-druid:
-  allow:
-    ip: 127.0.0.1
-  login:
-    user_name: root
-    password: root
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -31,6 +25,9 @@ spring:
     name: routeService
   cloud:
     nacos:
+      discovery:
+        server-addr: 10.1.4.16:8848 #Nacos作为服务中心地址
+        ip: 10.1.4.16
       config:
         server-addr: 10.1.4.16:8848
         file-extension: properties

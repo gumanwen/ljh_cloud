@@ -24,8 +24,8 @@ public class RouteController {
 
     @ApiOperation("保存巡查路线")
     @PostMapping("add")
-    public RespBean saveRoute(@RequestBody HashMap<String,Object> param){
-        return routeService.saveRoute(param);
+    public RespBean saveRoute(@RequestBody HashMap<String,Object> param,HttpServletRequest request){
+        return routeService.saveRoute(param,request);
     }
 
     @ApiOperation("修改巡查路线")
@@ -48,8 +48,8 @@ public class RouteController {
 
     @ApiOperation("查询路线列表")
     @GetMapping("findList")
-    public RespBean findList(){
-        return routeService.findAll();
+    public RespBean findList(HttpServletRequest request){
+        return routeService.findAll(request);
     }
 
     @ApiOperation("查询路线名称和id")
@@ -62,6 +62,12 @@ public class RouteController {
     @GetMapping("findEnumMenu")
     public RespBean findEnumMenu(@RequestParam String mode){
         return routeService.findEnumMenu(mode);
+    }
+
+    @ApiOperation("查询单个枚举对象")
+    @GetMapping("findEnum")
+    public RespBean findEnum(@RequestParam String code){
+        return routeService.findEnum(code);
     }
 
 }

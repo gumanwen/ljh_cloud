@@ -1,6 +1,9 @@
-apply plugin: 'org.springframework.boot'
 
 //自定义打包配置
+bootJar {
+    baseName = 'routeService'
+    version = '0.1.0'
+}
 
 //依赖
 dependencies {

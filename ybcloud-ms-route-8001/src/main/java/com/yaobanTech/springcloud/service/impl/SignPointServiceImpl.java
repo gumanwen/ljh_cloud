@@ -46,6 +46,7 @@ public class SignPointServiceImpl {
             if(bizSignPoint.getId() != null){
             try {
                 bizSignPoint.setModifyTime(new Date());
+                bizSignPoint.setSignPointStatus("已签到");
                 bizSignPointMapper.update(bizSignPoint);
             } catch (Exception e) {
                 e.printStackTrace();
