@@ -37,13 +37,12 @@ public class RouteServiceImpl {
     @Lazy
     private OauthService oauthService;
 
-
     public RespBean saveRoute(HashMap<String,Object> param,HttpServletRequest request) {
         String header = request.getHeader("Authorization");
         String token =  StringUtils.substringAfter(header, "Bearer ");
         String user = (String) oauthService.getCurrentUser(token).getObj();
         BizRoute bizRoute = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizRoute.class);
-        if(bizRoute != null && !bizRoute.getBizSignPoints().isEmpty()) {
+        if(bizRoute != null && !bizRoute.getBizSignPoints().isEmpty() && bizRoute.getId() == null) {
             try {
                 List<BizSignPoint> pointList = bizRoute.getBizSignPoints();
                 for (int i = 0; i <pointList.size() ; i++) {
@@ -57,7 +56,6 @@ public class RouteServiceImpl {
                 bizRoute.setRouteCreator(user);
                 bizRoute.setEnabled(1);
                 BizRoute route = bizRouteRepository.save(bizRoute);
-
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("保存失败！");
@@ -159,7 +157,7 @@ public class RouteServiceImpl {
         List<BizRoute> list = bizRouteRepository.findList(user);
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
-                list.get(i).setRouteCreator(chineseName);
+                list.get(i).setRouteCreator(user);
             }
         }
         return RespBean.ok("查询成功！",list);

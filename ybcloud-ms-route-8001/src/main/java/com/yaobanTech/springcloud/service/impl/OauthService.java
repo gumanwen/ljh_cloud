@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 public interface OauthService {
     @GetMapping("/user/userRight/getNameByUsername")
     RespBean getChineseName(@RequestParam("username")  String username);
+
     @GetMapping("/user/userRight/getCurrentUser")
     RespBean getCurrentUser(@RequestParam("token") String token);
 }

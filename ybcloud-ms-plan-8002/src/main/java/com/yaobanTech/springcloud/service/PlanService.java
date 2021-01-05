@@ -116,7 +116,7 @@ public class PlanService {
         String token =  StringUtils.substringAfter(header, "Bearer ");
         String user = (String) oauthService.getCurrentUser(token).getObj();
         String chineseName = (String) oauthService.getChineseName(user).getObj();
-        List<BizPlan> list = bizPlanRepository.findList();
+        List<BizPlan> list = bizPlanRepository.findList(user);
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
                 list.get(i).setPlanCreatedBy(chineseName);
