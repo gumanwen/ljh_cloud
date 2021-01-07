@@ -1,8 +1,6 @@
 package com.yaobanTech.springcloud.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.SelectBeforeUpdate;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -16,8 +14,8 @@ import java.util.Date;
  */
 
 @Entity
-@Table ( name ="biz_sign_point" )
-public class BizSignPoint  implements Serializable {
+@Table ( name ="biz_signed_point" )
+public class BizSignedPoint implements Serializable {
 
 	private static final long serialVersionUID =  96987551705552753L;
 
@@ -177,10 +175,23 @@ public class BizSignPoint  implements Serializable {
 	@Column(name = "modify_time" )
 	private Date modifyTime;
 
-	public BizSignPoint() {
+	/**
+	 * 任务表id
+	 */
+	@Column(name = "task_id" )
+	private String taskId;
+
+	/**
+	 * 文件类型
+	 */
+	@Column(name = "file_type" )
+	private String fileType;
+
+
+	public BizSignedPoint() {
 	}
 
-	public BizSignPoint(Integer id, String signPointCode, String currentChoosedAddress, String troubleCode, String troubleReason, String hiddenDangerType, String handleSuggestion, Integer enabled, Integer routeId, String location, String pipeDiameter, String memo, String siteConditions, String siteConditionsDesc, String hiddenDangerAddress, String hiddenDangerReason, String dischargeAddress, String dischargeTimeLast, Date dischargeTime, String estimatedDischarge, String routeType, String pointInspectionType, String signPointStatus, Date modifyTime) {
+	public BizSignedPoint(Integer id, String signPointCode, String currentChoosedAddress, String troubleCode, String troubleReason, String hiddenDangerType, String handleSuggestion, Integer enabled, Integer routeId, String location, String pipeDiameter, String memo, String siteConditions, String siteConditionsDesc, String hiddenDangerAddress, String hiddenDangerReason, String dischargeAddress, String dischargeTimeLast, Date dischargeTime, String estimatedDischarge, String routeType, String pointInspectionType, String signPointStatus, Date modifyTime) {
 		this.id = id;
 		this.signPointCode = signPointCode;
 		this.currentChoosedAddress = currentChoosedAddress;
@@ -205,6 +216,22 @@ public class BizSignPoint  implements Serializable {
 		this.pointInspectionType = pointInspectionType;
 		this.signPointStatus = signPointStatus;
 		this.modifyTime = modifyTime;
+	}
+
+	public String getFileType() {
+		return fileType;
+	}
+
+	public void setFileType(String fileType) {
+		this.fileType = fileType;
+	}
+
+	public String getTaskId() {
+		return taskId;
+	}
+
+	public void setTaskId(String taskId) {
+		this.taskId = taskId;
 	}
 
 	public static long getSerialVersionUID() {

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface OauthService {
     @GetMapping("/user/userRight/getNameByUsername")
     RespBean getChineseName(@RequestParam("username")  String username);
+
     @GetMapping("/user/userRight/getCurrentUser")
     RespBean getCurrentUser(@RequestParam("token") String token);
 }

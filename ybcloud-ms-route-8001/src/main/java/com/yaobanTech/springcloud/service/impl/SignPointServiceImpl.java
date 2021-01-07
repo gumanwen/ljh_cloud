@@ -2,9 +2,11 @@ package com.yaobanTech.springcloud.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.yaobanTech.springcloud.domain.BizSignPoint;
+import com.yaobanTech.springcloud.domain.BizSignedPoint;
 import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.repository.BizSignPointMapper;
 import com.yaobanTech.springcloud.repository.BizSignPointRepository;
+import com.yaobanTech.springcloud.repository.BizSignedPointRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -21,13 +23,17 @@ public class SignPointServiceImpl {
 
     @Autowired
     @Lazy
+    private BizSignedPointRepository signedPointRepository;
+
+    @Autowired
+    @Lazy
     private BizSignPointMapper bizSignPointMapper;
 
     public RespBean saveSignPoint(HashMap<String,Object> param) {
         BizSignPoint bizSignPoint = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizSignPoint.class);
         if(bizSignPoint != null) {
             try {
-                bizSignPoint.setSignPointStatus("未签到");
+//                bizSignPoint.setSignPointStatus("未签到");
                 bizSignPoint.setEnabled(1);
                 BizSignPoint signPoint = signPointRepository.save(bizSignPoint);
             } catch (Exception e) {
@@ -41,13 +47,16 @@ public class SignPointServiceImpl {
     }
 
     public RespBean updateSignPoint(HashMap<String,Object> param) {
+        BizSignedPoint bizSignedPoint = null;
         if(!param.isEmpty() && param.get("form") != null) {
-            BizSignPoint bizSignPoint = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizSignPoint.class);
-            if(bizSignPoint.getId() != null){
+             bizSignedPoint = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizSignedPoint.class);
+            BizSignPoint signPoint = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizSignPoint.class);
+            if(bizSignedPoint != null){
             try {
-                bizSignPoint.setModifyTime(new Date());
-                bizSignPoint.setSignPointStatus("已签到");
-                bizSignPointMapper.update(bizSignPoint);
+                bizSignedPoint.setModifyTime(new Date());
+                signPoint.setSignPointStatus("已签到");
+                signPointRepository.save(signPoint);
+                BizSignedPoint signedPoint = signedPointRepository.save(bizSignedPoint);
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("修改失败！");
@@ -55,7 +64,7 @@ public class SignPointServiceImpl {
         }else{
             return RespBean.error("id为空！");
         }
-        return RespBean.ok("修改成功！");
+        return RespBean.ok("修改成功！",bizSignedPoint.getId());
         }else{
             return RespBean.error("参数为空！");
         }
@@ -106,11 +115,11 @@ public class SignPointServiceImpl {
         return RespBean.ok("查询成功！",list);
     }
 
-    public RespBean findSignedList(Integer routeId) {
-        List<BizSignPoint> list = null;
-        if(routeId != null) {
+    public RespBean findSignedList(Integer routeId,String taskId) {
+        List<BizSignedPoint> list = null;
+        if(taskId != null) {
             try {
-                list = signPointRepository.findSignedList(routeId);
+                list = signedPointRepository.findSignedList(routeId,taskId);
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("查询失败！");

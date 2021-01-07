@@ -33,6 +33,10 @@ public class PlanService {
     @Lazy
     private OauthService oauthService;
 
+    @Autowired
+    @Lazy
+    private PlanMapper planMapper;
+
     SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public RespBean savePlan(HashMap<String,Object> param, HttpServletRequest request) {
@@ -115,8 +119,9 @@ public class PlanService {
         String header = request.getHeader("Authorization");
         String token =  StringUtils.substringAfter(header, "Bearer ");
         String user = (String) oauthService.getCurrentUser(token).getObj();
+        //List<BizPlan> list = bizPlanRepository.findList(user);
+        List<BizPlan> list = planMapper.findAll(user);
         String chineseName = (String) oauthService.getChineseName(user).getObj();
-        List<BizPlan> list = bizPlanRepository.findList(user);
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
                 list.get(i).setPlanCreatedBy(chineseName);

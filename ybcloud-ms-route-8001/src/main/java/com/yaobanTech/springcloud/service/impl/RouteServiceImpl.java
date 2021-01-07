@@ -63,7 +63,7 @@ public class RouteServiceImpl {
         }else{
             return RespBean.error("数据为空！");
         }
-        return RespBean.ok("保存成功！",bizRoute);
+        return RespBean.ok("保存成功！",bizRoute.getBizSignPoints());
     }
 
     public RespBean updateRoute(HashMap<String,Object> param) {
