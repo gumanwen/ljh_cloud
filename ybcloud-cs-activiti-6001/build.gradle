@@ -1,7 +1,10 @@
 apply plugin: 'org.springframework.boot'
 
 //自定义打包配置
-
+bootJar {
+    baseName = 'activitiService'
+    version = '0.1.0'
+}
 //依赖
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -25,5 +28,4 @@ dependencies {
     testCompile group: 'org.activiti', name: 'activiti-bpmn-layout', version: '7.0.0.Beta1'
     // https://mvnrepository.com/artifact/org.activiti.cloud/activiti-cloud-services-api
     compile group: 'org.activiti.cloud', name: 'activiti-cloud-services-api', version: '7.0.0.Beta1'
-
 }

@@ -3,9 +3,12 @@ package com.yaobanTech.springcloud.service;
 import com.alibaba.fastjson.JSONObject;
 import com.yaobanTech.springcloud.mapper.UserMapper;
 import com.yaobanTech.springcloud.pojos.RespBean;
+import com.yaobanTech.springcloud.pojos.User;
 import com.yaobanTech.springcloud.utils.FieldUtils;
+import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -14,11 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class UserRightsService {
@@ -418,4 +419,41 @@ public class UserRightsService {
             return RespBean.error("缺少角色代码！");
         }
     }
+
+    public RespBean getNameByUsername(String username) {
+        if(FieldUtils.isStringNotEmpty(username)){
+            User user = userMapper.loadUserByUsername(username);
+            if(FieldUtils.isObjectNotEmpty(user)){
+                return RespBean.ok("").setObj(user.getName());
+            }
+            return RespBean.error("数据库不存在该账号！");
+        }
+        return RespBean.error("参数账号为空！");
+    }
+
+    public Object getCurrentUser(String token) {
+        Map map= Jwts.parser()
+                .setSigningKey("ybcloud".getBytes(StandardCharsets.UTF_8))
+                .parseClaimsJws(token)
+                .getBody();
+        return  RespBean.ok("").setObj(map.get("user_name"));
+    }
+
+    public Object getCurrentUserAndRole(String token) {
+        HashMap<String,Object> result = new HashMap<>();
+        Map map= Jwts.parser()
+                .setSigningKey("ybcloud".getBytes(StandardCharsets.UTF_8))
+                .parseClaimsJws(token)
+                .getBody();
+        Iterator iterator = ((Collection<? extends GrantedAuthority> )map.get("authorities")).iterator();
+        Object object =null;
+        while(iterator.hasNext()) {
+            object = iterator.next();
+            //这里的Object就是你专的集合里的数据类型，不知道可以属object.getClass看看
+        }
+        result.put("username",map.get("user_name"));
+        result.put("roles", String.valueOf(object));
+        return  RespBean.ok("").setObj(result);
+    }
+
 }

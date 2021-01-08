@@ -79,4 +79,5 @@ public interface UserMapper {
  List<HashMap<Object, Object>> getMenuList(String grade);
 
  List<HashMap<String,String>> selectUserByRole(String role);
+
 }

@@ -7,6 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
@@ -17,6 +18,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableCaching//启动缓存
 @EnableTransactionManagement//启动事务管理
 @MapperScan("com.yaobanTech.springcloud.mapper")
+@EnableFeignClients
 public class ActivitiApplication {
     public static void main(String[] args) {
         SpringApplication.run(ActivitiApplication.class, args);

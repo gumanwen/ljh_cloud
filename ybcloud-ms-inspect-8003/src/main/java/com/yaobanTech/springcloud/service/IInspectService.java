@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.yaobanTech.springcloud.entity.utils.RespBean;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.util.Map;
 
@@ -18,7 +19,7 @@ import java.util.Map;
  */
 public interface IInspectService extends IService<Inspect> {
 
-    RespBean getPlanInspect(String type);
+    RespBean getPlanInspect(String type,HttpServletRequest request) throws IllegalAccessException;
 
     RespBean getTempInspect(String type);
 
@@ -30,7 +31,7 @@ public interface IInspectService extends IService<Inspect> {
 
     RespBean addPlanTask(Integer routeId,String  routeName ,Integer planId,String planName) throws ParseException;
 
-    RespBean getCheckInPoints(Integer routeId);
+    RespBean getCheckInPoints(Integer routeId,String inspectTaskId);
 
     RespBean getPointDetail(Integer id);
 
@@ -40,5 +41,9 @@ public interface IInspectService extends IService<Inspect> {
 
     RespBean autoCreate(Map<String, Object> params) throws ParseException;
 
-    RespBean send(Map<String, Object> params);
+    RespBean send(Map<String, Object> params,HttpServletRequest request);
+
+    Object getCurrentUser(String token);
+
+    RespBean findSignedList(Integer routeId, String inspectTaskId);
 }

@@ -5,22 +5,20 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
 import com.yaobanTech.springcloud.pojos.JwtUser;
 import com.yaobanTech.springcloud.pojos.RespBean;
-import com.yaobanTech.springcloud.pojos.User;
-import com.yaobanTech.springcloud.service.UserRightsService;
 import com.yaobanTech.springcloud.service.UserService;
 import io.jsonwebtoken.Jwts;
 import io.swagger.annotations.Api;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.endpoint.TokenEndpoint;
 import org.springframework.util.Base64Utils;
 import org.springframework.util.LinkedMultiValueMap;
@@ -28,6 +26,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -40,20 +40,19 @@ import javax.servlet.http.HttpServletRequest;
 //@CrossOrigin
 @RequestMapping("/user")
 public class UserController {
-
-    @Autowired
-    private UserRightsService userRightsService;
-    @Autowired
-    private LoadBalancerClient loadBalancerClient;
     @Autowired
     TokenEndpoint tokenEndPoint;
     @Autowired
     private RestTemplate restTemplate;
     @Autowired
     private UserService userService;
+    @Value("${server.ip}")
+    private String ip;
 
     @GetMapping("/getCurrentUser")
-    public Object getCurrentUser(HttpServletRequest request) {
+    @CrossOrigin
+    public Object getCurrentUser() {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         String header = request.getHeader("Authorization");
         String token =  StringUtils.substringAfter(header, "Bearer ");
         Map map= Jwts.parser()
@@ -63,15 +62,25 @@ public class UserController {
         return  RespBean.ok("").setObj(map.get("user_name"));
     }
 
-    /*@PostMapping("/login")
-    public RespBean login(@RequestBody Map<String,String> param) throws HttpRequestMethodNotSupportedException {
-        return userRightsService.login(param);
-    }*/
+    @GetMapping("/getCurrentUser1")
+    @CrossOrigin
+    public Object getCurrentUser1() {
+        return getCurrentUserAuthentication().getPrincipal();
+    }
+
+    /**
+     * 获取当前用户
+     * @return
+     */
+    public static Authentication getCurrentUserAuthentication(){
+        return SecurityContextHolder.getContext().getAuthentication();
+    }
+
 
     @PostMapping("/login")
     public RespBean getToken(@RequestBody Map<String,String> param) {
         //1.申请令牌
-        String authUrl = "http://192.168.50.167:6003/oauth/token";
+        String authUrl = "http://"+ip+":6003/oauth/token";
         String username = param.get("username");
         String password = param.get("password");
         String grant_type ="password";
@@ -114,9 +123,10 @@ public class UserController {
         result.put("username",username);
         result.put("userId",u.getId());
         result.put("roles", String.valueOf(object));
-        result.put("token", map.get("access_token"));
+        result.put("token", "Bearer "+map.get("access_token"));
         return RespBean.ok("登录成功！").setObj(result);
     }
+
     private String getHttpBasic(String clientId, String clientSecret) {
         String value = clientId + ":" + clientSecret;
         byte[] encode = Base64Utils.encode(value.getBytes());

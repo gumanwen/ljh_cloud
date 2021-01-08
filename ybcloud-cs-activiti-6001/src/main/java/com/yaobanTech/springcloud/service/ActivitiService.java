@@ -45,7 +45,7 @@ public class ActivitiService {
         RuntimeService runtimeService = processEngine.getRuntimeService();
         //启动流程
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(key,businessKey,variable);
-        return RespBean.ok("启动成功！").setObj(processInstance);
+        return RespBean.ok("启动成功！").setObj("");
     }
     @Transactional
     public RespBean completeTask(Map<String, Object> params) {

@@ -121,4 +121,20 @@ public class UserRightsController {
     public RespBean selectUserByRole(@RequestParam  String role){
         return userRightsService.selectUserByRole(role);
     }
+
+    @ApiOperation(value ="openfeign: 根据账号名获取姓名")
+    @GetMapping("getNameByUsername")
+    public RespBean getNameByUsername(@RequestParam("username")  String username){
+        return userRightsService.getNameByUsername(username);
+    }
+    @ApiOperation("openfeign: 获取当前登录人")
+    @GetMapping("/getCurrentUser")
+    public Object getCurrentUser(@RequestParam("token") String token) {
+        return userRightsService.getCurrentUser(token);
+    }
+    @ApiOperation("openfeign: 获取当前登录人和角色")
+    @GetMapping("/getCurrentUserAndRole")
+    public Object getCurrentUserAndRole(@RequestParam("token") String token) {
+        return userRightsService.getCurrentUserAndRole(token);
+    }
 }

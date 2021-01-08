@@ -52,6 +52,7 @@ mybatis-plus:
         call-setters-on-nulls: true
 server:
     port: 6003
+    ip: 10.1.4.16
 management:
     endpoint:
         health:

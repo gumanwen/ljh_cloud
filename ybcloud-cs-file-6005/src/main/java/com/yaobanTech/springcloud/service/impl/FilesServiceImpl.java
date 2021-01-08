@@ -1,5 +1,7 @@
 package com.yaobanTech.springcloud.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.yaobanTech.springcloud.entity.Files;
 import com.yaobanTech.springcloud.entity.utils.RespBean;
@@ -15,8 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.*;
 
 /**
  * <p>
@@ -102,7 +105,13 @@ public class FilesServiceImpl extends ServiceImpl<FilesMapper, Files> implements
     public RespBean selectOneByPid(String pid,String type) {
         if(FieldUtils.isStringNotEmpty(pid)){
             QueryWrapper<Files> queryWrapper = new QueryWrapper<>();
-            Files files = filesMapper.selectOne(queryWrapper.eq("isvalid",1).eq(FieldUtils.isStringNotEmpty(pid),"pid",pid).eq(FieldUtils.isStringNotEmpty(type),"type",type));
+            List<HashMap<String,Object>> result = new ArrayList<>();
+            List<Files> files = filesMapper.selectList(queryWrapper.eq("isvalid",1).eq(FieldUtils.isStringNotEmpty(pid),"pid",pid).eq(FieldUtils.isStringNotEmpty(type),"type",type));
+            if(files.size()>0){
+                for(int i=0;i<files.size();i++){
+                    result.add(JSON.parseObject(JSON.toJSONString(files.get(i)), (Type) Map.class));
+                }
+            }
             return RespBean.ok("文件列表").setObj(files);
         }else{
             return RespBean.error("缺少编号pid");

@@ -19,6 +19,13 @@ public class FieldUtils {
         String str = ObjectUtils.toString(obj, "");
         return StringUtils.isNotBlank(str);
     }
+    public static Object ifObjectEmpty(Object obj) {
+        String str = ObjectUtils.toString(obj, "");
+        if(StringUtils.isNotBlank(str)){
+            return obj;
+        };
+        return null;
+    }
     /**
      * 判断字符串是不是为空
      *
@@ -28,6 +35,13 @@ public class FieldUtils {
             return false;
         }else{
             return true;
+        }
+    }
+    public static String ifStringEmpty(String str){
+        if(str == null || "".equals(str)){
+            return null;
+        }else{
+            return str;
         }
     }
     /**

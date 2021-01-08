@@ -38,6 +38,10 @@ spring:
                   uri: lb://auth2Service #负载均衡 动态路由
                   predicates:
                       - Path=/user/**
+                - id: cs-auth
+                  uri: lb://auth2Service #负载均衡 动态路由
+                  predicates:
+                      - Path=/oauth/**
                 - id: cs-activiti
                   uri: lb://activitiService #负载均衡 动态路由
                   predicates:
@@ -75,12 +79,12 @@ security:
         client:
             client-id: demo-client
             client-secret: demo-secret
-            user-authorization-uri: http://localhost:6003/oauth/authorize
-            access-token-uri: http://localhost:6003/oauth/token
+            user-authorization-uri: http://192.168.50.91:6003/oauth/authorize
+            access-token-uri: http://192.168.50.91:6003/oauth/token
             resource:
             jwt:
-                key-uri: http://localhost:6003/oauth/token_key
+                key-uri: http://192.168.50.91:6003/oauth/token_key
                 key-value: demo
             authorization:
-            check-token-access: http://localhost:6003/oauth/check_token
+            check-token-access: http://192.168.50.91:6003/oauth/check_token
 ########资源服务器oauth2配置 - 此配置暂时不使用,在代码和数据库中已经存在########################################

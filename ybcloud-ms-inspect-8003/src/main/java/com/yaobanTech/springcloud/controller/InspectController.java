@@ -3,14 +3,21 @@ package com.yaobanTech.springcloud.controller;
 
 import com.yaobanTech.springcloud.entity.utils.RespBean;
 import com.yaobanTech.springcloud.service.IInspectService;
+import com.yaobanTech.springcloud.service.feign.AuthService;
 import com.yaobanTech.springcloud.service.feign.PlanService;
 import com.yaobanTech.springcloud.service.feign.RouteService;
+import io.jsonwebtoken.Jwts;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.Map;
 
@@ -32,13 +39,16 @@ public class InspectController {
     @Resource
     private PlanService planService;
 
+    @Resource
+    private AuthService authService;
+
     @Autowired
     private IInspectService iInspectService;
 
     @ApiOperation("app & web:获取计划任务列表")
     @GetMapping("/plan/getAllInspect")
-    public RespBean getPlanInspect(String type) {
-        return iInspectService.getPlanInspect(type);
+    public RespBean getPlanInspect(String type,HttpServletRequest request) throws IllegalAccessException {
+        return iInspectService.getPlanInspect(type,request);
     }
 
     @ApiOperation("web:根据计划编号获取计划任务列表")
@@ -79,9 +89,9 @@ public class InspectController {
 
     @ApiOperation("app：获取任务的签到点列表")
     @GetMapping("/plan/getCheckInPoints")
-    public RespBean getCheckInPoints(Integer routeId) {
+    public RespBean getCheckInPoints(Integer routeId,String inspectTaskId) {
         //调用route的rest接口
-        return iInspectService.getCheckInPoints(routeId);
+        return iInspectService.getCheckInPoints(routeId,inspectTaskId);
     }
 
     @ApiOperation("app：获取签到点详情")
@@ -107,9 +117,9 @@ public class InspectController {
 
     @ApiOperation("web：发起")
     @PostMapping("/task/send")
-    public RespBean send(@RequestBody Map<String, Object> params) {
+    public RespBean send(@RequestBody Map<String, Object> params,HttpServletRequest request) {
         //调用route的rest接口
-        return iInspectService.send(params);
+        return iInspectService.send(params,request);
     }
 
     @ApiOperation("web：获取路线下拉列表")
@@ -124,10 +134,29 @@ public class InspectController {
         return planService.findSelection();
     }
 
-    @ApiOperation("app:获取已签到列表")
+    @ApiOperation("app: 获取已签到列表")
     @GetMapping("/point/getPointedList")
-    public RespBean getPointedList(@RequestParam("routeId") Integer routeId){
-        return routeService.findSignedList(routeId);
+    public RespBean getPointedList(@RequestParam("routeId") Integer routeId,@RequestParam("inspectTaskId") String inspectTaskId){
+        return iInspectService.findSignedList(routeId,inspectTaskId);
     }
+
+    @ApiOperation("openfeign: 获取当前登录人")
+    @GetMapping("/getCurrentUser")
+    public Object getCurrentUser(@RequestParam("token") String token) {
+        return authService.getCurrentUser(token);
+    }
+
+    @ApiOperation("openfeign: 获取当前登录人")
+    @GetMapping("/getCurrentUserAndRole")
+    public Object getCurrentUserAndRole(@RequestParam("token") String token) {
+        return authService.getCurrentUserAndRole(token);
+    }
+
+    @ApiOperation("openfeign: 根据账号名获取姓名")
+    @GetMapping("/getNameByUsername")
+    public Object getNameByUsername(String username) {
+        return authService.getNameByUsername(username);
+    }
+
 }
 

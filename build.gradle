@@ -33,7 +33,8 @@ configure(allprojects) {
         maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
         mavenCentral()
     }
-
+    dependencies {
+    }
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
@@ -82,14 +83,41 @@ configure(subprojects) {
     jar {
         manifest.attributes provider: 'gradle'
     }
+
 }
 
-/**
- * 关闭父项目的打包功能
- */
-bootJar{
-    enabled=true
+// 将依赖包复制到lib目录
+task copyJar(type: Copy) {
+    // 清除现有的lib目录
+    delete "$buildDir\\libs\\lib"
+    from configurations.compileClasspath
+    into "$buildDir\\libs\\lib"
 }
-jar{
-    enabled=true
+
+// 拷贝配置文件
+task copyConfigFile(type: Copy) {
+    // 清除现有的配置目录
+    delete "$buildDir\\libs\\config"
+    from('src/main/resources')
+    into 'build/libs/config'
+}
+
+// 配置bootJar进行打包
+bootJar {
+    // jar包名称，默认是settings.gradle下的工程名 rootProject.name = 'alog-server'
+    baseName = 'alog-server'
+    // jar包版本号
+    version =  '0.0.1'
+    // 排除所有的jar
+    excludes = ["*.jar"]
+    // lib目录的清除和复制任务
+    dependsOn copyJar
+    // 配置目录的清除和复制任务
+    dependsOn copyConfigFile
+
+    // 指定依赖包的路径
+    manifest {
+        attributes "Manifest-Version": 1.0,
+                'Class-Path': configurations.compileClasspath.files.collect { "lib/$it.name" }.join(' ')
+    }
 }

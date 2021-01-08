@@ -17,4 +17,7 @@ import org.springframework.stereotype.Component;
 @Component
 public interface InspectMapper extends BaseMapper<Inspect> {
 
+    //获取班组员的未处理列表
+
+
 }

@@ -1,7 +1,11 @@
 apply plugin: 'org.springframework.boot'
 
 //自定义打包配置
-
+//自定义打包配置
+bootJar {
+    baseName = 'authService'
+    version = '0.1.0'
+}
 //依赖
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'

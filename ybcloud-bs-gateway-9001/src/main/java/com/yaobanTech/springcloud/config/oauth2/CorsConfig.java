@@ -6,7 +6,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import org.springframework.web.util.pattern.PathPatternParser;
-
+/*
+* 解决跨域问题
+*
+*/
 @Configuration
 public class CorsConfig {
     @Bean

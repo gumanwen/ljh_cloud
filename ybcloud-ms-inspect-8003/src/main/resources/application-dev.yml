@@ -54,3 +54,4 @@ mybatis-plus:
         call-setters-on-nulls: true
 server:
     port: 8003
+    ip: 10.1.4.16

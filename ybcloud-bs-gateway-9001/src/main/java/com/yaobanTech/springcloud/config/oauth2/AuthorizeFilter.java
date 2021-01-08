@@ -27,14 +27,14 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
         //2. 则获取响应
         ServerHttpResponse response = exchange.getResponse();
         //3. 如果是登录请求则放行
-        if (request.getURI().getPath().contains("/user")) {
+        if (request.getURI().getPath().contains("/user") || request.getURI().getPath().contains("/oauth") || request.getURI().getPath().contains("/api/file")) {
             return chain.filter(exchange);
         }
         //4. 获取请求头
         HttpHeaders headers = request.getHeaders();
         //5. 请求头中获取令牌
         String token = headers.getFirst(AUTHORIZE_TOKEN);
-        token =  org.apache.commons.lang.StringUtils.substringAfter(token, "");
+        token =  org.apache.commons.lang.StringUtils.substringAfter(token, "Bearer ");
         //6. 判断请求头中是否有令牌
         if (StringUtils.isEmpty(token)) {
             //7. 响应中放入返回的状态吗, 没有权限访问

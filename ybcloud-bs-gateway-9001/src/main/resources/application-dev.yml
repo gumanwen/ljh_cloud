@@ -38,6 +38,10 @@ spring:
                   uri: lb://auth2Service #负载均衡 动态路由
                   predicates:
                       - Path=/user/**
+                - id: cs-auth
+                  uri: lb://auth2Service #负载均衡 动态路由
+                  predicates:
+                      - Path=/oauth/**
                 - id: cs-activiti
                   uri: lb://activitiService #负载均衡 动态路由
                   predicates:
