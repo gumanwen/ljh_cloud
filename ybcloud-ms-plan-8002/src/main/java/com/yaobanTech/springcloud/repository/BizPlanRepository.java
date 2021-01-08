@@ -20,8 +20,8 @@ public interface BizPlanRepository extends JpaRepository<BizPlan,Integer>, JpaSp
     @Query("select t.routeId from  BizPlan t where t.id = ?1")
     Integer findRouteId(Integer planId);
 
-    @Query("from BizPlan t where t.enabled = 1")
-    List<BizPlan> findList();
+    @Query("from BizPlan t where t.enabled = 1 and t.planCreatedBy = ?1")
+    List<BizPlan> findList(String user);
 
     @Query("from BizPlan t where id = ?1  and t.enabled = 1")
     BizPlan findDetail(Integer id);

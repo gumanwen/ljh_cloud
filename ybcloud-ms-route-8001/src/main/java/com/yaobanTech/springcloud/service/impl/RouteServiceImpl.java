@@ -7,6 +7,7 @@ import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.domain.enumDef.EnumMenu;
 import com.yaobanTech.springcloud.repository.BizRouteRepository;
 import com.yaobanTech.springcloud.repository.BizSignPointRepository;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
@@ -17,6 +18,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.util.*;
 
@@ -35,10 +37,12 @@ public class RouteServiceImpl {
     @Lazy
     private OauthService oauthService;
 
-
-    public RespBean saveRoute(HashMap<String,Object> param) {
+    public RespBean saveRoute(HashMap<String,Object> param,HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        String token =  StringUtils.substringAfter(header, "Bearer ");
+        String user = (String) oauthService.getCurrentUser(token).getObj();
         BizRoute bizRoute = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizRoute.class);
-        if(bizRoute != null && !bizRoute.getBizSignPoints().isEmpty()) {
+        if(bizRoute != null && !bizRoute.getBizSignPoints().isEmpty() && bizRoute.getId() == null) {
             try {
                 List<BizSignPoint> pointList = bizRoute.getBizSignPoints();
                 for (int i = 0; i <pointList.size() ; i++) {
@@ -49,9 +53,9 @@ public class RouteServiceImpl {
                 }
                 List<BizSignPoint> list = bizSignPointRepository.saveAll(pointList);
                 bizRoute.setCreatedTime(new Date());
+                bizRoute.setRouteCreator(user);
                 bizRoute.setEnabled(1);
                 BizRoute route = bizRouteRepository.save(bizRoute);
-
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("保存失败！");
@@ -59,7 +63,7 @@ public class RouteServiceImpl {
         }else{
             return RespBean.error("数据为空！");
         }
-        return RespBean.ok("保存成功！",bizRoute);
+        return RespBean.ok("保存成功！",bizRoute.getBizSignPoints());
     }
 
     public RespBean updateRoute(HashMap<String,Object> param) {
@@ -144,9 +148,18 @@ public class RouteServiceImpl {
        return RespBean.ok("查询成功！",routeList);
     }
 
-    public RespBean findAll(){
-    //    String user = (String) oauthService.getCurrentUser(request).getObj();
-        List<BizRoute> list = bizRouteRepository.findList();
+    public RespBean findAll(HttpServletRequest request){
+        String header = request.getHeader("Authorization");
+        String token =  StringUtils.substringAfter(header, "Bearer ");
+        String user = (String) oauthService.getCurrentUser(token).getObj();
+        String chineseName = (String) oauthService.getChineseName(user).getObj();
+
+        List<BizRoute> list = bizRouteRepository.findList(user);
+        if(!list.isEmpty()){
+            for (int i = 0; i < list.size(); i++) {
+                list.get(i).setRouteCreator(user);
+            }
+        }
         return RespBean.ok("查询成功！",list);
     }
 
@@ -178,5 +191,17 @@ public class RouteServiceImpl {
             return RespBean.error("枚举mode为空！");
         }
         return RespBean.ok("查询成功！", list);
+    }
+
+    public RespBean findEnum(String code){
+            if (null == code) {
+                return RespBean.error("code为空");
+            }
+            for (EnumMenu temp : EnumMenu.values()) {
+                if (temp.getCode().equals(code) ) {
+                    return RespBean.ok("查询成功",temp.getDesc());
+                }
+            }
+        return RespBean.error("未查询到该code");
     }
 }

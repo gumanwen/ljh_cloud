@@ -1,8 +1,5 @@
 package com.yaobanTech.springcloud.domain.enumDef;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public enum EnumMenu {
 
 	DISCHARGE("0", "末梢水排放","定点巡查类型"),
@@ -21,20 +18,19 @@ public enum EnumMenu {
 	POINT("10", "定点巡查","路线类型"),
 
 
-	UNAPPROVAL("11", "'待审核'","计划类型"),
-	PROGRESSING("12", "'进行中'","计划类型"),
-	COMPLETE("13", "'已完成'","计划类型"),
-	APPROVALED("14", "'已审核'","计划类型"),
-	UNPASS("15", "'审核不通过'","计划类型"),
-	DELETE("16", "'已删除'","计划类型"),
+	UNAPPROVAL("11", "待审核","计划状态"),
+	PROGRESSING("12", "进行中","计划状态"),
+	COMPLETE("13", "已完成","计划状态"),
+	APPROVALED("14", "已审核","计划状态"),
+	UNPASS("15", "审核不通过","计划状态"),
+	DELETE("16", "已删除","计划状态"),
 
 	INSTWO("17", "2天一巡","计划周期"),
 	INSTRREE("18", "3天一巡","计划周期"),
 	INSSEVEN("19", "7天一巡","计划周期"),
 
-	USED("20", "启用","计划状态"),
-	UNUSED("21", "禁用","计划状态");
-
+	USED("20", "日常巡查","计划类型"),
+	UNUSED("21", "临时巡查","计划类型");
 	private String code;    //枚举值
 	private String desc;    //枚举描述
 	private String mode;    //所属模块
@@ -69,13 +65,13 @@ public enum EnumMenu {
 		this.mode = mode;
 	}
 
-	public static String getEnumByKey(String code) {
+	public static EnumMenu getEnumByKey(String code) {
 		if (null == code) {
 			return null;
 		}
 		for (EnumMenu temp : EnumMenu.values()) {
-			if (temp.getCode() == code) {
-				return temp.getDesc();
+			if (temp.getCode().equals(code)) {
+				return temp;
 			}
 		}
 		return null;

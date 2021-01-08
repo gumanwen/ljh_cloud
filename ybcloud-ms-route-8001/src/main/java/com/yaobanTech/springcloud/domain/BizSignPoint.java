@@ -1,7 +1,9 @@
 package com.yaobanTech.springcloud.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SelectBeforeUpdate;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -132,6 +134,11 @@ public class BizSignPoint  implements Serializable {
 	/**
 	 * 排放时间
 	 */
+	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(
+			pattern = "yyyy-MM-dd HH:mm:ss",
+			timezone = "GMT+8"
+	)
 	@Column(name = "discharge_time" )
 	private Date dischargeTime;
 
@@ -162,6 +169,11 @@ public class BizSignPoint  implements Serializable {
 	/**
 	 * 修改时间
 	 */
+	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(
+			pattern = "yyyy-MM-dd HH:mm:ss",
+			timezone = "GMT+8"
+	)
 	@Column(name = "modify_time" )
 	private Date modifyTime;
 

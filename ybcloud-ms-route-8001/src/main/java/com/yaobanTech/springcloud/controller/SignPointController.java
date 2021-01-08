@@ -53,7 +53,7 @@ public class SignPointController {
 
     @ApiOperation("查询已签到签到列表")
     @GetMapping("findSignedList")
-    public RespBean findSignedList(@RequestParam Integer routeId){
-        return signPointService.findSignedList(routeId);
+    public RespBean findSignedList(@RequestParam Integer routeId,@RequestParam String taskId){
+        return signPointService.findSignedList(routeId,taskId);
     }
 }

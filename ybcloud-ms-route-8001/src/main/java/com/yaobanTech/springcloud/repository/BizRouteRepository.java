@@ -17,8 +17,8 @@ public interface BizRouteRepository extends JpaRepository<BizRoute,Integer>, Jpa
     @Query("update BizRoute t set t.enabled = 0 where t.id = ?1")
     Integer deleteRoute(Integer id);
 
-    @Query(value = "select * from biz_route where enabled = 1 ",nativeQuery = true)
-    List<BizRoute> findList();
+    @Query(value = "from BizRoute t where t.enabled = 1 and t.routeCreator = ?1")
+    List<BizRoute> findList(String user);
 
     @Query(value = "select * from biz_route where enabled = 1 and id = ?1",nativeQuery = true)
     BizRoute findDetail(Integer id);

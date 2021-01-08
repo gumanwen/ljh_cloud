@@ -1,6 +1,6 @@
 spring:
     datasource:
-        url: jdbc:sqlserver://localhost:1433;DatabaseName=kmtysw
+        url: jdbc:sqlserver://192.168.50.167:1433;DatabaseName=kmtysw
         username: sa
         password: yaobanTech3131 #yaobanTech3131
         driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
@@ -23,7 +23,7 @@ spring:
         nacos:
             discovery:
                 server-addr: 192.168.50.91:8848
-                ip: 192.168.50.167
+                ip: 192.168.50.91
             config:
                 server-addr: 192.168.50.91:8848
                 file-extension: properties

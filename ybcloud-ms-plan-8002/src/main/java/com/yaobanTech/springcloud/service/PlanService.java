@@ -5,10 +5,12 @@ import com.yaobanTech.springcloud.domain.BizPlan;
 import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.domain.enumDef.EnumMenu;
 import com.yaobanTech.springcloud.repository.BizPlanRepository;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -27,13 +29,25 @@ public class PlanService {
     @Lazy
     private InspectService inspectService;
 
+    @Autowired
+    @Lazy
+    private OauthService oauthService;
+
+    @Autowired
+    @Lazy
+    private PlanMapper planMapper;
+
     SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    public RespBean savePlan(HashMap<String,Object> param) {
+    public RespBean savePlan(HashMap<String,Object> param, HttpServletRequest request) {
         BizPlan bizPlan = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizPlan.class);
         if(bizPlan != null) {
             try {
                 bizPlan.setEnabled(1);
+                String header = request.getHeader("Authorization");
+                String token =  StringUtils.substringAfter(header, "Bearer ");
+                String user = (String) oauthService.getCurrentUser(token).getObj();
+                bizPlan.setPlanCreatedBy(user);
                 BizPlan plan = bizPlanRepository.save(bizPlan);
                 String code = bizPlan.getPlanPorid();
                 EnumMenu key = EnumMenu.getEnumByKey(code);
@@ -101,8 +115,18 @@ public class PlanService {
         return RespBean.ok("查询成功！",routeId);
     }
 
-    public RespBean findAll(){
-        List<BizPlan> list = bizPlanRepository.findList();
+    public RespBean findAll(HttpServletRequest request){
+        String header = request.getHeader("Authorization");
+        String token =  StringUtils.substringAfter(header, "Bearer ");
+        String user = (String) oauthService.getCurrentUser(token).getObj();
+        //List<BizPlan> list = bizPlanRepository.findList(user);
+        List<BizPlan> list = planMapper.findAll(user);
+        String chineseName = (String) oauthService.getChineseName(user).getObj();
+        if(!list.isEmpty()){
+            for (int i = 0; i < list.size(); i++) {
+                list.get(i).setPlanCreatedBy(chineseName);
+            }
+        }
         return RespBean.ok("查询成功！",list);
     }
 
