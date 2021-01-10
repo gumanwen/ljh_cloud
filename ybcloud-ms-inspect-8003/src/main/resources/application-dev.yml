@@ -55,3 +55,6 @@ mybatis-plus:
 server:
     port: 8003
     ip: 10.1.4.16
+ribbon:
+    ConnectTimeout: 30000
+    ReadTimeout: 7000

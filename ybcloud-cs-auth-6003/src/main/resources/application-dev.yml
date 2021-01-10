@@ -57,3 +57,6 @@ management:
     endpoint:
         health:
             enabled: true
+ribbon:
+    ConnectTimeout: 30000
+    ReadTimeout: 7000

@@ -11,7 +11,7 @@
                             http://www.springframework.org/schema/tx/spring-tx.xsd">
 
     <bean id="processEngineConfiguration" class="org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration">
-        <!--<property name="databaseType" value="postgres"></property> 10.3.72.44   47.92.144.224  10.1.4.23 --><!-- 数据库类型，最好配置一下 -->
+        <!--<property name="databaseType" value="postgres"></property> 10.3.72.44   47.92.144.224  10.1.4.23 --><!-- 数据库类型，最好配置一下 ?characterEncoding=utf-8&amp;autoReconnect=true-->
         <property name="jdbcUrl" value="jdbc:sqlserver://47.92.144.224:1433;DatabaseName=ybcloud-cs-activiti-6001"></property>   <!-- 数据库URL，我放在名为activiti数据库中 -->
         <property name="jdbcDriver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"></property>   <!-- 数据库驱动类 mysql是这个，其它的数据库修改一下即可 -->
         <property name="jdbcUsername" value="sa"></property>  <!-- 连接数据库的账号 -->

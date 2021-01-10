@@ -480,6 +480,20 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         }
     }
 
+    @Transactional
+    public RespBean send1(HttpServletRequest request) {
+
+                Map<String,Object> taskMap = new HashMap<>();
+                Map<String, Object> variable = new HashMap<String, Object>();
+                variable.put("ROLE_BZY","inspector");
+                variable.put("ROLE_BZZ","bzz" );
+                taskMap.put("key","inspect");
+                taskMap.put("businessKey","123456");
+                taskMap.put("variable",variable);
+                return activitiService.startProcess(taskMap);
+
+    }
+
     @Override
     public Object getCurrentUser(String token) {
         Map map= Jwts.parser()
@@ -498,12 +512,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                 //获取报建文件列表
                 if(FieldUtils.isObjectNotEmpty(list.get(i).get("fileType"))) {
                     List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) fileService.selectOneByPid(String.valueOf((Integer) list.get(i).get("id")), (String) list.get(i).get("fileType")).getObj();
-                    if (fileList.size() > 0) {
-                        for (int j = 0; j < fileList.size(); j++) {
-                            fileList.get(j).put("show", "");
-                            fileList.get(j).put("fullpath", "http://" + ip + ":" + port + fileList.get(j).get("url"));
-                        }
-                    }
+
                     list.get(i).put("fileList", fileList);
                 }
             }

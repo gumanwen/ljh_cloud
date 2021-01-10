@@ -88,3 +88,6 @@ security:
             authorization:
             check-token-access: http://192.168.50.91:6003/oauth/check_token
 ########资源服务器oauth2配置 - 此配置暂时不使用,在代码和数据库中已经存在########################################
+ribbon:
+    ConnectTimeout: 30000
+    ReadTimeout: 7000

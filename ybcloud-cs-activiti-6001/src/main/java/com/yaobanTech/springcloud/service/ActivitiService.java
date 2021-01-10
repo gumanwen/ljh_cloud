@@ -44,7 +44,7 @@ public class ActivitiService {
         // 获取RunTimeService
         RuntimeService runtimeService = processEngine.getRuntimeService();
         //启动流程
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(key,businessKey,variable);
+        runtimeService.startProcessInstanceByKey(key,businessKey,variable);
         return RespBean.ok("启动成功！").setObj("");
     }
     @Transactional

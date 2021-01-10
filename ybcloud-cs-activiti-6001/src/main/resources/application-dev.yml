@@ -39,3 +39,6 @@ mybatis-plus:
         call-setters-on-nulls: true
 server:
     port: 6001
+ribbon:
+    ConnectTimeout: 30000
+    ReadTimeout: 7000

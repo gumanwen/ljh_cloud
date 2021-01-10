@@ -43,6 +43,8 @@ public interface IInspectService extends IService<Inspect> {
 
     RespBean send(Map<String, Object> params,HttpServletRequest request);
 
+    RespBean send1(HttpServletRequest request);
+
     Object getCurrentUser(String token);
 
     RespBean findSignedList(Integer routeId, String inspectTaskId);

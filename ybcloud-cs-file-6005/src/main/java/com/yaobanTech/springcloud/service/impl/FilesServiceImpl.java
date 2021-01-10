@@ -45,11 +45,11 @@ public class FilesServiceImpl extends ServiceImpl<FilesMapper, Files> implements
     @Value("${web.upload-vpath}")
     private String vpath;
 
-    /*@Value("${server.ip}")
+    @Value("${server.ip}")
     private String ip;
 
     @Value("${server.port}")
-    private String port;*/
+    private String port;
 
     @Override
     public RespBean importFiles(MultipartFile[] fileList, String pid, String type) throws IOException {
@@ -112,7 +112,13 @@ public class FilesServiceImpl extends ServiceImpl<FilesMapper, Files> implements
                     result.add(JSON.parseObject(JSON.toJSONString(files.get(i)), (Type) Map.class));
                 }
             }
-            return RespBean.ok("文件列表").setObj(files);
+            if (result.size() > 0) {
+                for (int j = 0; j < result.size(); j++) {
+                    result.get(j).put("show", "");
+                    result.get(j).put("fullpath", "http://" + ip + ":" + "8888" + result.get(j).get("url"));
+                }
+            }
+            return RespBean.ok("文件列表").setObj(result);
         }else{
             return RespBean.error("缺少编号pid");
         }

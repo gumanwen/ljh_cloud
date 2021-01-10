@@ -45,8 +45,12 @@ mybatis-plus:
         call-setters-on-nulls: true
 server:
     port: 6005
+    ip: 10.1.4.16
     max-http-header-size: 8192
 web:
     upload-path: C:/fujian/
     upload-vpath: /file/
     download-path: http://10.1.4.16:6005
+ribbon:
+    ConnectTimeout: 30000
+    ReadTimeout: 7000

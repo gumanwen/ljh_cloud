@@ -122,6 +122,13 @@ public class InspectController {
         return iInspectService.send(params,request);
     }
 
+    @ApiOperation("web：发起")
+    @PostMapping("/task/send1")
+    public RespBean send1(HttpServletRequest request) {
+        //调用route的rest接口
+        return iInspectService.send1(request);
+    }
+
     @ApiOperation("web：获取路线下拉列表")
     @GetMapping("/route/findSelection")
     public RespBean findSelection() {
