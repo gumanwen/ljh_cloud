@@ -187,6 +187,12 @@ public class BizSignedPoint implements Serializable {
 	@Column(name = "file_type" )
 	private String fileType;
 
+	/**
+	 * 签到点类型
+	 */
+	@Column(name = "sign_point_type" )
+	private String signPointType;
+
 
 	public BizSignedPoint() {
 	}
@@ -216,6 +222,14 @@ public class BizSignedPoint implements Serializable {
 		this.pointInspectionType = pointInspectionType;
 		this.signPointStatus = signPointStatus;
 		this.modifyTime = modifyTime;
+	}
+
+	public String getSignPointType() {
+		return signPointType;
+	}
+
+	public void setSignPointType(String signPointType) {
+		this.signPointType = signPointType;
 	}
 
 	public String getFileType() {

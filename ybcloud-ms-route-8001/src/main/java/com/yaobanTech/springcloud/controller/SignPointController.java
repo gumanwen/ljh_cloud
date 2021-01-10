@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 
 @RestController
 @RefreshScope
@@ -51,9 +52,21 @@ public class SignPointController {
         return signPointService.findList(routeId);
     }
 
+    @ApiOperation("根据taskId查询签到点列表")
+    @GetMapping("findListByTaskId")
+    public RespBean findListByTaskId(@RequestParam Integer routeId,@RequestParam String inspectTaskId){
+        return signPointService.findListByTaskId(routeId,inspectTaskId);
+    }
+
     @ApiOperation("查询已签到签到列表")
     @GetMapping("findSignedList")
     public RespBean findSignedList(@RequestParam Integer routeId,@RequestParam String taskId){
         return signPointService.findSignedList(routeId,taskId);
+    }
+
+    @ApiOperation("新增任务签到点")
+    @GetMapping("taskPoint")
+    public RespBean taskPoint(@RequestParam List<String> taskIds, @RequestParam Integer routeId ){
+        return signPointService.taskPoint(taskIds,routeId);
     }
 }

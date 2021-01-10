@@ -177,6 +177,12 @@ public class BizSignPoint  implements Serializable {
 	@Column(name = "modify_time" )
 	private Date modifyTime;
 
+	/**
+	 * 签到点类型
+	 */
+	@Column(name = "sign_point_type" )
+	private String signPointType;
+
 	public BizSignPoint() {
 	}
 
@@ -205,6 +211,14 @@ public class BizSignPoint  implements Serializable {
 		this.pointInspectionType = pointInspectionType;
 		this.signPointStatus = signPointStatus;
 		this.modifyTime = modifyTime;
+	}
+
+	public String getSignPointType() {
+		return signPointType;
+	}
+
+	public void setSignPointType(String signPointType) {
+		this.signPointType = signPointType;
 	}
 
 	public static long getSerialVersionUID() {
