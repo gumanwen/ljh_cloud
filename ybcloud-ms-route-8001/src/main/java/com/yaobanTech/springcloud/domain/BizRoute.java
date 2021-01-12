@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description  
@@ -143,6 +144,18 @@ public class BizRoute  implements Serializable {
 	private String addr;
 
 	/**
+	 * 用水管理所枚举对象
+	 */
+    @Transient
+	private Map<String,Object> waterOfficeMenu;
+
+	/**
+	 * 用水管理所枚举对象
+	 */
+	@Transient
+	private Map<String,Object> routeTypeMenu;
+
+	/**
 	 * 签到点
 	 */
    	@OneToMany(targetEntity = BizSignPoint.class,fetch = FetchType.EAGER)
@@ -177,6 +190,22 @@ public class BizRoute  implements Serializable {
 
 	public void setAddr(String addr) {
 		this.addr = addr;
+	}
+
+	public Map<String, Object> getWaterOfficeMenu() {
+		return waterOfficeMenu;
+	}
+
+	public void setWaterOfficeMenu(Map<String, Object> waterOfficeMenu) {
+		this.waterOfficeMenu = waterOfficeMenu;
+	}
+
+	public Map<String, Object> getRouteTypeMenu() {
+		return routeTypeMenu;
+	}
+
+	public void setRouteTypeMenu(Map<String, Object> routeTypeMenu) {
+		this.routeTypeMenu = routeTypeMenu;
 	}
 
 	public String getHiddenDangerReason() {

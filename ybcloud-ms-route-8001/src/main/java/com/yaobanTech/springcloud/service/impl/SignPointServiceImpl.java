@@ -3,6 +3,7 @@ package com.yaobanTech.springcloud.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.yaobanTech.springcloud.domain.BizSignPoint;
 import com.yaobanTech.springcloud.domain.BizSignedPoint;
+import com.yaobanTech.springcloud.domain.FieldUtils;
 import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.repository.BizSignPointMapper;
 import com.yaobanTech.springcloud.repository.BizSignPointRepository;
@@ -28,6 +29,10 @@ public class SignPointServiceImpl {
     @Autowired
     @Lazy
     private BizSignPointMapper bizSignPointMapper;
+
+    @Autowired
+    @Lazy
+    private FileService fileService;
 
     public RespBean saveSignPoint(HashMap<String,Object> param) {
         BizSignPoint bizSignPoint = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizSignPoint.class);
@@ -121,6 +126,15 @@ public class SignPointServiceImpl {
         if(taskId != null && routeId != null) {
             try {
                  list = signedPointRepository.findListByTaskId(routeId,taskId);
+                if(list.size()>0){
+                    for(int i =0; i<list.size(); i++){
+                        //获取报建文件列表
+                        if(FieldUtils.isObjectNotEmpty(list.get(i).getFileType())) {
+                            List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) fileService.selectOneByPid(String.valueOf((Integer) list.get(i).getId()), (String) list.get(i).getFileType()).getObj();
+                            list.get(i).setFileList(fileList);
+                        }
+                    }
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("查询失败！");

@@ -3,6 +3,7 @@ package com.yaobanTech.springcloud.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.yaobanTech.springcloud.domain.BizRoute;
 import com.yaobanTech.springcloud.domain.BizSignPoint;
+import com.yaobanTech.springcloud.domain.FieldUtils;
 import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.domain.enumDef.EnumMenu;
 import com.yaobanTech.springcloud.repository.BizRouteRepository;
@@ -36,6 +37,10 @@ public class RouteServiceImpl {
     @Autowired
     @Lazy
     private OauthService oauthService;
+
+    @Autowired
+    @Lazy
+    private FileService fileService;
 
     public RespBean saveRoute(HashMap<String,Object> param,HttpServletRequest request) {
         String header = request.getHeader("Authorization");
@@ -94,7 +99,13 @@ public class RouteServiceImpl {
         Integer i = null;
         if(id != null) {
             try {
-                i = bizRouteRepository.deleteRoute(id);
+                BizRoute detail = bizRouteRepository.findDetail(id);
+                List<BizSignPoint> signPoints = detail.getBizSignPoints();
+                if(!signPoints.isEmpty()) {
+                    i = bizRouteRepository.deleteRoute(id);
+                }else{
+                    return RespBean.error("删除失败！该路线包含签到点,无法进行删除操作！");
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("删除失败！");
@@ -157,7 +168,22 @@ public class RouteServiceImpl {
         List<BizRoute> list = bizRouteRepository.findList(user);
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
-                list.get(i).setRouteCreator(user);
+                BizRoute route = list.get(i);
+                List<BizSignPoint> points = route.getBizSignPoints();
+                if(points.size()>0){
+                    for(int j =0; j<points.size();j++){
+                        //获取报建文件列表
+                        if(FieldUtils.isObjectNotEmpty(points.get(j).getFileType())) {
+                            List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) fileService.selectOneByPid(String.valueOf((Integer) points.get(j).getId()), (String) points.get(j).getFileType()).getObj();
+                            points.get(j).setFileList(fileList);
+                        }
+                    }
+                }
+                Map waterOfficeMenu = (Map) findEnum(route.getWaterManagementOffice()).getObj();
+                Map routeTypeMenu = (Map) findEnum(route.getRouteType()).getObj();
+                route.setRouteTypeMenu(routeTypeMenu);
+                route.setWaterOfficeMenu(waterOfficeMenu);
+                route.setRouteCreator(user);
             }
         }
         return RespBean.ok("查询成功！",list);
@@ -170,6 +196,25 @@ public class RouteServiceImpl {
 
     public RespBean findDetail(Integer id){
         BizRoute br = bizRouteRepository.findDetail(id);
+        if(br != null) {
+            List<BizSignPoint> list = br.getBizSignPoints();
+            //获取报建文件列表
+            if(list.size()>0){
+                for(int i =0; i<list.size(); i++){
+                    //获取报建文件列表
+                    if(FieldUtils.isObjectNotEmpty(list.get(i).getFileType())) {
+                        List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) fileService.selectOneByPid(String.valueOf((Integer) list.get(i).getId()), (String) list.get(i).getFileType()).getObj();
+                        list.get(i).setFileList(fileList);
+                    }
+                }
+            }
+
+            Map waterOfficeMenu = (Map) findEnum(br.getWaterManagementOffice()).getObj();
+            Map routeTypeMenu = (Map) findEnum(br.getRouteType()).getObj();
+            br.setRouteTypeMenu(routeTypeMenu);
+            br.setWaterOfficeMenu(waterOfficeMenu);
+            return RespBean.ok("查询成功！",br);
+        }
         return RespBean.ok("查询成功！",br);
     }
 
@@ -194,14 +239,21 @@ public class RouteServiceImpl {
     }
 
     public RespBean findEnum(String code){
-            if (null == code) {
-                return RespBean.error("code为空");
-            }
-            for (EnumMenu temp : EnumMenu.values()) {
-                if (temp.getCode().equals(code) ) {
-                    return RespBean.ok("查询成功",temp.getDesc());
+        Map<String, Object> map = new HashMap<>();
+        if(code != null) {
+            EnumMenu[] menus = EnumMenu.values();
+            for (int i = 0; i < menus.length; i++) {
+                EnumMenu menu = menus[i];
+                if (code.equals(menu.getCode())) {
+                    map.put("mode", menu.getMode());
+                    map.put("code", menu.getCode());
+                    map.put("desc", menu.getDesc());
+                    break;
                 }
             }
-        return RespBean.error("未查询到该code");
+        }else{
+            return RespBean.error("枚举code为空！");
+        }
+        return RespBean.ok("查询成功！", map);
     }
 }

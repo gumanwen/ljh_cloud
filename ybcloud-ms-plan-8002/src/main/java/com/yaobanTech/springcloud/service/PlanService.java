@@ -21,9 +21,14 @@ import java.util.Map;
 @Transactional
 @Service
 public class PlanService {
+
     @Autowired
     @Lazy
     private BizPlanRepository bizPlanRepository;
+
+    @Autowired
+    @Lazy
+    private RouteService routeService;
 
     @Autowired
     @Lazy
@@ -89,7 +94,12 @@ public class PlanService {
     public RespBean deletePlan(Integer id) {
         if(id != null) {
             try {
-                bizPlanRepository.deletePlan(id);
+                Object o = inspectService.findInspectListById(id).getObj();
+                if(o != null) {
+                    bizPlanRepository.deletePlan(id);
+                }else{
+                    return RespBean.error("删除失败！该计划包含任务,无法进行删除操作！");
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("删除失败！");
@@ -119,12 +129,16 @@ public class PlanService {
         String header = request.getHeader("Authorization");
         String token =  StringUtils.substringAfter(header, "Bearer ");
         String user = (String) oauthService.getCurrentUser(token).getObj();
-        //List<BizPlan> list = bizPlanRepository.findList(user);
         List<BizPlan> list = planMapper.findAll(user);
         String chineseName = (String) oauthService.getChineseName(user).getObj();
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
-                list.get(i).setPlanCreatedBy(chineseName);
+                BizPlan plan = list.get(i);
+                plan.setPlanCreatedBy(chineseName);
+                Map map = (Map) findEnum(plan.getPlanType()).getObj();
+                plan.setRouteTypeMenu(map);
+                Object o = routeService.findDetail(plan.getRouteId()).getObj();
+                plan.setRouteObj(o);
             }
         }
         return RespBean.ok("查询成功！",list);
@@ -158,5 +172,24 @@ public class PlanService {
             return RespBean.error("枚举mode为空！");
         }
         return RespBean.ok("查询成功！", list);
+    }
+
+    public RespBean findEnum(String code){
+        Map<String, Object> map = new HashMap<>();
+        if(code != null) {
+            EnumMenu[] menus = EnumMenu.values();
+            for (int i = 0; i < menus.length; i++) {
+                EnumMenu menu = menus[i];
+                if (code.equals(menu.getCode())) {
+                    map.put("mode", menu.getMode());
+                    map.put("code", menu.getCode());
+                    map.put("desc", menu.getDesc());
+                    break;
+                }
+            }
+        }else{
+            return RespBean.error("枚举code为空！");
+        }
+        return RespBean.ok("查询成功！", map);
     }
 }
