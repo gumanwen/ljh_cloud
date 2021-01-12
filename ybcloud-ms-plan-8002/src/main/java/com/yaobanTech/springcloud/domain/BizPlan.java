@@ -154,10 +154,10 @@ public class BizPlan  implements Serializable {
 	private Object routeObj;
 
 	/**
-	 * 路线类型枚举
+	 * 计划类型枚举
 	 */
     @Transient
-	private Map<String,Object> routeTypeMenu;
+	private Map<String,Object> planTypeMenu;
 
 	public BizPlan() {
 	}
@@ -191,12 +191,12 @@ public class BizPlan  implements Serializable {
 		this.routeObj = routeObj;
 	}
 
-	public Map<String, Object> getRouteTypeMenu() {
-		return routeTypeMenu;
+	public Map<String, Object> getPlanTypeMenu() {
+		return planTypeMenu;
 	}
 
-	public void setRouteTypeMenu(Map<String, Object> routeTypeMenu) {
-		this.routeTypeMenu = routeTypeMenu;
+	public void setPlanTypeMenu(Map<String, Object> planTypeMenu) {
+		this.planTypeMenu = planTypeMenu;
 	}
 
 	public static long getSerialVersionUID() {

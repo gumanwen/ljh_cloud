@@ -13,10 +13,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Transactional
 @Service
@@ -94,11 +91,14 @@ public class PlanService {
     public RespBean deletePlan(Integer id) {
         if(id != null) {
             try {
-                Object o = inspectService.findInspectListById(id).getObj();
-                if(o != null) {
+                BizPlan detail = bizPlanRepository.findDetail(id);
+                Date date = new Date();
+                Date startTime = detail.getStartTime();
+               Boolean flag = startTime.before(date);
+                if(!flag) {
                     bizPlanRepository.deletePlan(id);
                 }else{
-                    return RespBean.error("删除失败！该计划包含任务,无法进行删除操作！");
+                    return RespBean.error("删除失败！该计划已开始,无法删除！");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -136,7 +136,7 @@ public class PlanService {
                 BizPlan plan = list.get(i);
                 plan.setPlanCreatedBy(chineseName);
                 Map map = (Map) findEnum(plan.getPlanType()).getObj();
-                plan.setRouteTypeMenu(map);
+                plan.setPlanTypeMenu(map);
                 Object o = routeService.findDetail(plan.getRouteId()).getObj();
                 plan.setRouteObj(o);
             }
@@ -151,7 +151,12 @@ public class PlanService {
 
     public RespBean findById(Integer id){
         BizPlan bp = bizPlanRepository.findDetail(id);
-        return RespBean.ok("查询成功！",bp);
+        if(bp != null) {
+            Map map = (Map) findEnum(bp.getPlanType()).getObj();
+            bp.setPlanTypeMenu(map);
+            return RespBean.ok("查询成功！", bp);
+        }
+        return RespBean.ok("查询成功！", bp);
     }
 
     public RespBean findEnumMenu(String mode){
