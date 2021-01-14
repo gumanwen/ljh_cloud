@@ -97,6 +97,5 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter{
                 .checkTokenAccess("isAuthenticated()")
                 .allowFormAuthenticationForClients();
     }
-
 }
 

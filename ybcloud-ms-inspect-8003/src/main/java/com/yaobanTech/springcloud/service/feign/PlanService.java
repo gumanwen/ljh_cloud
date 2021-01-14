@@ -16,5 +16,5 @@ public interface PlanService {
     RespBean findById(@RequestParam("id") Integer id);
 
     @GetMapping("/api/plan/findSelection")
-    RespBean findSelection();
+    RespBean findSelection(@RequestParam("routeId") Integer routeId);
 }

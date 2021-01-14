@@ -67,6 +67,7 @@ public class FilesServiceImpl extends ServiceImpl<FilesMapper, Files> implements
                     folder.mkdirs();
                 }
                 for (int i = 0; i < fileList.length; i++) {
+                    UUID uuid = UUID.randomUUID();
                     String oldName = fileList[i].getOriginalFilename();
                     String filename = oldName.substring(0, oldName.lastIndexOf("."));
                     String typename= oldName.substring(oldName.lastIndexOf(".")+1);
@@ -77,7 +78,7 @@ public class FilesServiceImpl extends ServiceImpl<FilesMapper, Files> implements
                     }else  if("mp4".equals(typename.toLowerCase()) || "flv".equals(typename.toLowerCase()) || "avi".equals(typename.toLowerCase()) || "rm".equals(typename.toLowerCase()) || "rmvb".equals(typename.toLowerCase()) || "wmv".equals(typename.toLowerCase()) ){
                         mimeType ="video/"+typename.toLowerCase();
                     }
-                    String newName = pid + "_Default_" + oldName.substring(oldName.lastIndexOf("."));
+                    String newName = pid + "_"+ uuid + "_" + type + oldName.substring(oldName.lastIndexOf("."));
                     fileList[i].transferTo(new File(folder, newName));
                     String url = vpath + "upload/" + format + newName;
                     logger.info(filename + url);

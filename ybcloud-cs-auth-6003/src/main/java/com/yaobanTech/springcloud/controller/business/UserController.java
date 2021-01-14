@@ -107,6 +107,7 @@ public class UserController {
         if (map == null || map.get("access_token") == null || map.get("refresh_token") == null || map.get("jti") == null) {
             //申请令牌失败
            // ExceptionCast.cast(AuthCode.AUTH_LOGIN_APPLYTOKEN_FAIL);
+            return RespBean.error("登录失败！");
         }
         //2.封装结果数据
         //AuthToken authToken = new AuthToken().setAccessToken((String) map.get("access_token")).setRefreshToken((String) map.get("refresh_token")).setJwtToken((String) map.get("jti"));

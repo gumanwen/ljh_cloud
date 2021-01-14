@@ -131,14 +131,14 @@ public class InspectController {
 
     @ApiOperation("web：获取路线下拉列表")
     @GetMapping("/route/findSelection")
-    public RespBean findSelection() {
-        return routeService.findSelection();
+    public RespBean findSelection(@RequestParam("code") String code) {
+        return routeService.findSelection(code);
     }
 
     @ApiOperation("web：获取计划下拉列表")
     @GetMapping("/plan/findSelection")
-    public RespBean findplanSelection() {
-        return planService.findSelection();
+    public RespBean findplanSelection(@RequestParam("routeId") Integer routeId) {
+        return planService.findSelection(routeId);
     }
 
     @ApiOperation("app: 获取已签到列表")

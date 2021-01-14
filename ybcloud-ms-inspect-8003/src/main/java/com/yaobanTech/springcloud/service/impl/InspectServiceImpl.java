@@ -98,14 +98,14 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
             respBean.setMsg("未处理列表");
         }else if("1".equals(type)){
             //获取处理中的列表
-            list= inspectMapper.selectList(queryWrapper.apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),begin_time,20) <= convert(varchar(20),'"+date+"',20)"));
+            list= inspectMapper.selectList(queryWrapper.lt("complete_rate","100").apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),begin_time,20) <= convert(varchar(20),'"+date+"',20)"));
             status = "处理中";
             respBean.setMsg("处理中列表");
         }else if("2".equals(type)){
             //获取已处理的列表
             list= inspectMapper.selectList(queryWrapper.eq("complete_rate","100"));
-            status = "已处理";
-            respBean.setMsg("已处理列表");
+            status = "已完成";
+            respBean.setMsg("已完成列表");
         }else if("3".equals(type)){
             //获取已延期的列表
             list= inspectMapper.selectList(queryWrapper.apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),dead_time,20) < convert(varchar(20),'"+date+"',20)"));
@@ -115,7 +115,6 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
             list= inspectMapper.selectList(queryWrapper);
             respBean.setMsg("全部列表");
         }
-
         if(list.size()>0){
             for(int i = 0;i<list.size();i++){
                 Map<String, Object> map1 = new HashMap<String, Object>();
@@ -142,9 +141,12 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                     map1.put("hiddenDangerAmount", FieldUtils.ifObjectEmpty(map2.get("hiddenDangerAmount")));
                     map1.put("overReason", FieldUtils.ifObjectEmpty(map2.get("overReason")));
                     map1.put("signIn", FieldUtils.ifObjectEmpty(map2.get("signIn")));
+                    map1.put("waterOfficeMenu", FieldUtils.ifObjectEmpty(map2.get("waterOfficeMenu")));
+                    map1.put("routeTypeMenu", FieldUtils.ifObjectEmpty(map2.get("routeTypeMenu")));
                     map1.put("planName", FieldUtils.ifObjectEmpty(map3.get("planName")));
                     map1.put("planType", FieldUtils.ifObjectEmpty(map3.get("planType")));
                     map1.put("planPorid", FieldUtils.ifObjectEmpty(map3.get("planPorid")));
+                    map1.put("planTypeMenu", FieldUtils.ifObjectEmpty(map3.get("planTypeMenu")));
                     if (FieldUtils.isObjectNotEmpty(map1)) {
                         combineResultMap.putAll(map1);
                     }
@@ -164,11 +166,13 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                     map1.put("planName", "");
                     map1.put("planType", "");
                     map1.put("planPorid", "");
+                    map1.put("waterOfficeMenu", "");
+                    map1.put("routeTypeMenu", "");
+                    map1.put("planTypeMenu","");
                     if (FieldUtils.isObjectNotEmpty(map1)) {
                         combineResultMap.putAll(map1);
                     }
                     resultList.add(combineResultMap);
-                    return RespBean.ok("缺少路线或计划信息！").setObj(resultList);
                 }
             }
         }
@@ -278,11 +282,18 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
             RespBean re = planService.findById(planId);
             List<String> list = new ArrayList<>();
             Map map = (Map) re.getObj();
+            Map enumMap = new HashMap();
+            String cycleStr = null;
             if(FieldUtils.isObjectNotEmpty(map.get("planPorid")) && FieldUtils.isObjectNotEmpty(map.get("startTime")) && FieldUtils.isObjectNotEmpty(map.get("endTime"))){
                 Date start =  daydateFormat.parse((String) map.get("startTime"));
                 Date end =  daydateFormat.parse((String) map.get("endTime"));
                 RespBean respBean = routeService.findEnum((String) map.get("planPorid"));
-                String cycleStr = (String) respBean.getObj();
+                if(FieldUtils.isObjectNotEmpty(respBean)){
+                    enumMap = (Map)respBean.getObj();
+                    if(FieldUtils.isObjectNotEmpty(enumMap.get("desc"))){
+                        cycleStr = (String) enumMap.get("desc");
+                    }
+                }
                 int days = DateUtils.daysBetween(start,end);
                 Integer cycle = Integer.valueOf(cycleStr.substring(0,1));
                 int nums = (int) Math.floor(days/cycle);
@@ -385,7 +396,8 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
     @Override
     @Transactional
     public RespBean autoCreate(Map<String, Object> params) throws ParseException {
-        if(FieldUtils.isObjectNotEmpty(params.get("planId")) && FieldUtils.isObjectNotEmpty(params.get("routeId"))){
+        return RespBean.ok("");
+        /*if(FieldUtils.isObjectNotEmpty(params.get("planId")) && FieldUtils.isObjectNotEmpty(params.get("routeId"))){
             Integer planId = (Integer) params.get("planId");
             Integer routeId = (Integer) params.get("routeId");
             if(FieldUtils.isObjectNotEmpty(params.get("period")) && FieldUtils.isObjectNotEmpty(params.get("startTime")) && FieldUtils.isObjectNotEmpty(params.get("endTime"))){
@@ -426,7 +438,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
 
         }else{
             return RespBean.error("参数为空！");
-        }
+        }*/
     }
 
     @Override
@@ -482,7 +494,6 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
 
     @Transactional
     public RespBean send1(HttpServletRequest request) {
-
                 Map<String,Object> taskMap = new HashMap<>();
                 Map<String, Object> variable = new HashMap<String, Object>();
                 variable.put("ROLE_BZY","inspector");
@@ -491,7 +502,6 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                 taskMap.put("businessKey","123456");
                 taskMap.put("variable",variable);
                 return activitiService.startProcess(taskMap);
-
     }
 
     @Override
@@ -506,7 +516,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
     @Override
     public RespBean findSignedList(Integer routeId, String inspectTaskId) {
         RespBean respBean = routeService.findSignedList(routeId,inspectTaskId);
-        List<HashMap<String,Object>> list = (List<HashMap<String, Object>>) respBean.getObj();
+        /*List<HashMap<String,Object>> list = (List<HashMap<String, Object>>) respBean.getObj();
         if(list.size()>0){
             for(int i =0; i<list.size(); i++){
                 //获取报建文件列表
@@ -517,6 +527,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                 }
             }
         }
-        return RespBean.ok("").setObj(list);
+        return RespBean.ok("").setObj(list);*/
+        return respBean;
     }
 }
