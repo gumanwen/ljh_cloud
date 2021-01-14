@@ -136,7 +136,9 @@ public class PlanService {
                 BizPlan plan = list.get(i);
                 plan.setPlanCreatedBy(chineseName);
                 Map map = (Map) findEnum(plan.getPlanType()).getObj();
+                Map ps = (Map) findEnum(plan.getPlanStatus()).getObj();
                 plan.setPlanTypeMenu(map);
+                plan.setPlanStatusMenu(ps);
                 Object o = routeService.findDetail(plan.getRouteId()).getObj();
                 plan.setRouteObj(o);
             }
@@ -144,8 +146,8 @@ public class PlanService {
         return RespBean.ok("查询成功！",list);
     }
 
-    public RespBean findSelection(){
-        List<HashMap<String,Object>> selection = bizPlanRepository.findSelection();
+    public RespBean findSelection(Integer routeId){
+        List<HashMap<String,Object>> selection = bizPlanRepository.findSelection(routeId);
         return RespBean.ok("查询成功！",selection);
     }
 
@@ -153,7 +155,11 @@ public class PlanService {
         BizPlan bp = bizPlanRepository.findDetail(id);
         if(bp != null) {
             Map map = (Map) findEnum(bp.getPlanType()).getObj();
+            Map ps = (Map) findEnum(bp.getPlanStatus()).getObj();
             bp.setPlanTypeMenu(map);
+            bp.setPlanStatusMenu(ps);
+            Object o = routeService.findDetail(bp.getRouteId()).getObj();
+            bp.setRouteObj(o);
             return RespBean.ok("查询成功！", bp);
         }
         return RespBean.ok("查询成功！", bp);

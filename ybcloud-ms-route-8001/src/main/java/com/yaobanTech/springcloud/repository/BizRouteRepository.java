@@ -20,10 +20,13 @@ public interface BizRouteRepository extends JpaRepository<BizRoute,Integer>, Jpa
     @Query(value = "from BizRoute t where t.routeCreator = ?1")
     List<BizRoute> findList(String user);
 
+    @Query(value = "from BizRoute t where t.routeCreator = ?1 and t.enabled = 1")
+    List<BizRoute> findExitList(String user);
+
     @Query(value = "select * from biz_route where id = ?1",nativeQuery = true)
     BizRoute findDetail(Integer id);
 
-    @Query(value = "select new map(b.id,b.routeName) from BizRoute b where b.enabled = 1")
-    List<HashMap<String,Object>> findSelection();
+    @Query(value = "select new map(b.id,b.routeName) from BizRoute b where b.enabled = 1 and b.waterManagementOffice = ?1")
+    List<HashMap<String,Object>> findSelection(String code);
 
 }

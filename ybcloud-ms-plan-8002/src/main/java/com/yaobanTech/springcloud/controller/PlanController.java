@@ -51,10 +51,10 @@ public class PlanController {
         return planService.findPlanId(id);
     }
 
-    @ApiOperation("查询路线名称和id")
+    @ApiOperation("查询计划名称和id")
     @GetMapping("findSelection")
-    public RespBean findSelection(){
-        return planService.findSelection();
+    public RespBean findSelection(@RequestParam Integer routeId){
+        return planService.findSelection(routeId);
     }
 
 
