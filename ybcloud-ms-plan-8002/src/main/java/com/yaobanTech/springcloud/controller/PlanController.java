@@ -81,4 +81,10 @@ public class PlanController {
     public RespBean findEnumMenu(@RequestParam String mode) {
         return planService.findEnumMenu(mode);
     }
+
+    @ApiOperation("查询单个枚举对象")
+    @GetMapping("findEnum")
+    public RespBean findEnum(@RequestParam String code){
+        return planService.findEnum(code);
+    }
 }

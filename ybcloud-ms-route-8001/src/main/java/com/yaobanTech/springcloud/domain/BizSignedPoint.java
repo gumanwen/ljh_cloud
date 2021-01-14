@@ -6,6 +6,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @Description  
@@ -187,6 +189,18 @@ public class BizSignedPoint implements Serializable {
 	@Column(name = "file_type" )
 	private String fileType;
 
+	/**
+	 * 签到点类型
+	 */
+	@Column(name = "sign_point_type" )
+	private String signPointType;
+
+	/**
+	 * 附件
+	 */
+    @Transient
+	private List<HashMap<String, Object>> fileList;
+
 
 	public BizSignedPoint() {
 	}
@@ -216,6 +230,22 @@ public class BizSignedPoint implements Serializable {
 		this.pointInspectionType = pointInspectionType;
 		this.signPointStatus = signPointStatus;
 		this.modifyTime = modifyTime;
+	}
+
+	public List<HashMap<String, Object>> getFileList() {
+		return fileList;
+	}
+
+	public void setFileList(List<HashMap<String, Object>> fileList) {
+		this.fileList = fileList;
+	}
+
+	public String getSignPointType() {
+		return signPointType;
+	}
+
+	public void setSignPointType(String signPointType) {
+		this.signPointType = signPointType;
 	}
 
 	public String getFileType() {

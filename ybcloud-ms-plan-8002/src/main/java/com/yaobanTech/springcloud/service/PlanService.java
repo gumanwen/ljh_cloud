@@ -13,17 +13,19 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Transactional
 @Service
 public class PlanService {
+
     @Autowired
     @Lazy
     private BizPlanRepository bizPlanRepository;
+
+    @Autowired
+    @Lazy
+    private RouteService routeService;
 
     @Autowired
     @Lazy
@@ -89,7 +91,15 @@ public class PlanService {
     public RespBean deletePlan(Integer id) {
         if(id != null) {
             try {
-                bizPlanRepository.deletePlan(id);
+                BizPlan detail = bizPlanRepository.findDetail(id);
+                Date date = new Date();
+                Date startTime = detail.getStartTime();
+               Boolean flag = startTime.before(date);
+                if(!flag) {
+                    bizPlanRepository.deletePlan(id);
+                }else{
+                    return RespBean.error("删除失败！该计划已开始,无法删除！");
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("删除失败！");
@@ -119,12 +129,16 @@ public class PlanService {
         String header = request.getHeader("Authorization");
         String token =  StringUtils.substringAfter(header, "Bearer ");
         String user = (String) oauthService.getCurrentUser(token).getObj();
-        //List<BizPlan> list = bizPlanRepository.findList(user);
         List<BizPlan> list = planMapper.findAll(user);
         String chineseName = (String) oauthService.getChineseName(user).getObj();
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
-                list.get(i).setPlanCreatedBy(chineseName);
+                BizPlan plan = list.get(i);
+                plan.setPlanCreatedBy(chineseName);
+                Map map = (Map) findEnum(plan.getPlanType()).getObj();
+                plan.setPlanTypeMenu(map);
+                Object o = routeService.findDetail(plan.getRouteId()).getObj();
+                plan.setRouteObj(o);
             }
         }
         return RespBean.ok("查询成功！",list);
@@ -137,7 +151,12 @@ public class PlanService {
 
     public RespBean findById(Integer id){
         BizPlan bp = bizPlanRepository.findDetail(id);
-        return RespBean.ok("查询成功！",bp);
+        if(bp != null) {
+            Map map = (Map) findEnum(bp.getPlanType()).getObj();
+            bp.setPlanTypeMenu(map);
+            return RespBean.ok("查询成功！", bp);
+        }
+        return RespBean.ok("查询成功！", bp);
     }
 
     public RespBean findEnumMenu(String mode){
@@ -158,5 +177,24 @@ public class PlanService {
             return RespBean.error("枚举mode为空！");
         }
         return RespBean.ok("查询成功！", list);
+    }
+
+    public RespBean findEnum(String code){
+        Map<String, Object> map = new HashMap<>();
+        if(code != null) {
+            EnumMenu[] menus = EnumMenu.values();
+            for (int i = 0; i < menus.length; i++) {
+                EnumMenu menu = menus[i];
+                if (code.equals(menu.getCode())) {
+                    map.put("mode", menu.getMode());
+                    map.put("code", menu.getCode());
+                    map.put("desc", menu.getDesc());
+                    break;
+                }
+            }
+        }else{
+            return RespBean.error("枚举code为空！");
+        }
+        return RespBean.ok("查询成功！", map);
     }
 }

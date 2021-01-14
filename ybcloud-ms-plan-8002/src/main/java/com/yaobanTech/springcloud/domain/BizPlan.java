@@ -6,6 +6,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * @Description  
@@ -43,9 +44,9 @@ public class BizPlan  implements Serializable {
 	/**
 	 * 开始时间
 	 */
-	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	@DateTimeFormat(pattern="yyyy-MM-dd")
 	@JsonFormat(
-			pattern = "yyyy-MM-dd HH:mm:ss",
+			pattern = "yyyy-MM-dd",
 			timezone = "GMT+8"
 	)
    	@Column(name = "start_time" )
@@ -54,9 +55,9 @@ public class BizPlan  implements Serializable {
 	/**
 	 * 结束时间
 	 */
-	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	@DateTimeFormat(pattern="yyyy-MM-dd")
 	@JsonFormat(
-			pattern = "yyyy-MM-dd HH:mm:ss",
+			pattern = "yyyy-MM-dd",
 			timezone = "GMT+8"
 	)
    	@Column(name = "end_time" )
@@ -146,6 +147,18 @@ public class BizPlan  implements Serializable {
 	@Column(name = "trouble_code" )
 	private String troubleCode;
 
+	/**
+	 * 路线对象
+	 */
+    @Transient
+	private Object routeObj;
+
+	/**
+	 * 计划类型枚举
+	 */
+    @Transient
+	private Map<String,Object> planTypeMenu;
+
 	public BizPlan() {
 	}
 
@@ -168,6 +181,22 @@ public class BizPlan  implements Serializable {
 		this.routeId = routeId;
 		this.mainKey = mainKey;
 		this.troubleCode = troubleCode;
+	}
+
+	public Object getRouteObj() {
+		return routeObj;
+	}
+
+	public void setRouteObj(Object routeObj) {
+		this.routeObj = routeObj;
+	}
+
+	public Map<String, Object> getPlanTypeMenu() {
+		return planTypeMenu;
+	}
+
+	public void setPlanTypeMenu(Map<String, Object> planTypeMenu) {
+		this.planTypeMenu = planTypeMenu;
 	}
 
 	public static long getSerialVersionUID() {

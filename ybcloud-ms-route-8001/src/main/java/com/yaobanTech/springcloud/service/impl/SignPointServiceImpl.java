@@ -3,6 +3,7 @@ package com.yaobanTech.springcloud.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.yaobanTech.springcloud.domain.BizSignPoint;
 import com.yaobanTech.springcloud.domain.BizSignedPoint;
+import com.yaobanTech.springcloud.domain.FieldUtils;
 import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.repository.BizSignPointMapper;
 import com.yaobanTech.springcloud.repository.BizSignPointRepository;
@@ -29,11 +30,14 @@ public class SignPointServiceImpl {
     @Lazy
     private BizSignPointMapper bizSignPointMapper;
 
+    @Autowired
+    @Lazy
+    private FileService fileService;
+
     public RespBean saveSignPoint(HashMap<String,Object> param) {
         BizSignPoint bizSignPoint = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizSignPoint.class);
         if(bizSignPoint != null) {
             try {
-//                bizSignPoint.setSignPointStatus("未签到");
                 bizSignPoint.setEnabled(1);
                 BizSignPoint signPoint = signPointRepository.save(bizSignPoint);
             } catch (Exception e) {
@@ -48,15 +52,17 @@ public class SignPointServiceImpl {
 
     public RespBean updateSignPoint(HashMap<String,Object> param) {
         BizSignedPoint bizSignedPoint = null;
+        Integer id = null;
         if(!param.isEmpty() && param.get("form") != null) {
              bizSignedPoint = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizSignedPoint.class);
             BizSignPoint signPoint = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizSignPoint.class);
             if(bizSignedPoint != null){
             try {
                 bizSignedPoint.setModifyTime(new Date());
-                signPoint.setSignPointStatus("已签到");
                 signPointRepository.save(signPoint);
+                bizSignedPoint.setSignPointStatus("已签到");
                 BizSignedPoint signedPoint = signedPointRepository.save(bizSignedPoint);
+                id = signedPoint.getId();
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("修改失败！");
@@ -64,7 +70,7 @@ public class SignPointServiceImpl {
         }else{
             return RespBean.error("id为空！");
         }
-        return RespBean.ok("修改成功！",bizSignedPoint.getId());
+        return RespBean.ok("修改成功！",id);
         }else{
             return RespBean.error("参数为空！");
         }
@@ -115,6 +121,30 @@ public class SignPointServiceImpl {
         return RespBean.ok("查询成功！",list);
     }
 
+    public RespBean findListByTaskId(Integer routeId,String taskId) {
+        List<BizSignedPoint> list = null;
+        if(taskId != null && routeId != null) {
+            try {
+                 list = signedPointRepository.findListByTaskId(routeId,taskId);
+                if(list.size()>0){
+                    for(int i =0; i<list.size(); i++){
+                        //获取报建文件列表
+                        if(FieldUtils.isObjectNotEmpty(list.get(i).getFileType())) {
+                            List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) fileService.selectOneByPid(String.valueOf((Integer) list.get(i).getId()), (String) list.get(i).getFileType()).getObj();
+                            list.get(i).setFileList(fileList);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return RespBean.error("查询失败！");
+            }
+        }else{
+            return RespBean.error("路线或任务id为空！");
+        }
+        return RespBean.ok("查询成功！",list);
+    }
+
     public RespBean findSignedList(Integer routeId,String taskId) {
         List<BizSignedPoint> list = null;
         if(taskId != null) {
@@ -130,36 +160,29 @@ public class SignPointServiceImpl {
         return RespBean.ok("查询成功！",list);
     }
 
-//    public RespBean findCondition(String waterManagementOffice,String fixedPointInspectionType,
-//                                  String planInspectionMileage,String createdTime,
-//                                  String SignPointName,String SignPointCreator,
-//                                  String SignPointType) {
-//        Specification<BizSignPoint> spec = new Specification<BizSignPoint>() {
-//            @Override
-//            public Predicate toPredicate(Root<BizSignPoint> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-//               //从root取属性
-//                Path<Object> path1 = root.get("waterManagementOffice");
-//                Path<Object> path2 = root.get("fixedPointInspectionType");
-//                Path<Object> path3 = root.get("planInspectionMileage");
-//                Path<Object> path4 = root.get("createdTime");
-//                Path<Object> path5 = root.get("SignPointName");
-//                Path<Object> path6 = root.get("SignPointCreator");
-//                Path<Object> path7 = root.get("SignPointType");
-//                //cb构造查询条件
-//                Predicate p1 = cb.equal(path1, waterManagementOffice);
-//                Predicate p2 = cb.equal(path2, waterManagementOffice);
-//                Predicate p3 = cb.equal(path3, waterManagementOffice);
-//                Predicate p4 = cb.equal(path4, waterManagementOffice);
-//                Predicate p5 = cb.equal(path5, waterManagementOffice);
-//                Predicate p6 = cb.equal(path6, waterManagementOffice);
-//                Predicate p7 = cb.equal(path7, waterManagementOffice);
-//                //cb连接查询条件
-//                Predicate predicate = cb.and(p1, p2, p3, p4, p5, p5, p7);
-//                return predicate;
-//            }
-//        };
-//        Sort sort = Sort.by(Sort.Direction.DESC,"createdTime");
-//        List<BizSignPoint> SignPointList = signPointRepository.findAll(spec,sort);
-//       return RespBean.ok("查询成功！",SignPointList);
-//    }
+    public RespBean taskPoint(List<String> taskIds,Integer routeId) {
+        if(!taskIds.isEmpty() && routeId != null){
+            List<BizSignPoint> signPointList = signPointRepository.findSignPointListByRouteId(routeId);
+            for (int i = 0; i < taskIds.size(); i++) {
+                for (int j = 0; j < signPointList.size(); j++) {
+                    BizSignPoint bizSignPoint = signPointList.get(j);
+                    HashMap<String, Object> hashMap = objectToMap(bizSignPoint);
+                    hashMap.put("taskId",taskIds.get(i));
+                    hashMap.put("fileType","");
+                    BizSignedPoint bizSignedPoint = JSONObject.parseObject(JSONObject.toJSONString(hashMap), BizSignedPoint.class);
+                    bizSignedPoint.setId(null);
+                    bizSignedPoint.setSignPointStatus("未签到");
+                    bizSignedPoint.setEnabled(1);
+                    signedPointRepository.save(bizSignedPoint);
+                }
+            }
+            return RespBean.ok("新建成功！");
+        }
+        return RespBean.error("新建异常！任务Id或路线Id不能为空！");
+    }
+
+    public static HashMap<String,Object> objectToMap(Object object){
+        return JSONObject.parseObject(JSONObject.toJSONString(object),HashMap.class);
+    }
+
 }
