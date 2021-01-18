@@ -52,10 +52,16 @@ public class RouteController {
         return routeService.findAll(request);
     }
 
+    @ApiOperation("查询未删除路线列表")
+    @GetMapping("findExitList")
+    public RespBean findExitList(HttpServletRequest request){
+        return routeService.findExitAll(request);
+    }
+
     @ApiOperation("查询路线名称和id")
     @GetMapping("findSelection")
-    public RespBean findSelection(){
-        return routeService.findSelection();
+    public RespBean findSelection(@RequestParam String code){
+        return routeService.findSelection(code);
     }
 
     @ApiOperation("查询定点巡查类型枚举")

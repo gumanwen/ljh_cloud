@@ -36,6 +36,10 @@ public class RouteServiceImpl {
 
     @Autowired
     @Lazy
+    private SignPointServiceImpl signPointService;
+
+    @Autowired
+    @Lazy
     private OauthService oauthService;
 
     @Autowired
@@ -189,13 +193,44 @@ public class RouteServiceImpl {
         return RespBean.ok("查询成功！",list);
     }
 
-    public RespBean findSelection(){
-        List<HashMap<String, Object>> selection = bizRouteRepository.findSelection();
+    public RespBean findExitAll(HttpServletRequest request){
+        String header = request.getHeader("Authorization");
+        String token =  StringUtils.substringAfter(header, "Bearer ");
+        String user = (String) oauthService.getCurrentUser(token).getObj();
+        String chineseName = (String) oauthService.getChineseName(user).getObj();
+
+        List<BizRoute> list = bizRouteRepository.findExitList(user);
+        if(!list.isEmpty()){
+            for (int i = 0; i < list.size(); i++) {
+                BizRoute route = list.get(i);
+                List<BizSignPoint> points = route.getBizSignPoints();
+                if(points.size()>0){
+                    for(int j =0; j<points.size();j++){
+                        //获取报建文件列表
+                        if(FieldUtils.isObjectNotEmpty(points.get(j).getFileType())) {
+                            List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) fileService.selectOneByPid(String.valueOf((Integer) points.get(j).getId()), (String) points.get(j).getFileType()).getObj();
+                            points.get(j).setFileList(fileList);
+                        }
+                    }
+                }
+                Map waterOfficeMenu = (Map) findEnum(route.getWaterManagementOffice()).getObj();
+                Map routeTypeMenu = (Map) findEnum(route.getRouteType()).getObj();
+                route.setRouteTypeMenu(routeTypeMenu);
+                route.setWaterOfficeMenu(waterOfficeMenu);
+                route.setRouteCreator(user);
+            }
+        }
+        return RespBean.ok("查询成功！",list);
+    }
+
+    public RespBean findSelection(String code){
+        List<HashMap<String, Object>> selection = bizRouteRepository.findSelection(code);
         return RespBean.ok("查询成功！",selection);
     }
 
     public RespBean findDetail(Integer id){
         BizRoute br = bizRouteRepository.findDetail(id);
+        List<BizSignPoint> pointList = (List<BizSignPoint>) signPointService.findList(br.getId()).getObj();
         if(br != null) {
             List<BizSignPoint> list = br.getBizSignPoints();
             //获取报建文件列表
@@ -213,6 +248,7 @@ public class RouteServiceImpl {
             Map routeTypeMenu = (Map) findEnum(br.getRouteType()).getObj();
             br.setRouteTypeMenu(routeTypeMenu);
             br.setWaterOfficeMenu(waterOfficeMenu);
+            br.setBizSignPoints(pointList);
             return RespBean.ok("查询成功！",br);
         }
         return RespBean.ok("查询成功！",br);
