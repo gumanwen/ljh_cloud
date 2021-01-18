@@ -34,7 +34,7 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
         HttpHeaders headers = request.getHeaders();
         //5. 请求头中获取令牌
         String token = headers.getFirst(AUTHORIZE_TOKEN);
-        token =  org.apache.commons.lang.StringUtils.substringAfter(token, "Bearer ");
+        token =  StringUtils.substringAfter(token, "Bearer ");
         //6. 判断请求头中是否有令牌
         if (StringUtils.isEmpty(token)) {
             //7. 响应中放入返回的状态吗, 没有权限访问

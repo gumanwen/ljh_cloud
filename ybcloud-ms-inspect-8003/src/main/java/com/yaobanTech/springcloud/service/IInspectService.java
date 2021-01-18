@@ -48,4 +48,8 @@ public interface IInspectService extends IService<Inspect> {
     Object getCurrentUser(String token);
 
     RespBean findSignedList(Integer routeId, String inspectTaskId);
+
+    RespBean stop(String inspectTaskId);
+
+    RespBean delete(String inspectTaskId);
 }

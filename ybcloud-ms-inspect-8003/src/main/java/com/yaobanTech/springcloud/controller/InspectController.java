@@ -164,6 +164,19 @@ public class InspectController {
     public Object getNameByUsername(String username) {
         return authService.getNameByUsername(username);
     }
+    /*已完成的任务不能终止。*/
+    @ApiOperation("web: 终止任务")
+    @GetMapping("/stop")
+    public RespBean stop (String inspectTaskId){
+        return iInspectService.stop(inspectTaskId);
+    }
+    /*任务计划开始时间之前和计划结束时间之后能删除*/
+    @ApiOperation("web: 删除任务")
+    @GetMapping("/delete")
+    public RespBean delete (String inspectTaskId){
+        return iInspectService.delete(inspectTaskId);
+    }
+
 
 }
 

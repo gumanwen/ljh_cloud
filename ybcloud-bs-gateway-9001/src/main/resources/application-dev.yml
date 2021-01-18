@@ -1,4 +1,6 @@
 spring:
+    autoconfigure:
+        exclude: org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationAutoConfiguration
     datasource:
         url: jdbc:sqlserver://10.1.4.23:1433;DatabaseName=kmtysw
         username: sa
@@ -73,6 +75,9 @@ mybatis:
         call-setters-on-nulls: true
 server:
     port: 8888
+ribbon:
+    ConnectTimeout: 30000
+    ReadTimeout: 7000
 ########资源服务器oauth2配置 - 此配置暂时不使用,在代码和数据库中已经存在########################################
 security:
     oauth2:
@@ -88,6 +93,5 @@ security:
             authorization:
             check-token-access: http://10.1.4.16:6003/oauth/check_token
 ########资源服务器oauth2配置 - 此配置暂时不使用,在代码和数据库中已经存在########################################
-ribbon:
-    ConnectTimeout: 30000
-    ReadTimeout: 7000
+####对接安信平台
+

@@ -530,4 +530,14 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         return RespBean.ok("").setObj(list);*/
         return respBean;
     }
+
+    @Override
+    public RespBean stop(String inspectTaskId) {
+        return null;
+    }
+
+    @Override
+    public RespBean delete(String inspectTaskId) {
+        return null;
+    }
 }
