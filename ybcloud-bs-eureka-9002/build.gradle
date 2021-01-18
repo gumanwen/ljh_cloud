@@ -1,0 +1,15 @@
+apply plugin: 'org.springframework.boot'
+
+//自定义打包配置
+//自定义打包配置
+bootJar {
+    baseName = 'eurekaService'
+    version = '0.1.0'
+}
+
+//依赖
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+// https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-netflix-eureka-server
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-eureka-server', version: '2.2.2.RELEASE'
+}
