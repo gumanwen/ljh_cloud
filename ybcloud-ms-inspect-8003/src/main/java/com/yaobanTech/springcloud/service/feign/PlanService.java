@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(value ="planService" )
 public interface PlanService {
-
     @GetMapping("/api/plan/{id}")
     RespBean findrouteId(@PathVariable("id") Integer id);
 

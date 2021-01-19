@@ -24,10 +24,10 @@ spring:
     cloud:
         nacos:
             discovery:
-                server-addr: 192.168.191.1:8848
+                server-addr: 192.168.50.91:8848
                 ip: 192.168.50.167
             config:
-                server-addr: 192.168.191.1:8848
+                server-addr: 192.168.50.91:8848
                 file-extension: properties
                 namespace: 8740fef6-e5cd-4bee-aa59-1982b454323e
                 group: DEFAULT_GROUP
@@ -95,5 +95,12 @@ ribbon:
     ReadTimeout: 7000
 eureka:
     client:
+        fetch-registry: true
+        register-with-eureka: true
         service-url:
             defaultZone: http://localhost:9002/eureka
+    instance:
+        hostname: 192.168.50.167
+        prefer-ip-address: true
+        instance-id: 192.168.50.167:8888
+        ip-address: 192.168.50.167

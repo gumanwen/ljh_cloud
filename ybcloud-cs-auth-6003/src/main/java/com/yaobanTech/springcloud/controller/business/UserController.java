@@ -7,9 +7,11 @@ import java.util.Iterator;
 import java.util.Map;
 import com.yaobanTech.springcloud.pojos.JwtUser;
 import com.yaobanTech.springcloud.pojos.RespBean;
+import com.yaobanTech.springcloud.pojos.User;
 import com.yaobanTech.springcloud.service.UserService;
 import io.jsonwebtoken.Jwts;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +21,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.provider.endpoint.TokenEndpoint;
 import org.springframework.util.Base64Utils;
 import org.springframework.util.LinkedMultiValueMap;
@@ -48,6 +52,8 @@ public class UserController {
     private UserService userService;
     @Value("${server.ip}")
     private String ip;
+    @Autowired
+    private PasswordEncoder bCryptPasswordEncoder;
 
     @GetMapping("/getCurrentUser")
     @CrossOrigin
@@ -132,6 +138,22 @@ public class UserController {
         String value = clientId + ":" + clientSecret;
         byte[] encode = Base64Utils.encode(value.getBytes());
         return "Basic " + new String(encode);
+    }
+
+    @ApiOperation(value = "注册新用户")
+    @PostMapping("/register")
+    public String register(@RequestBody Map<String,String> registerUser){
+        String name = registerUser.get("name");
+        String username = registerUser.get("username");
+        String password = bCryptPasswordEncoder.encode(registerUser.get("password"));
+        String role = registerUser.get("role");
+        User user = new User();
+        user.setName(name);
+        user.setUsername(username);
+        user.setPassword(password);
+        user.setRole(role);
+        userService.save(user);
+        return "注册成功";
     }
 }
 

@@ -2,7 +2,7 @@ server:
     port: 9002 #服务端口
 spring:
     datasource:
-        url: jdbc:sqlserver://localhost:1433;DatabaseName=ybcloud
+        url: jdbc:sqlserver://localhost:1433;DatabaseName=kmtysw
         username: sa
         password: yaobanTech3131 #yaobanTech3131
         driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
@@ -32,3 +32,4 @@ eureka:
         eviction-interval-timer-in-ms: 60000 #服务注册表清理间隔（单位毫秒，默认是60*1000）
     instance:
         hostname: 127.0.0.1
+        ip-address: 192.168.50.167

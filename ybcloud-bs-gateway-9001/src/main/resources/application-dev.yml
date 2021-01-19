@@ -20,7 +20,7 @@ spring:
             validation-timeout: 3000
             login-timeout: 5
     application:
-        name: Service
+        name: pipeNet-Inspect-Service
     cloud:
         nacos:
             discovery:
@@ -42,27 +42,27 @@ spring:
                   predicates:
                       - Path=/oauth/**
                 - id: cs-activiti
-                  uri: lb://10.1.4.16:6001 #负载均衡 动态路由
+                  uri: http://10.1.4.16:6001 #负载均衡 动态路由
                   predicates:
                       - Path=/api/activiti/**
                 - id: cs-file
-                  uri: lb://10.1.4.16:6005 #负载均衡 动态路由
+                  uri: http://10.1.4.16:6005 #负载均衡 动态路由
                   predicates:
                       - Path=/api/file/**
                 - id: cs-file1
-                  uri: lb://10.1.4.16:6005 #负载均衡 动态路由
+                  uri: http://10.1.4.16:6005 #负载均衡 动态路由
                   predicates:
                       - Path=/file/**
                 - id: ms-route
-                  uri: lb://10.1.4.16:8001 #负载均衡 动态路由
+                  uri: http://10.1.4.16:8001 #负载均衡 动态路由
                   predicates:
                       - Path=/api/route/**
                 - id: ms-plan
-                  uri: lb://10.1.4.16:8002 #负载均衡 动态路由
+                  uri: http://10.1.4.16:8002 #负载均衡 动态路由
                   predicates:
                       - Path=/api/plan/**
                 - id: ms-inspect
-                  uri: lb://10.1.4.16:8003 #负载均衡 动态路由
+                  uri: http://10.1.4.16:8003 #负载均衡 动态路由
                   predicates:
                       - Path=/api/inspect/**
 mybatis:

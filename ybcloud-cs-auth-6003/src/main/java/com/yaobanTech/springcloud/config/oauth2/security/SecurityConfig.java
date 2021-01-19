@@ -11,7 +11,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @EnableWebSecurity /*启用springsecurity*/
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
     /**
      * 引入密码加密类
      * @return

@@ -9,6 +9,9 @@ bootJar {
 //依赖
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    compile group: 'com.alibaba.cloud', name: 'spring-cloud-starter-alibaba-nacos-discovery', version: '2.2.1.RELEASE'
+    compile group: 'com.alibaba.cloud', name: 'spring-cloud-starter-alibaba-nacos-config', version: '2.2.1.RELEASE'
     compile group: 'org.projectlombok', name: 'lombok', version: '1.18.12'
     // https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-boot-starter
     compile group: 'com.baomidou', name: 'mybatis-plus-boot-starter', version: '3.3.2'

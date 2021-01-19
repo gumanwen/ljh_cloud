@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@FeignClient(value ="routeService" )
+@FeignClient(value ="routeService")
 public interface RouteService {
     /*签到点详情*/
     @GetMapping("/api/route/signPoint/findSignPoint")

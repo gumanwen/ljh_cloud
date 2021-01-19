@@ -65,12 +65,13 @@ configure(subprojects) {
     dependencies {
         //springcloudgateway的内部是通过netty+webflux实现的，webflux实现和springmvc配置依赖冲突。
         //implementation 'org.springframework.boot:spring-boot-starter-web'
-        //implementation 'org.springframework.boot:spring-boot-starter-actuator'//影响eureka和nacos共存
+        //影响eureka和nacos共存
+        //implementation 'org.springframework.boot:spring-boot-starter-actuator'
         implementation group: 'org.mybatis.spring.boot', name: 'mybatis-spring-boot-starter', version: '2.1.2'
         implementation group: 'org.springframework.boot', name: 'spring-boot-devtools', version: '2.3.5.RELEASE'
         implementation group: 'com.microsoft.sqlserver', name: 'mssql-jdbc', version: '7.4.1.jre8'
+        //eureka微服务不需要nacos
         //compile group: 'com.alibaba.cloud', name: 'spring-cloud-starter-alibaba-nacos-discovery', version: '2.2.1.RELEASE'
-        // https://mvnrepository.com/artifact/com.alibaba.cloud/spring-cloud-starter-alibaba-nacos-config
         //compile group: 'com.alibaba.cloud', name: 'spring-cloud-starter-alibaba-nacos-config', version: '2.2.1.RELEASE'
         // https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-openfeign
         compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '2.2.5.RELEASE'
