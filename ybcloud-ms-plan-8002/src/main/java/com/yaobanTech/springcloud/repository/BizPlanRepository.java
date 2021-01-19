@@ -30,4 +30,8 @@ public interface BizPlanRepository extends JpaRepository<BizPlan,Integer>, JpaSp
     List<HashMap<String,Object>> findSelection(Integer routeId);
 
 
+    @Modifying
+    @Query("update BizPlan t set t.enabled = t.enabled + 1 where t.routeId = ?1")
+    void testFeign(Integer routeId);
+
 }

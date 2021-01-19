@@ -5,6 +5,8 @@ import com.yaobanTech.springcloud.domain.BizPlan;
 import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.domain.enumDef.EnumMenu;
 import com.yaobanTech.springcloud.repository.BizPlanRepository;
+import io.seata.core.context.RootContext;
+import io.seata.spring.annotation.GlobalTransactional;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -125,6 +127,7 @@ public class PlanService {
         return RespBean.ok("查询成功！",routeId);
     }
 
+    @GlobalTransactional
     public RespBean findAll(HttpServletRequest request){
         String header = request.getHeader("Authorization");
         String token =  StringUtils.substringAfter(header, "Bearer ");
@@ -139,7 +142,11 @@ public class PlanService {
                 Map ps = (Map) findEnum(plan.getPlanStatus()).getObj();
                 plan.setPlanTypeMenu(map);
                 plan.setPlanStatusMenu(ps);
-                Object o = routeService.findDetail(plan.getRouteId()).getObj();
+                RespBean respBean = routeService.findDetail(plan.getRouteId());
+                Object o = respBean.getObj();
+                if(respBean.getStatus() == 500){
+                    throw new RuntimeException("Feign调用路线服务失败！");
+                }
                 plan.setRouteObj(o);
             }
         }
@@ -151,6 +158,7 @@ public class PlanService {
         return RespBean.ok("查询成功！",selection);
     }
 
+    @Transactional
     public RespBean findById(Integer id){
         BizPlan bp = bizPlanRepository.findDetail(id);
         if(bp != null) {
@@ -158,7 +166,11 @@ public class PlanService {
             Map ps = (Map) findEnum(bp.getPlanStatus()).getObj();
             bp.setPlanTypeMenu(map);
             bp.setPlanStatusMenu(ps);
-            Object o = routeService.findDetail(bp.getRouteId()).getObj();
+            RespBean respBean = routeService.findDetail(bp.getRouteId());
+            Object o = respBean.getObj();
+            if(respBean.getStatus() == 500){
+                throw new RuntimeException("Feign调用路线服务失败！");
+            }
             bp.setRouteObj(o);
             return RespBean.ok("查询成功！", bp);
         }
@@ -203,4 +215,13 @@ public class PlanService {
         }
         return RespBean.ok("查询成功！", map);
     }
+
+    @GlobalTransactional
+    public RespBean testFeign(Integer routeId){
+       bizPlanRepository.testFeign(routeId);
+       routeService.testFeign(routeId);
+        return RespBean.ok("测试成功！", RootContext.getXID());
+    }
+
+
 }

@@ -87,4 +87,11 @@ public class PlanController {
     public RespBean findEnum(@RequestParam String code){
         return planService.findEnum(code);
     }
+
+    @ApiOperation("测试事务")
+    @GetMapping("testFeign")
+    public RespBean testFeign(@RequestParam Integer routeId){
+        return planService.testFeign(routeId);
+    }
+
 }

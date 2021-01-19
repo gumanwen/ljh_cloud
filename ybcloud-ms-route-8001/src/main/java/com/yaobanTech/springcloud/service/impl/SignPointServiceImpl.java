@@ -8,6 +8,7 @@ import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.repository.BizSignPointMapper;
 import com.yaobanTech.springcloud.repository.BizSignPointRepository;
 import com.yaobanTech.springcloud.repository.BizSignedPointRepository;
+import io.seata.spring.annotation.GlobalTransactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -121,6 +122,7 @@ public class SignPointServiceImpl {
         return RespBean.ok("查询成功！",list);
     }
 
+    @GlobalTransactional
     public RespBean findListByTaskId(Integer routeId,String taskId) {
         List<BizSignedPoint> list = null;
         if(taskId != null && routeId != null) {
@@ -130,7 +132,11 @@ public class SignPointServiceImpl {
                     for(int i =0; i<list.size(); i++){
                         //获取报建文件列表
                         if(FieldUtils.isObjectNotEmpty(list.get(i).getFileType())) {
-                            List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) fileService.selectOneByPid(String.valueOf((Integer) list.get(i).getId()), (String) list.get(i).getFileType()).getObj();
+                            RespBean respBean = fileService.selectOneByPid(String.valueOf((Integer) list.get(i).getId()), (String) list.get(i).getFileType());
+                            List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) respBean.getObj();
+                            if(respBean.getStatus() == 500){
+                                throw new RuntimeException("Feign调用文件服务失败");
+                            }
                             list.get(i).setFileList(fileList);
                         }
                     }
