@@ -86,12 +86,12 @@ public class RouteServiceImpl {
         if(bizRoute.getId() != null && !bizRoute.getBizSignPoints().isEmpty()) {
             try {
                 List<BizSignPoint> pointList = bizRoute.getBizSignPoints();
-                for (int i = 0; i <pointList.size() ; i++) {
-                    Integer id = pointList.get(i).getId();
-                    if(id == null || "".equals(id)){
-                        return RespBean.error("签到点ID为空,修改失败！");
-                    }
-                }
+//                for (int i = 0; i <pointList.size() ; i++) {
+//                    Integer id = pointList.get(i).getId();
+//                    if(id == null || "".equals(id)){
+//                        return RespBean.error("签到点ID为空,修改失败！");
+//                    }
+//                }
                 List<BizSignPoint> list = bizSignPointRepository.saveAll(bizRoute.getBizSignPoints());
                 BizRoute route = bizRouteRepository.save(bizRoute);
 
@@ -102,7 +102,7 @@ public class RouteServiceImpl {
         }else{
             return RespBean.error("id为空或签到点信息为空！");
         }
-        return RespBean.ok("修改成功！");
+        return RespBean.ok("修改成功！",bizRoute.getBizSignPoints());
     }
 
     public RespBean deleteRoute(Integer id) {

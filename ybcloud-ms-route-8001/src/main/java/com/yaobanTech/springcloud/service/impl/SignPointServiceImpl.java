@@ -1,21 +1,20 @@
 package com.yaobanTech.springcloud.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.yaobanTech.springcloud.domain.BizSignPoint;
-import com.yaobanTech.springcloud.domain.BizSignedPoint;
-import com.yaobanTech.springcloud.domain.FieldUtils;
-import com.yaobanTech.springcloud.domain.RespBean;
+import com.yaobanTech.springcloud.domain.*;
+import com.yaobanTech.springcloud.domain.enumDef.EnumMenu;
+import com.yaobanTech.springcloud.repository.BizRouteRepository;
 import com.yaobanTech.springcloud.repository.BizSignPointMapper;
 import com.yaobanTech.springcloud.repository.BizSignPointRepository;
 import com.yaobanTech.springcloud.repository.BizSignedPointRepository;
 import io.seata.spring.annotation.GlobalTransactional;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 
 @Service
 public class SignPointServiceImpl {
@@ -29,7 +28,11 @@ public class SignPointServiceImpl {
 
     @Autowired
     @Lazy
-    private BizSignPointMapper bizSignPointMapper;
+    private BizRouteRepository bizRouteRepository;
+
+    @Autowired
+    @Lazy
+    private OauthService oauthService;
 
     @Autowired
     @Lazy
@@ -107,11 +110,57 @@ public class SignPointServiceImpl {
         return RespBean.ok("查询成功！",byId);
     }
 
+    public RespBean findListByUser(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        String token =  StringUtils.substringAfter(header, "Bearer ");
+        String user = (String) oauthService.getCurrentUser(token).getObj();
+        if(oauthService.getCurrentUser(token).getStatus() == 500){
+            throw new RuntimeException("Feign调用权限服务失败");
+        }
+        String chineseName = (String) oauthService.getChineseName(user).getObj();
+        if(oauthService.getChineseName(user).getStatus() == 500){
+            throw new RuntimeException("Feign调用权限服务失败");
+        }
+        List<BizRoute> routeList = bizRouteRepository.findList(user);
+        List<BizSignPoint> list = new ArrayList<>();
+        if(!routeList.isEmpty()){
+            for (int i = 0; i < routeList.size(); i++) {
+                BizRoute route = routeList.get(i);
+                String pointInspectionType = route.getPointInspectionType();
+                String routeType = route.getRouteType();
+                String waterManagementOffice = route.getWaterManagementOffice();
+                Map pointInspectionTypeEnum = (Map) EnumMenu.findEnum(pointInspectionType).getObj();
+                Map routeTypeEnum = (Map) EnumMenu.findEnum(routeType).getObj();
+                Map waterManagementOfficeEnum = (Map) EnumMenu.findEnum(waterManagementOffice).getObj();
+                List<BizSignPoint> points = route.getBizSignPoints();
+                if(points.size()>0){
+                    for(int j =0; j<points.size();j++){
+                        //获取报建文件列表
+                        if(FieldUtils.isObjectNotEmpty(points.get(j).getFileType())) {
+                            RespBean respBean = fileService.selectOneByPid(String.valueOf((Integer) points.get(j).getId()), (String) points.get(j).getFileType());
+                            List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) respBean.getObj();
+                            if(respBean.getStatus() == 500){
+                                throw new RuntimeException("Feign调用文件服务失败");
+                            }
+                            Map signPointTypeEnum = (Map) EnumMenu.findEnum(points.get(j).getSignPointType()).getObj();
+                            points.get(j).setFileList(fileList);
+                            points.get(j).setWaterUseOfficeEnum(waterManagementOfficeEnum);
+                            points.get(j).setSignPointTypeEnum(pointInspectionTypeEnum);
+                            points.get(j).setRouteTypeEnum(routeTypeEnum);
+                        }
+                        list.add(points.get(j));
+                    }
+                }
+            }
+        }
+        return RespBean.ok("查询成功！",list);
+    }
+
     public RespBean findList(Integer routeId) {
         List<BizSignPoint> list = null;
         if(routeId != null) {
             try {
-                 list = signPointRepository.findSignPointListByRouteId(routeId);
+                list = signPointRepository.findSignPointListByRouteId(routeId);
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("查询失败！");
@@ -185,6 +234,25 @@ public class SignPointServiceImpl {
             return RespBean.ok("新建成功！");
         }
         return RespBean.error("新建异常！任务Id或路线Id不能为空！");
+    }
+
+    public  RespBean findEnum(String code){
+        Map<String, Object> map = new HashMap<>();
+        if(code != null) {
+            EnumMenu[] menus = EnumMenu.values();
+            for (int i = 0; i < menus.length; i++) {
+                EnumMenu menu = menus[i];
+                if (code.equals(menu.getCode())) {
+                    map.put("mode", menu.getMode());
+                    map.put("code", menu.getCode());
+                    map.put("desc", menu.getDesc());
+                    break;
+                }
+            }
+        }else{
+            return RespBean.error("枚举code为空！");
+        }
+        return RespBean.ok("查询成功！", map);
     }
 
     public static HashMap<String,Object> objectToMap(Object object){

@@ -9,6 +9,7 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 
@@ -46,10 +47,16 @@ public class SignPointController {
         return signPointService.findSignPoint(id);
     }
 
-    @ApiOperation("查询签到点列表")
+    @ApiOperation("查询路线对应签到点列表")
     @GetMapping("findList")
     public RespBean findList(@RequestParam Integer routeId){
         return signPointService.findList(routeId);
+    }
+
+    @ApiOperation("查询角色所有签到点列表")
+    @GetMapping("findListByUser")
+    public RespBean findListByUser(HttpServletRequest request){
+        return signPointService.findListByUser(request);
     }
 
     @ApiOperation("根据taskId查询签到点列表")

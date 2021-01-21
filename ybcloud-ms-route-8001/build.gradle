@@ -22,7 +22,10 @@ dependencies {
     compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.22'
     // https://mvnrepository.com/artifact/com.alibaba/druid-spring-boot-starter
     compile group: 'com.alibaba', name: 'druid-spring-boot-starter', version: '1.2.4'
-
+    // https://mvnrepository.com/artifact/com.alibaba.cloud/spring-cloud-alibaba-seata
+    compile group: 'com.alibaba.cloud', name: 'spring-cloud-alibaba-seata', version: '2.1.0.RELEASE'
+    // https://mvnrepository.com/artifact/io.seata/seata-server
+    compile group: 'io.seata', name: 'seata-server', version: '0.7.1'
 
 
     testImplementation('org.springframework.boot:spring-boot-starter-test') {

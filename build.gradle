@@ -83,10 +83,6 @@ configure(subprojects) {
         compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.7.0'
         // https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui
         compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.7.0'
-        // https://mvnrepository.com/artifact/com.alibaba.cloud/spring-cloud-alibaba-seata
-        compile group: 'com.alibaba.cloud', name: 'spring-cloud-alibaba-seata', version: '2.1.0.RELEASE'
-        // https://mvnrepository.com/artifact/io.seata/seata-server
-        compile group: 'io.seata', name: 'seata-server', version: '0.7.1'
     }
     jar {
         manifest.attributes provider: 'gradle'
