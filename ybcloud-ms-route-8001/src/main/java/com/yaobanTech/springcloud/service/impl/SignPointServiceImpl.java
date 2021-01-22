@@ -14,9 +14,11 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 import java.util.*;
 
 @Service
+@Transactional
 public class SignPointServiceImpl {
     @Autowired
     @Lazy
@@ -110,6 +112,7 @@ public class SignPointServiceImpl {
         return RespBean.ok("查询成功！",byId);
     }
 
+    @GlobalTransactional
     public RespBean findListByUser(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
         String token =  StringUtils.substringAfter(header, "Bearer ");
