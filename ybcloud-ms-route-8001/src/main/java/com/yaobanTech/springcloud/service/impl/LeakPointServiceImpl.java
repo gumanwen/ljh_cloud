@@ -9,15 +9,15 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 @Service
-@Transactional
 public class LeakPointServiceImpl {
     @Autowired
     @Lazy
@@ -106,15 +106,15 @@ public class LeakPointServiceImpl {
         return RespBean.ok("删除成功！");
     }
 
-    @GlobalTransactional
     public RespBean findDetail(Integer id) {
         BizLeakPointEntity blpe = null;
         if(id != null) {
             try {
                 blpe = leakPointRepository.findBizLeakPointEntity(id);
-                String chineseName = (String) oauthService.getChineseName(blpe.getCommitBy()).getObj();
+                RespBean bean = oauthService.getChineseName(blpe.getCommitBy());
+                String chineseName = (String)bean.getObj();
                 blpe.setCommitBy(chineseName);
-                if(oauthService.getChineseName(blpe.getCommitBy()).getStatus() == 500){
+                if(bean.getStatus() == 500){
                     throw new RuntimeException("Feign调用权限服务失败");
                 }
             } catch (Exception e) {
@@ -127,8 +127,8 @@ public class LeakPointServiceImpl {
         return RespBean.ok("查询成功！",blpe);
     }
 
-    @GlobalTransactional
-    public RespBean findListByUser(HttpServletRequest request) {
+     @Transactional(propagation= Propagation.NOT_SUPPORTED)
+     public RespBean findListByUser(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
         String token =  StringUtils.substringAfter(header, "Bearer ");
         String user = (String) oauthService.getCurrentUser(token).getObj();
@@ -139,7 +139,7 @@ public class LeakPointServiceImpl {
         if(oauthService.getChineseName(user).getStatus() == 500){
             throw new RuntimeException("Feign调用权限服务失败");
         }
-        List<BizLeakPointEntity> list = leakPointRepository.findList(user);
+        List<BizLeakPointEntity> list = leakPointRepository.findOfList(user);
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
                 BizLeakPointEntity bizLeakPointEntity = list.get(i);

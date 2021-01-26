@@ -1,28 +1,33 @@
 package com.yaobanTech.springcloud.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.yaobanTech.springcloud.domain.*;
-import com.yaobanTech.springcloud.domain.enumDef.EnumMenu;
+import com.yaobanTech.springcloud.domain.BizHiddenDangerPointEntity;
+import com.yaobanTech.springcloud.domain.BizSuggestionEntity;
+import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.repository.BizHiddenDangerPointRepository;
-import com.yaobanTech.springcloud.repository.BizRouteRepository;
-import com.yaobanTech.springcloud.repository.BizSignPointRepository;
-import com.yaobanTech.springcloud.repository.BizSignedPointRepository;
+import com.yaobanTech.springcloud.repository.SuggestionRepository;
 import io.seata.spring.annotation.GlobalTransactional;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 @Service
-@Transactional
 public class HiddenDangerPointServiceImpl {
     @Autowired
     @Lazy
     private BizHiddenDangerPointRepository hiddenDangerPointRepository;
+
+    @Autowired
+    @Lazy
+    private SuggestionRepository suggestionRepository;
 
     @Autowired
     @Lazy
@@ -61,6 +66,7 @@ public class HiddenDangerPointServiceImpl {
                 }
                 bizHiddenDangerPointEntity.setCommitDate(new Date());
                 bizHiddenDangerPointEntity.setEnabled(1);
+                bizHiddenDangerPointEntity.setHiddenDangerStatus("未跟进");
                 bizHiddenDangerPointEntity.setCommitBy(user);
                 bizHiddenDangerPointEntity.setHiddenDangerPointCode(hiddenDangerPointCode);
                hiddenDangerPointRepository.save(bizHiddenDangerPointEntity);
@@ -113,8 +119,10 @@ public class HiddenDangerPointServiceImpl {
         if(id != null) {
             try {
                 bdpe = hiddenDangerPointRepository.findHiddenDangerPoint(id);
+                List<BizSuggestionEntity> suggestionEntityList = suggestionRepository.findList(bdpe.getHiddenDangerPointCode());
                 String chineseName = (String) oauthService.getChineseName(bdpe.getCommitBy()).getObj();
                 bdpe.setCommitBy(chineseName);
+                bdpe.setHandleAdvice(suggestionEntityList);
                 if(oauthService.getChineseName(bdpe.getCommitBy()).getStatus() == 500){
                     throw new RuntimeException("Feign调用权限服务失败");
                 }
@@ -128,7 +136,7 @@ public class HiddenDangerPointServiceImpl {
         return RespBean.ok("查询成功！",bdpe);
     }
 
-    @GlobalTransactional
+    @Transactional(propagation= Propagation.NOT_SUPPORTED)
     public RespBean findListByUser(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
         String token =  StringUtils.substringAfter(header, "Bearer ");
@@ -145,6 +153,8 @@ public class HiddenDangerPointServiceImpl {
             for (int i = 0; i < list.size(); i++) {
                 BizHiddenDangerPointEntity bizHiddenDangerPointEntity = list.get(i);
                 bizHiddenDangerPointEntity.setCommitBy(chineseName);
+                List<BizSuggestionEntity> suggestionEntityList = suggestionRepository.findList(bizHiddenDangerPointEntity.getHiddenDangerPointCode());
+                bizHiddenDangerPointEntity.setHandleAdvice(suggestionEntityList);
 //                if(points.size()>0){
 //                    for(int j =0; j<points.size();j++){
 //                        //获取报建文件列表

@@ -76,10 +76,10 @@ public class RouteController {
         return routeService.findEnum(code);
     }
 
-    @ApiOperation("测试事务")
-    @GetMapping("testFeign")
-    public RespBean testFeign(@RequestParam Integer routeId){
-        return routeService.testFeign(routeId);
-    }
+//    @ApiOperation("测试事务")
+//    @GetMapping("testFeign")
+//    public RespBean testFeign(@RequestParam Integer routeId){
+//        return routeService.testFeign(routeId);
+//    }
 
 }

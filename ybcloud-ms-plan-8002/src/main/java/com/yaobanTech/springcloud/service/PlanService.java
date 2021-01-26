@@ -5,6 +5,7 @@ import com.yaobanTech.springcloud.domain.BizPlan;
 import com.yaobanTech.springcloud.domain.FindCondition;
 import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.domain.enumDef.EnumMenu;
+import com.yaobanTech.springcloud.repository.BizPlanMapper;
 import com.yaobanTech.springcloud.repository.BizPlanRepository;
 import io.seata.core.context.RootContext;
 import io.seata.spring.annotation.GlobalTransactional;
@@ -34,6 +35,10 @@ public class PlanService {
 
     @Autowired
     @Lazy
+    private BizPlanMapper bizPlanMapper;
+
+    @Autowired
+    @Lazy
     private RouteService routeService;
 
     @Autowired
@@ -55,6 +60,8 @@ public class PlanService {
         if(bizPlan != null) {
             try {
                 bizPlan.setEnabled(1);
+                bizPlan.setPlanStatus("11");
+                bizPlan.setPlanCreatedTime(new Date());
                 String header = request.getHeader("Authorization");
                 String token =  StringUtils.substringAfter(header, "Bearer ");
                 String user = (String) oauthService.getCurrentUser(token).getObj();
@@ -86,7 +93,7 @@ public class PlanService {
         BizPlan bizPlan = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizPlan.class);
         if(bizPlan.getId() != null) {
             try {
-                BizPlan plan = bizPlanRepository.save(bizPlan);
+                bizPlanMapper.update(bizPlan);
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("修改失败！");
@@ -147,8 +154,10 @@ public class PlanService {
                 plan.setPlanCreatedBy(chineseName);
                 Map map = (Map) findEnum(plan.getPlanType()).getObj();
                 Map ps = (Map) findEnum(plan.getPlanStatus()).getObj();
+                Map pp = (Map) findEnum(plan.getPlanPorid()).getObj();
                 plan.setPlanTypeMenu(map);
                 plan.setPlanStatusMenu(ps);
+                plan.setPlanPoridMenu(pp);
                 RespBean respBean = routeService.findDetail(plan.getRouteId());
                 Object o = respBean.getObj();
                 if(respBean.getStatus() == 500){
@@ -171,8 +180,10 @@ public class PlanService {
         if(bp != null) {
             Map map = (Map) findEnum(bp.getPlanType()).getObj();
             Map ps = (Map) findEnum(bp.getPlanStatus()).getObj();
+            Map pp = (Map) findEnum(bp.getPlanPorid()).getObj();
             bp.setPlanTypeMenu(map);
             bp.setPlanStatusMenu(ps);
+            bp.setPlanPoridMenu(pp);
             RespBean respBean = routeService.findDetail(bp.getRouteId());
             Object o = respBean.getObj();
             if(respBean.getStatus() == 500){

@@ -1,5 +1,8 @@
 package com.yaobanTech.springcloud.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -37,6 +40,11 @@ public class BizSuggestionEntity {
 	/**
 	 * 意见时间
 	 */
+	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(
+			pattern = "yyyy-MM-dd HH:mm:ss",
+			timezone = "GMT+8"
+	)
    @Column(name = "commit_date" )
 	private Date commitDate;
 

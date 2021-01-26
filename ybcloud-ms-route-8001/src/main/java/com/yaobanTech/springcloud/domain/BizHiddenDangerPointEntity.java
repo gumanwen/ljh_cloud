@@ -1,7 +1,11 @@
 package com.yaobanTech.springcloud.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Description  
@@ -106,9 +110,7 @@ public class BizHiddenDangerPointEntity {
 	private String riskLevel;
 
 	/**
-	 * 保护供水管
-网设施告知
-书
+	 * 保护供水管网设施告知书
 	 */
    @Column(name = "network_notification" )
 	private String networkNotification;
@@ -128,6 +130,11 @@ public class BizHiddenDangerPointEntity {
 	/**
 	 * 提交时间
 	 */
+	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(
+			pattern = "yyyy-MM-dd HH:mm:ss",
+			timezone = "GMT+8"
+	)
    @Column(name = "commit_date" )
 	private Date commitDate;
 
@@ -136,6 +143,37 @@ public class BizHiddenDangerPointEntity {
 	 */
    @Column(name = "enabled" )
 	private Integer enabled;
+
+	/**
+	 * 隐患状态
+	 */
+	@Column(name = "hidden_danger_status" )
+	private String hiddenDangerStatus;
+
+	/**
+	 * 结束时间
+	 */
+	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(
+			pattern = "yyyy-MM-dd HH:mm:ss",
+			timezone = "GMT+8"
+	)
+	@Column(name = "end_date" )
+	private Date endDate;
+
+	/**
+	 * 隐患时长
+	 */
+	@Transient
+	private String hiddenLast;
+
+	/**
+	 * 处理意见
+	 */
+	@Transient
+	private List<BizSuggestionEntity> handleAdvice;
+
+
 
 	public BizHiddenDangerPointEntity() {
 	}
@@ -161,6 +199,38 @@ public class BizHiddenDangerPointEntity {
 		this.commitBy = commitBy;
 		this.commitDate = commitDate;
 		this.enabled = enabled;
+	}
+
+	public List<BizSuggestionEntity> getHandleAdvice() {
+		return handleAdvice;
+	}
+
+	public void setHandleAdvice(List<BizSuggestionEntity> handleAdvice) {
+		this.handleAdvice = handleAdvice;
+	}
+
+	public String getHiddenDangerStatus() {
+		return hiddenDangerStatus;
+	}
+
+	public void setHiddenDangerStatus(String hiddenDangerStatus) {
+		this.hiddenDangerStatus = hiddenDangerStatus;
+	}
+
+	public Date getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
+
+	public String getHiddenLast() {
+		return hiddenLast;
+	}
+
+	public void setHiddenLast(String hiddenLast) {
+		this.hiddenLast = hiddenLast;
 	}
 
 	public Integer getId() {

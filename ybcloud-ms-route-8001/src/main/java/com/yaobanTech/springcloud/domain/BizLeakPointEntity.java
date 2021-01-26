@@ -1,11 +1,15 @@
 package com.yaobanTech.springcloud.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.persistence.*;
 import java.util.Date;
 
 /**
  * @Description  
- * @Author  浣滆�呭悕绉癨n * @Date 2021-01-22 14:07:11 
+ * @Author  yuxy
+ * @Date 2021-01-22 14:07:11
  */
 
 @Entity
@@ -96,8 +100,24 @@ public class BizLeakPointEntity {
 	/**
 	 * 提交时间
 	 */
+	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(
+			pattern = "yyyy-MM-dd HH:mm:ss",
+			timezone = "GMT+8"
+	)
    @Column(name = "commit_Date" )
 	private Date commitDate;
+
+   /**
+	 * 结束时间
+	 */
+   @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+   @JsonFormat(
+		   pattern = "yyyy-MM-dd HH:mm:ss",
+		   timezone = "GMT+8"
+   )
+   @Column(name = "end_Date" )
+	private Date endDate;
 
 	/**
 	 * 是否有效
@@ -105,10 +125,16 @@ public class BizLeakPointEntity {
    @Column(name = "enabled" )
 	private Integer enabled;
 
+   /**
+	 * 漏点状态
+	 */
+   @Column(name = "leak_point_status" )
+	private String leakPointStatus;
+
 	public BizLeakPointEntity() {
 	}
 
-	public BizLeakPointEntity(Integer id, String leakPointCode, Integer routeId, String waterUseOffice, String equipmentName, String equipmentSize, String abnormalPhenomena, String abnormalReason, String currentPosition, String autoGetPositon, String memo, String assetType, String commitBy, Date commitDate, Integer enabled) {
+	public BizLeakPointEntity(Integer id, String leakPointCode, Integer routeId, String waterUseOffice, String equipmentName, String equipmentSize, String abnormalPhenomena, String abnormalReason, String currentPosition, String autoGetPositon, String memo, String assetType, String commitBy, Date commitDate, Date endDate, Integer enabled, String leakPointStatus) {
 		this.id = id;
 		this.leakPointCode = leakPointCode;
 		this.routeId = routeId;
@@ -123,7 +149,25 @@ public class BizLeakPointEntity {
 		this.assetType = assetType;
 		this.commitBy = commitBy;
 		this.commitDate = commitDate;
+		this.endDate = endDate;
 		this.enabled = enabled;
+		this.leakPointStatus = leakPointStatus;
+	}
+
+	public Date getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
+
+	public String getLeakPointStatus() {
+		return leakPointStatus;
+	}
+
+	public void setLeakPointStatus(String leakPointStatus) {
+		this.leakPointStatus = leakPointStatus;
 	}
 
 	public Integer getId() {
@@ -263,7 +307,9 @@ public class BizLeakPointEntity {
 				", assetType='" + assetType + '\'' +
 				", commitBy='" + commitBy + '\'' +
 				", commitDate=" + commitDate +
+				", endDate=" + endDate +
 				", enabled=" + enabled +
+				", leakPointStatus='" + leakPointStatus + '\'' +
 				'}';
 	}
 }

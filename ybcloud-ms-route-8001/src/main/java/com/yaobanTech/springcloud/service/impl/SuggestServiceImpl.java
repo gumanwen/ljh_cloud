@@ -3,6 +3,8 @@ package com.yaobanTech.springcloud.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.yaobanTech.springcloud.domain.BizSuggestionEntity;
 import com.yaobanTech.springcloud.domain.RespBean;
+import com.yaobanTech.springcloud.repository.BizHiddenDangerPointRepository;
+import com.yaobanTech.springcloud.repository.BizLeakPointRepository;
 import com.yaobanTech.springcloud.repository.SuggestionRepository;
 import io.seata.spring.annotation.GlobalTransactional;
 import org.apache.commons.lang.StringUtils;
@@ -25,12 +27,20 @@ public class SuggestServiceImpl {
 
     @Autowired
     @Lazy
+    private BizHiddenDangerPointRepository hiddenDangerPointRepository;
+
+    @Autowired
+    @Lazy
+    private BizLeakPointRepository leakPointRepository;
+
+    @Autowired
+    @Lazy
     private OauthService oauthService;
 
     @GlobalTransactional
     public RespBean saveSuggestion(HashMap<String,Object> param,HttpServletRequest request) {
         BizSuggestionEntity bizSuggestionEntity = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizSuggestionEntity.class);
-        if(bizSuggestionEntity != null) {
+        if(bizSuggestionEntity != null && bizSuggestionEntity.getFCode() != null) {
             try {
                 String header = request.getHeader("Authorization");
                 String token =  StringUtils.substringAfter(header, "Bearer ");
@@ -41,7 +51,14 @@ public class SuggestServiceImpl {
                 bizSuggestionEntity.setCommitDate(new Date());
                 bizSuggestionEntity.setEnabled(1);
                 bizSuggestionEntity.setCommitBy(user);
-               suggestionRepository.save(bizSuggestionEntity);
+                suggestionRepository.save(bizSuggestionEntity);
+                String fCode = bizSuggestionEntity.getFCode();
+                if(fCode.contains("CNY")||fCode.contains("CBY")||fCode.contains("SJY")){
+                    hiddenDangerPointRepository.updateHiddenDangerPoint(bizSuggestionEntity.getFCode());
+                }
+                if(fCode.contains("CNL")||fCode.contains("CBL")||fCode.contains("SJL")){
+                    leakPointRepository.updateBizLeakPoint(bizSuggestionEntity.getFCode());
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("保存失败！");

@@ -15,7 +15,7 @@ import java.util.HashMap;
 @RestController
 @RefreshScope
 @Api(description = "漏点接口")
-@RequestMapping("/api/leakPoint")
+@RequestMapping("/api/route/leakPoint")
 public class LeakPointController {
 
     @Autowired

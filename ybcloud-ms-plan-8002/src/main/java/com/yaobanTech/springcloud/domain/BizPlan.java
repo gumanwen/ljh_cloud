@@ -160,6 +160,12 @@ public class BizPlan  implements Serializable {
 	private Map<String,Object> planTypeMenu;
 
     /**
+	 * 计划周期枚举
+	 */
+    @Transient
+	private Map<String,Object> planPoridMenu;
+
+    /**
 	 * 计划状态枚举
 	 */
     @Transient
@@ -187,6 +193,14 @@ public class BizPlan  implements Serializable {
 		this.routeId = routeId;
 		this.mainKey = mainKey;
 		this.troubleCode = troubleCode;
+	}
+
+	public Map<String, Object> getPlanPoridMenu() {
+		return planPoridMenu;
+	}
+
+	public void setPlanPoridMenu(Map<String, Object> planPoridMenu) {
+		this.planPoridMenu = planPoridMenu;
 	}
 
 	public Map<String, Object> getPlanStatusMenu() {

@@ -201,8 +201,10 @@ public class RouteServiceImpl {
                 }
                 Map waterOfficeMenu = (Map) findEnum(route.getWaterManagementOffice()).getObj();
                 Map routeTypeMenu = (Map) findEnum(route.getRouteType()).getObj();
+                Map pointInspectionTypeMenu = (Map) findEnum(route.getPointInspectionType()).getObj();
                 route.setRouteTypeMenu(routeTypeMenu);
                 route.setWaterOfficeMenu(waterOfficeMenu);
+                route.setPointInspectionTypeMenu(pointInspectionTypeMenu);
                 route.setRouteCreator(user);
             }
         }
@@ -241,8 +243,10 @@ public class RouteServiceImpl {
                 }
                 Map waterOfficeMenu = (Map) findEnum(route.getWaterManagementOffice()).getObj();
                 Map routeTypeMenu = (Map) findEnum(route.getRouteType()).getObj();
+                Map pointInspectionTypeMenu = (Map) findEnum(route.getPointInspectionType()).getObj();
                 route.setRouteTypeMenu(routeTypeMenu);
                 route.setWaterOfficeMenu(waterOfficeMenu);
+                route.setPointInspectionTypeMenu(pointInspectionTypeMenu);
                 route.setRouteCreator(user);
             }
         }
@@ -277,9 +281,11 @@ public class RouteServiceImpl {
 
             Map waterOfficeMenu = (Map) findEnum(br.getWaterManagementOffice()).getObj();
             Map routeTypeMenu = (Map) findEnum(br.getRouteType()).getObj();
+            Map pointInspectionTypeMenu = (Map) findEnum(br.getPointInspectionType()).getObj();
             br.setRouteTypeMenu(routeTypeMenu);
             br.setWaterOfficeMenu(waterOfficeMenu);
             br.setBizSignPoints(pointList);
+            br.setPointInspectionTypeMenu(pointInspectionTypeMenu);
             return RespBean.ok("查询成功！",br);
         }
         return RespBean.ok("查询成功！",br);

@@ -17,7 +17,7 @@ import java.util.List;
 @RestController
 @RefreshScope
 @Api(description = "隐患点接口")
-@RequestMapping("/api/hiddenDangerPoint")
+@RequestMapping("/api/route/hiddenDangerPoint")
 public class HiddenDangerPointController {
 
     @Autowired
