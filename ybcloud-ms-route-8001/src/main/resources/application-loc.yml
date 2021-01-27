@@ -66,3 +66,7 @@ redis:
       min-idle: 8  # 连接池中的最小空闲连接
   timeout: 12000  # 连接超时时间（毫秒）
   password: 123456
+
+ribbon:
+  ConnectTimeout: 30000
+  ReadTimeout: 7000

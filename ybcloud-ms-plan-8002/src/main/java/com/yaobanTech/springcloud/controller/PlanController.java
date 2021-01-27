@@ -71,6 +71,12 @@ public class PlanController {
         return planService.findById(id);
     }
 
+    @ApiOperation("查询路线对应的所有计划")
+    @GetMapping("findByRouteId")
+    public RespBean findByRouteId(@RequestParam Integer routeId) {
+        return planService.findByRouteId(routeId);
+    }
+
     @ApiOperation("查询任务详情列表")
     @GetMapping("findInspectListById")
     public RespBean findInspectListById(@RequestParam Integer id) {

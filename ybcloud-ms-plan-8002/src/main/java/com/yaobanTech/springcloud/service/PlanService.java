@@ -195,6 +195,12 @@ public class PlanService {
         return RespBean.ok("查询成功！", bp);
     }
 
+    @Transactional
+    public RespBean findByRouteId(Integer routeId){
+        List<BizPlan> list = bizPlanRepository.findByRouteId(routeId);
+        return RespBean.ok("查询成功！", list);
+    }
+
     public RespBean findEnumMenu(String mode){
         List<Map<String, String>> list = new ArrayList<>();
         if(mode != null) {

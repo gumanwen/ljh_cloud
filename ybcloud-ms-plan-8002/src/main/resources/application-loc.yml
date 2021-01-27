@@ -46,3 +46,7 @@ mybatis:
 
 server:
   port: 8002
+
+ribbon:
+  ConnectTimeout: 30000
+  ReadTimeout: 7000

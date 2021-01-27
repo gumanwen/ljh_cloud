@@ -42,6 +42,10 @@ public class RouteServiceImpl {
 
     @Autowired
     @Lazy
+    private PlanService planService;
+
+    @Autowired
+    @Lazy
     private OauthService oauthService;
 
     @Autowired
@@ -111,10 +115,11 @@ public class RouteServiceImpl {
             try {
                 BizRoute detail = bizRouteRepository.findDetail(id);
                 List<BizSignPoint> signPoints = detail.getBizSignPoints();
-                if(!signPoints.isEmpty()) {
+                List<Object> list = (List<Object>) planService.findByRouteId(id).getObj();
+                if(signPoints.isEmpty() && list.isEmpty()) {
                     i = bizRouteRepository.deleteRoute(id);
                 }else{
-                    return RespBean.error("删除失败！该路线包含签到点,无法进行删除操作！");
+                    return RespBean.error("删除失败！该路线包含计划或签到点,无法进行删除操作！");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -330,12 +335,12 @@ public class RouteServiceImpl {
         return RespBean.ok("查询成功！", map);
     }
 
-    public RespBean testFeign(Integer Id){
-
-      bizRouteRepository.testFeign(Id);
-
-      return RespBean.ok("修改成功！",RootContext.getXID());
-    }
+//    public RespBean testFeign(Integer Id){
+//
+//      bizRouteRepository.testFeign(Id);
+//
+//      return RespBean.ok("修改成功！",RootContext.getXID());
+//    }
 
 
 }
