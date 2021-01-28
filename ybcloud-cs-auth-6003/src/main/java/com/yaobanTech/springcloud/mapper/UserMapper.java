@@ -13,7 +13,7 @@ import java.util.Map;
 @Component
 public interface UserMapper {
 
- @Insert("insert into SEC_USER (name,username,password,role) values(#{name},#{username},#{password},#{role})")
+ @Insert("insert into SEC_USER (name,username,password,role,department) values(#{name},#{username},#{password},#{role},#{department})")
  public void save(User user);
 
  User loadUserByUsername(String username);

@@ -34,11 +34,11 @@ spring:
         gateway:
             routes:
                 - id: cs-auth
-                  uri: http://10.1.4.16:6003/ #负载均衡 动态路由
+                  uri: http://10.1.4.16:6003 #负载均衡 动态路由
                   predicates:
                       - Path=/user/**
                 - id: cs-auth
-                  uri: http://10.1.4.16:6003/ #负载均衡 动态路由
+                  uri: http://10.1.4.16:6003 #负载均衡 动态路由
                   predicates:
                       - Path=/oauth/**
                 - id: cs-activiti

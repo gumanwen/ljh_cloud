@@ -6,18 +6,13 @@ import com.yaobanTech.springcloud.service.IInspectService;
 import com.yaobanTech.springcloud.service.feign.AuthService;
 import com.yaobanTech.springcloud.service.feign.PlanService;
 import com.yaobanTech.springcloud.service.feign.RouteService;
-import io.jsonwebtoken.Jwts;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.nio.charset.StandardCharsets;
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.Map;
 
@@ -47,8 +42,8 @@ public class InspectController {
 
     @ApiOperation("app & web:获取计划任务列表")
     @GetMapping("/plan/getAllInspect")
-    public RespBean getPlanInspect(String type,HttpServletRequest request) throws IllegalAccessException {
-        return iInspectService.getPlanInspect(type,request);
+    public RespBean getPlanInspect(String type,long pageNo,long pageSize,HttpServletRequest request) throws IllegalAccessException, UnsupportedEncodingException {
+        return iInspectService.getPlanInspect(type, pageNo, pageSize,request);
     }
 
     @ApiOperation("web:根据计划编号获取计划任务列表")
@@ -65,7 +60,7 @@ public class InspectController {
 
     @ApiOperation("web：新增临时任务")
     @GetMapping("/temp/addTempTask")
-    public RespBean addTempTask(Integer routeId,String  routeName ,String inspector,String beginTime,String endTime) {
+    public RespBean addTempTask(Integer routeId,String  routeName ,String inspector,String beginTime,String endTime) throws ParseException {
         return iInspectService.addTempTask(routeId,routeName,inspector,beginTime,endTime);
     }
 
@@ -115,7 +110,7 @@ public class InspectController {
         return iInspectService.autoCreate(params);
     }
 
-    @ApiOperation("web：发起")
+    @ApiOperation("web：派发")
     @PostMapping("/task/send")
     public RespBean send(@RequestBody Map<String, Object> params,HttpServletRequest request) {
         //调用route的rest接口
@@ -164,19 +159,19 @@ public class InspectController {
     public Object getNameByUsername(String username) {
         return authService.getNameByUsername(username);
     }
+
     /*已完成的任务不能终止。*/
     @ApiOperation("web: 终止任务")
     @GetMapping("/stop")
     public RespBean stop (String inspectTaskId){
         return iInspectService.stop(inspectTaskId);
     }
+
     /*任务计划开始时间之前和计划结束时间之后能删除*/
     @ApiOperation("web: 删除任务")
     @GetMapping("/delete")
     public RespBean delete (String inspectTaskId){
         return iInspectService.delete(inspectTaskId);
     }
-
-
 }
 

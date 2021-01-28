@@ -147,11 +147,13 @@ public class UserController {
         String username = registerUser.get("username");
         String password = bCryptPasswordEncoder.encode(registerUser.get("password"));
         String role = registerUser.get("role");
+        String dept = registerUser.get("dept");
         User user = new User();
         user.setName(name);
         user.setUsername(username);
         user.setPassword(password);
         user.setRole(role);
+        user.setDepartment(dept);
         userService.save(user);
         return "注册成功";
     }

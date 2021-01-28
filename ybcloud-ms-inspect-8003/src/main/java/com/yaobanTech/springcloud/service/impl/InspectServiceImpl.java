@@ -3,8 +3,12 @@ package com.yaobanTech.springcloud.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.alibaba.nacos.client.utils.JSONUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yaobanTech.springcloud.entity.Inspect;
+import com.yaobanTech.springcloud.entity.LoginUser;
 import com.yaobanTech.springcloud.entity.utils.RedisGeneratorCode;
 import com.yaobanTech.springcloud.entity.utils.RespBean;
 import com.yaobanTech.springcloud.mapper.InspectMapper;
@@ -14,8 +18,11 @@ import com.yaobanTech.springcloud.service.feign.*;
 import com.yaobanTech.springcloud.utils.DateUtils;
 import com.yaobanTech.springcloud.utils.FieldUtils;
 import io.jsonwebtoken.Jwts;
+import io.micrometer.core.instrument.util.JsonUtils;
 import io.swagger.models.auth.In;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -23,6 +30,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -65,14 +74,24 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
 
     SimpleDateFormat daydateFormat= new SimpleDateFormat("yyyy-MM-dd");
 
+    private static final Logger logger = LoggerFactory.getLogger(InspectServiceImpl.class);
+
     @Value("${server.ip}")
     private String ip;
 
     @Value("${server.port}")
     private String port;
-
     @Override
-    public RespBean getPlanInspect(String type,HttpServletRequest request) throws IllegalAccessException {
+    public RespBean getPlanInspect(String type,long pageNo,long pageSize,HttpServletRequest request) throws IllegalAccessException, UnsupportedEncodingException {
+
+        logger.info("清远用户token="+request.getHeader("TW-AUTH-HEADER"));
+        String tokenT = request.getHeader("TW-AUTH-HEADER");
+        LoginUser loginUser = null;
+        if(FieldUtils.isStringNotEmpty(tokenT)){
+            tokenT = URLDecoder.decode(tokenT,"UTF-8");
+            loginUser = JSON.parseObject(tokenT,LoginUser.class);
+            logger.info("清远用户信息="+loginUser.toString());
+        }
         String header = request.getHeader("Authorization");
         String token =  StringUtils.substringAfter(header, "Bearer ");
         RespBean feignRespBean = authService.getCurrentUserAndRole(token);
@@ -86,33 +105,40 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         QueryWrapper<Inspect> queryWrapper = new QueryWrapper<>();
         RespBean respBean = new RespBean();
         queryWrapper.eq("task_type","计划任务");
-        List<Inspect>  list = new ArrayList<>();
+        List<Inspect> list = new ArrayList<>();
         List<Map<String,Object>> resultList = new ArrayList<>();
+        Map<String,Object> result = new HashMap<>();
         if(roles.indexOf("BZZ")== -1){//班组长
             queryWrapper.eq("inspect_person",username);
         }
+        IPage<Inspect> page = new Page<Inspect>(pageNo,pageSize);
+        page =inspectMapper.selectPage(page,queryWrapper);
         if("0".equals(type)){
             //获取未处理的列表
-            list= inspectMapper.selectList(queryWrapper.apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),begin_time,20) > convert(varchar(20),'"+date+"',20)"));
+            queryWrapper.apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),begin_time,20) > convert(varchar(20),'"+date+"',20)");
+            list= inspectMapper.selectPage(page,queryWrapper).getRecords();
             status = "未处理";
             respBean.setMsg("未处理列表");
         }else if("1".equals(type)){
             //获取处理中的列表
-            list= inspectMapper.selectList(queryWrapper.lt("complete_rate","100").apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),begin_time,20) <= convert(varchar(20),'"+date+"',20)"));
+            queryWrapper.lt("complete_rate","100").apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),begin_time,20) <= convert(varchar(20),'"+date+"',20)");
+            list= inspectMapper.selectPage(page,queryWrapper).getRecords();
             status = "处理中";
             respBean.setMsg("处理中列表");
         }else if("2".equals(type)){
             //获取已处理的列表
-            list= inspectMapper.selectList(queryWrapper.eq("complete_rate","100"));
+            queryWrapper.eq("complete_rate","100");
+            list= inspectMapper.selectPage(page,queryWrapper).getRecords();
             status = "已完成";
             respBean.setMsg("已完成列表");
         }else if("3".equals(type)){
             //获取已延期的列表
-            list= inspectMapper.selectList(queryWrapper.apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),dead_time,20) < convert(varchar(20),'"+date+"',20)"));
+            queryWrapper.apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),dead_time,20) < convert(varchar(20),'"+date+"',20)");
+            list= inspectMapper.selectPage(page,queryWrapper).getRecords();
             status = "已延期";
             respBean.setMsg("已延期列表");
         }else{
-            list= inspectMapper.selectList(queryWrapper);
+            list= inspectMapper.selectPage(page,queryWrapper).getRecords();
             respBean.setMsg("全部列表");
         }
         if(list.size()>0){
@@ -129,7 +155,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                 if(FieldUtils.isObjectNotEmpty(inspect.getPlanId())){
                     map3 = (Map<String, Object>) planService.findById(inspect.getPlanId()).getObj();
                 }
-                if(FieldUtils.isObjectNotEmpty(map2) && FieldUtils.isObjectNotEmpty(map3)) {
+                if(FieldUtils.isObjectNotEmpty(map2)) {
                     // 合并
                     Map<String, Object> combineResultMap = new HashMap<String, Object>();
                     map1 = FieldUtils.objectToMap(inspect);
@@ -143,14 +169,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                     map1.put("signIn", FieldUtils.ifObjectEmpty(map2.get("signIn")));
                     map1.put("waterOfficeMenu", FieldUtils.ifObjectEmpty(map2.get("waterOfficeMenu")));
                     map1.put("routeTypeMenu", FieldUtils.ifObjectEmpty(map2.get("routeTypeMenu")));
-                    map1.put("planName", FieldUtils.ifObjectEmpty(map3.get("planName")));
-                    map1.put("planType", FieldUtils.ifObjectEmpty(map3.get("planType")));
-                    map1.put("planPorid", FieldUtils.ifObjectEmpty(map3.get("planPorid")));
-                    map1.put("planTypeMenu", FieldUtils.ifObjectEmpty(map3.get("planTypeMenu")));
-                    if (FieldUtils.isObjectNotEmpty(map1)) {
-                        combineResultMap.putAll(map1);
-                    }
-                    resultList.add(combineResultMap);
+                    map1.put("pointInspectionTypeMenu", FieldUtils.ifObjectEmpty(map2.get("pointInspectionTypeMenu")));
                 }else{
                     // 合并
                     Map<String, Object> combineResultMap = new HashMap<String, Object>();
@@ -163,20 +182,30 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                     map1.put("hiddenDangerAmount", "");
                     map1.put("overReason", "");
                     map1.put("signIn", "");
+                    map1.put("waterOfficeMenu", "");
+                    map1.put("routeTypeMenu", "");
+                    map1.put("pointInspectionTypeMenu", "");
+                }
+                if(FieldUtils.isObjectNotEmpty(map3)){
+                    Map<String, Object> combineResultMap = new HashMap<String, Object>();
+                    map1.put("planName", FieldUtils.ifObjectEmpty(map3.get("planName")));
+                    map1.put("planType", FieldUtils.ifObjectEmpty(map3.get("planType")));
+                    map1.put("planPorid", FieldUtils.ifObjectEmpty(map3.get("planPorid")));
+                    map1.put("planTypeMenu", FieldUtils.ifObjectEmpty(map3.get("planTypeMenu")));
+                    map1.put("planPoridMenu",FieldUtils.ifObjectEmpty(map3.get("planPoridMenu")));
+                }else{
                     map1.put("planName", "");
                     map1.put("planType", "");
                     map1.put("planPorid", "");
-                    map1.put("waterOfficeMenu", "");
-                    map1.put("routeTypeMenu", "");
                     map1.put("planTypeMenu","");
-                    if (FieldUtils.isObjectNotEmpty(map1)) {
-                        combineResultMap.putAll(map1);
-                    }
-                    resultList.add(combineResultMap);
+                    map1.put("planPoridMenu","");
                 }
+                resultList.add(map1);
             }
         }
-        return RespBean.ok("").setObj(resultList);
+        result.put("total",page.getTotal());
+        result.put("list",resultList);
+        return RespBean.ok("").setObj(result);
     }
 
     @Override
@@ -213,25 +242,28 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
             //创建对象
             QueryWrapper<Inspect> queryWrapper = new QueryWrapper<>();
             Inspect inspect = inspectMapper.selectOne(queryWrapper.eq("inspect_task_id",inspect_task_id));
-            if(FieldUtils.isObjectNotEmpty(inspect.getRouteId())){
-                map2 = (Map<String, Object>) routeService.findDetail(inspect.getRouteId()).getObj();
+            if(FieldUtils.isObjectNotEmpty(inspect)){
+                if(FieldUtils.isObjectNotEmpty(inspect.getRouteId())){
+                    map2 = (Map<String, Object>) routeService.findDetail(inspect.getRouteId()).getObj();
+                }
+                if(FieldUtils.isObjectNotEmpty(inspect.getPlanId())){
+                    map3 = (Map<String, Object>) planService.findById(inspect.getPlanId()).getObj();
+                }
+                // 合并
+                Map<String, Object> combineResultMap = new HashMap<String, Object>();
+                map1 = FieldUtils.objectToMap(inspect);
+                if(FieldUtils.isObjectNotEmpty(map2)){
+                    combineResultMap.putAll(map2);
+                }
+                if(FieldUtils.isObjectNotEmpty(map3)){
+                    combineResultMap.putAll(map3);
+                }
+                if(FieldUtils.isObjectNotEmpty(map1)){
+                    combineResultMap.putAll(map1);
+                }
+                return RespBean.ok("").setObj(combineResultMap);
             }
-            if(FieldUtils.isObjectNotEmpty(inspect.getPlanId())){
-                map3 = (Map<String, Object>) planService.findById(inspect.getPlanId()).getObj();
-            }
-            // 合并
-            Map<String, Object> combineResultMap = new HashMap<String, Object>();
-            map1 = FieldUtils.objectToMap(inspect);
-            if(FieldUtils.isObjectNotEmpty(map2)){
-                combineResultMap.putAll(map2);
-            }
-            if(FieldUtils.isObjectNotEmpty(map3)){
-                combineResultMap.putAll(map3);
-            }
-            if(FieldUtils.isObjectNotEmpty(map1)){
-                combineResultMap.putAll(map1);
-            }
-            return RespBean.ok("").setObj(combineResultMap);
+            return RespBean.ok("数据信息有误！").setObj("");
         }else{
             return RespBean.error("缺少任务编号");
         }
@@ -256,16 +288,18 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
 
     @Override
     @Transactional
-    public RespBean addTempTask(Integer routeId,String  routeName ,String inspector,String beginTime,String endTime) {
+    public RespBean addTempTask(Integer routeId,String routeName ,String inspector,String beginTime,String endTime) throws ParseException {
         Inspect inspect = new Inspect();
-        if(FieldUtils.isObjectNotEmpty(routeId)){
+        if(FieldUtils.isObjectNotEmpty(routeId)&&FieldUtils.isStringNotEmpty(beginTime)&&FieldUtils.isStringNotEmpty(endTime)){
+            Date start =  new Date(Long.parseLong(beginTime));
+            Date end =  new Date(Long.parseLong(endTime));
             inspect.setRouteId(routeId);
             String inspect_task_id = "";
             inspect_task_id = redisGeneratorCode.createGenerateCode("临时任务","LS",true,4);
             inspect.setInspectTaskId(inspect_task_id);
             inspect.setTaskType("临时任务");
-            inspect.setBeginTime(dateFormat.format(beginTime));
-            inspect.setDeadTime(dateFormat.format(endTime));
+            inspect.setBeginTime(daydateFormat.format(start));
+            inspect.setDeadTime(daydateFormat.format(end));
             inspect.setCompleteRate("0");
             inspect.setStatus("处理中");
             int id = inspectMapper.insert(inspect);
@@ -303,8 +337,8 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                         String inspect_task_id = "";
                         inspect_task_id = redisGeneratorCode.createGenerateCode("计划任务","JH",true,4);
                         inspect.setInspectTaskId(inspect_task_id);
-                        inspect.setBeginTime(dateFormat.format(DateUtils.daysAdd(start,cycle*i)));
-                        inspect.setDeadTime(dateFormat.format(DateUtils.daysAdd(start,cycle*(i+1))));
+                        inspect.setBeginTime(daydateFormat.format(DateUtils.daysAdd(start,cycle*i)));
+                        inspect.setDeadTime(daydateFormat.format(DateUtils.daysAdd(start,cycle*(i+1))));
                         inspect.setPlanId(planId);
                         inspect.setRouteId(routeId);
                         inspect.setTaskType("计划任务");

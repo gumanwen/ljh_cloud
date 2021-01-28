@@ -34,6 +34,58 @@ public class User {
 
     private String code;
 
+    private String department;
+
+    public User() {
+    }
+
+    public User(UserMapper userMapper, Integer id, String username, String password, String role, String name, String phone, String telephone, String address, Boolean enabled, String userface, String remark, String staffCode, String code, String department) {
+        this.userMapper = userMapper;
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.role = role;
+        this.name = name;
+        this.phone = phone;
+        this.telephone = telephone;
+        this.address = address;
+        this.enabled = enabled;
+        this.userface = userface;
+        this.remark = remark;
+        this.staffCode = staffCode;
+        this.code = code;
+        this.department = department;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "userMapper=" + userMapper +
+                ", id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", role='" + role + '\'' +
+                ", name='" + name + '\'' +
+                ", phone='" + phone + '\'' +
+                ", telephone='" + telephone + '\'' +
+                ", address='" + address + '\'' +
+                ", enabled=" + enabled +
+                ", userface='" + userface + '\'' +
+                ", remark='" + remark + '\'' +
+                ", staffCode='" + staffCode + '\'' +
+                ", code='" + code + '\'' +
+                ", department='" + department + '\'' +
+                '}';
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
     public String getStaffCode() {
         return staffCode;
     }
@@ -72,44 +124,6 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", role='" + role + '\'' +
-                ", name='" + name + '\'' +
-                ", phone='" + phone + '\'' +
-                ", telephone='" + telephone + '\'' +
-                ", address='" + address + '\'' +
-                ", enabled=" + enabled +
-                ", userface='" + userface + '\'' +
-                ", remark='" + remark + '\'' +
-                ", staffCode='" + staffCode + '\'' +
-                '}';
-    }
-
-    public User() {
-    }
-
-    public User(UserMapper userMapper, Integer id, String username, String password, String role, String name, String phone, String telephone, String address, Boolean enabled, String userface, String remark, String staffCode, String code) {
-        this.userMapper = userMapper;
-        this.id = id;
-        this.username = username;
-        this.password = password;
-        this.role = role;
-        this.name = name;
-        this.phone = phone;
-        this.telephone = telephone;
-        this.address = address;
-        this.enabled = enabled;
-        this.userface = userface;
-        this.remark = remark;
-        this.staffCode = staffCode;
-        this.code = code;
     }
 
     public String getCode() {

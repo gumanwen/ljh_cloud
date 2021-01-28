@@ -6,6 +6,7 @@ import com.yaobanTech.springcloud.entity.utils.RespBean;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ import java.util.Map;
  */
 public interface IInspectService extends IService<Inspect> {
 
-    RespBean getPlanInspect(String type,HttpServletRequest request) throws IllegalAccessException;
+    RespBean getPlanInspect(String type,long pageNo,long pageSize,HttpServletRequest request) throws IllegalAccessException, UnsupportedEncodingException;
 
     RespBean getTempInspect(String type);
 
@@ -27,7 +28,7 @@ public interface IInspectService extends IService<Inspect> {
 
     RespBean updateInspectDetailById(Map<String,Object> params);
 
-    RespBean addTempTask(Integer routeId,String  routeName ,String inspector,String beginTime,String endTime);
+    RespBean addTempTask(Integer routeId,String  routeName ,String inspector,String beginTime,String endTime) throws ParseException;
 
     RespBean addPlanTask(Integer routeId,String  routeName ,Integer planId,String planName) throws ParseException;
 
