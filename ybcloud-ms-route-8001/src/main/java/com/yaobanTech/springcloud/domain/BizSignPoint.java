@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description  
@@ -197,6 +198,32 @@ public class BizSignPoint  implements Serializable {
 	@Transient
 	private List<HashMap<String, Object>> fileList;
 
+
+	/**
+	 * 用水管理所枚举
+	 */
+	@Transient
+	private Map<String,Object> waterUseOfficeEnum;
+
+	/**
+	 * 路线类型枚举
+	 */
+	@Transient
+	private Map<String,Object> routeTypeEnum;
+
+	/**
+	 * 定点巡查类型枚举
+	 */
+	@Transient
+	private Map<String,Object> pointInspectionTypeEnum;
+
+	/**
+	 * 签到点类型枚举
+	 */
+	@Transient
+	private Map<String,Object> signPointTypeEnum;
+
+
 	public BizSignPoint() {
 	}
 
@@ -225,6 +252,38 @@ public class BizSignPoint  implements Serializable {
 		this.pointInspectionType = pointInspectionType;
 		this.signPointStatus = signPointStatus;
 		this.modifyTime = modifyTime;
+	}
+
+	public Map<String, Object> getWaterUseOfficeEnum() {
+		return waterUseOfficeEnum;
+	}
+
+	public void setWaterUseOfficeEnum(Map<String, Object> waterUseOfficeEnum) {
+		this.waterUseOfficeEnum = waterUseOfficeEnum;
+	}
+
+	public Map<String, Object> getRouteTypeEnum() {
+		return routeTypeEnum;
+	}
+
+	public void setRouteTypeEnum(Map<String, Object> routeTypeEnum) {
+		this.routeTypeEnum = routeTypeEnum;
+	}
+
+	public Map<String, Object> getPointInspectionTypeEnum() {
+		return pointInspectionTypeEnum;
+	}
+
+	public void setPointInspectionTypeEnum(Map<String, Object> pointInspectionTypeEnum) {
+		this.pointInspectionTypeEnum = pointInspectionTypeEnum;
+	}
+
+	public Map<String, Object> getSignPointTypeEnum() {
+		return signPointTypeEnum;
+	}
+
+	public void setSignPointTypeEnum(Map<String, Object> signPointTypeEnum) {
+		this.signPointTypeEnum = signPointTypeEnum;
 	}
 
 	public List<HashMap<String, Object>> getFileList() {

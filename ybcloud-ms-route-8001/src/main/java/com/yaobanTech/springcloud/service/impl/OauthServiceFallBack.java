@@ -1,0 +1,17 @@
+package com.yaobanTech.springcloud.service.impl;
+
+import com.yaobanTech.springcloud.domain.RespBean;
+import org.springframework.stereotype.Component;
+
+@Component
+public class OauthServiceFallBack implements OauthService{
+    @Override
+    public RespBean getChineseName(String username) {
+        return RespBean.error("调用权限服务失败！");
+    }
+
+    @Override
+    public RespBean getCurrentUser(String token) {
+        return RespBean.error("调用权限服务失败！");
+    }
+}

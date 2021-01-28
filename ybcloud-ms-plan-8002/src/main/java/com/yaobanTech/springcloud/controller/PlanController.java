@@ -1,5 +1,6 @@
 package com.yaobanTech.springcloud.controller;
 
+import com.yaobanTech.springcloud.domain.FindCondition;
 import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.service.InspectService;
 import com.yaobanTech.springcloud.service.PlanService;
@@ -70,6 +71,12 @@ public class PlanController {
         return planService.findById(id);
     }
 
+    @ApiOperation("查询路线对应的所有计划")
+    @GetMapping("findByRouteId")
+    public RespBean findByRouteId(@RequestParam Integer routeId) {
+        return planService.findByRouteId(routeId);
+    }
+
     @ApiOperation("查询任务详情列表")
     @GetMapping("findInspectListById")
     public RespBean findInspectListById(@RequestParam Integer id) {
@@ -84,7 +91,20 @@ public class PlanController {
 
     @ApiOperation("查询单个枚举对象")
     @GetMapping("findEnum")
-    public RespBean findEnum(@RequestParam String code){
+    public RespBean findSEnum(@RequestParam String code){
         return planService.findEnum(code);
     }
+
+//    @ApiOperation("测试事务")
+//    @GetMapping("testFeign")
+//    public RespBean testFeign(@RequestParam Integer routeId){
+//        return planService.testFeign(routeId);
+//    }
+
+//    @ApiOperation("条件查询")
+//    @GetMapping("findConditon")
+//    public RespBean findCondition(@RequestBody FindCondition findCondition){
+//        return planService.findCondition(findCondition);
+//    }
+
 }

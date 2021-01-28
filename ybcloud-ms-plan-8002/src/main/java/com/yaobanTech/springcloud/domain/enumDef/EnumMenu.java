@@ -1,5 +1,10 @@
 package com.yaobanTech.springcloud.domain.enumDef;
 
+import com.yaobanTech.springcloud.domain.RespBean;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public enum EnumMenu {
 
 	DISCHARGE("0", "末梢水排放","定点巡查类型"),
@@ -29,8 +34,12 @@ public enum EnumMenu {
 	INSTRREE("18", "3天一巡","计划周期"),
 	INSSEVEN("19", "7天一巡","计划周期"),
 
-	USED("20", "日常巡查","计划类型"),
-	UNUSED("21", "临时巡查","计划类型");
+	DAYLY("20", "日常巡查","计划类型"),
+	CORRENT("21", "临时巡查","计划类型"),
+
+	COMMON("22", "普通","签到点类型"),
+	HIGHDANGER("23", "高危","签到点类型");
+
 	private String code;    //枚举值
 	private String desc;    //枚举描述
 	private String mode;    //所属模块
@@ -75,6 +84,25 @@ public enum EnumMenu {
 			}
 		}
 		return null;
+	}
+
+	public static RespBean findEnum(String code){
+		Map<String, Object> map = new HashMap<>();
+		if(code != null) {
+			EnumMenu[] menus = EnumMenu.values();
+			for (int i = 0; i < menus.length; i++) {
+				EnumMenu menu = menus[i];
+				if (code.equals(menu.getCode())) {
+					map.put("mode", menu.getMode());
+					map.put("code", menu.getCode());
+					map.put("desc", menu.getDesc());
+					break;
+				}
+			}
+		}else{
+			return RespBean.error("枚举code为空！");
+		}
+		return RespBean.ok("查询成功！", map);
 	}
 
 }

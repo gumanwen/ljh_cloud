@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 
-@FeignClient(value ="auth2Service" )
+@FeignClient(value ="auth2Service",fallback = OauthServiceFallBack.class)
 public interface OauthService {
     @GetMapping("/user/userRight/getNameByUsername")
     RespBean getChineseName(@RequestParam("username")  String username);
