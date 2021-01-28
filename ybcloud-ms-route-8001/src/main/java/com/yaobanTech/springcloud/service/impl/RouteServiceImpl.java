@@ -8,7 +8,6 @@ import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.domain.enumDef.EnumMenu;
 import com.yaobanTech.springcloud.repository.BizRouteRepository;
 import com.yaobanTech.springcloud.repository.BizSignPointRepository;
-import io.seata.core.context.RootContext;
 import io.seata.spring.annotation.GlobalTransactional;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,6 @@ import javax.transaction.Transactional;
 import java.util.*;
 
 @Service
-@Transactional
 public class RouteServiceImpl {
     @Autowired
     @Lazy
@@ -85,6 +83,7 @@ public class RouteServiceImpl {
         return RespBean.ok("保存成功！",bizRoute.getBizSignPoints());
     }
 
+    @Transactional
     public RespBean updateRoute(HashMap<String,Object> param) {
         BizRoute bizRoute = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizRoute.class);
         if(bizRoute.getId() != null && !bizRoute.getBizSignPoints().isEmpty()) {
@@ -109,6 +108,7 @@ public class RouteServiceImpl {
         return RespBean.ok("修改成功！",bizRoute.getBizSignPoints());
     }
 
+    @Transactional
     public RespBean deleteRoute(Integer id) {
         Integer i = null;
         if(id != null) {
@@ -174,7 +174,7 @@ public class RouteServiceImpl {
        return RespBean.ok("查询成功！",routeList);
     }
 
-    @GlobalTransactional
+    @Transactional
     public RespBean findAll(HttpServletRequest request){
         String header = request.getHeader("Authorization");
         String token =  StringUtils.substringAfter(header, "Bearer ");
@@ -216,7 +216,7 @@ public class RouteServiceImpl {
         return RespBean.ok("查询成功！",list);
     }
 
-    @GlobalTransactional
+    @Transactional
     public RespBean findExitAll(HttpServletRequest request){
         String header = request.getHeader("Authorization");
         String token =  StringUtils.substringAfter(header, "Bearer ");
@@ -263,7 +263,7 @@ public class RouteServiceImpl {
         return RespBean.ok("查询成功！",selection);
     }
 
-    @GlobalTransactional
+    @Transactional
     public RespBean findDetail(Integer id){
         BizRoute br = bizRouteRepository.findDetail(id);
         List<BizSignPoint> pointList = (List<BizSignPoint>) signPointService.findList(br.getId()).getObj();
