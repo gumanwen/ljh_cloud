@@ -23,7 +23,7 @@ spring:
         nacos:
             discovery:
                 server-addr: 192.168.50.91:8848
-                ip: 192.168.50.168
+                ip: 192.168.50.103
             config:
                 server-addr: 192.168.50.91:8848
                 file-extension: properties

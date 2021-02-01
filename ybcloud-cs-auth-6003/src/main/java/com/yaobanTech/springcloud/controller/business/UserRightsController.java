@@ -129,12 +129,17 @@ public class UserRightsController {
     }
     @ApiOperation("openfeign: 获取当前登录人")
     @GetMapping("/getCurrentUser")
-    public Object getCurrentUser(@RequestParam("token") String token) {
+    public RespBean getCurrentUser(@RequestParam("token") String token) {
         return userRightsService.getCurrentUser(token);
     }
     @ApiOperation("openfeign: 获取当前登录人和角色")
     @GetMapping("/getCurrentUserAndRole")
-    public Object getCurrentUserAndRole(@RequestParam("token") String token) {
+    public RespBean getCurrentUserAndRole(@RequestParam("token") String token) {
         return userRightsService.getCurrentUserAndRole(token);
+    }
+    @ApiOperation("openfeign: 获取当前登录人所有信息")
+    @GetMapping("/getAll")
+    public RespBean getAll(@RequestParam("token")String token,@RequestParam("type")Integer type){
+        return userRightsService.getAll(token,type);
     }
 }

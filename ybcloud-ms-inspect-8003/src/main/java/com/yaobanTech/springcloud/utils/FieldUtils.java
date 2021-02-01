@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -73,5 +74,33 @@ public class FieldUtils {
             map.put(fieldName, value);
         }
         return map;
+    }
+    /**
+     * 将list数组转成字符串
+     *
+     * @param
+     * @return
+     * @throws
+     */
+    public String ListToStr(List<Integer> list){
+        System.out.println("List数组："+list);
+        String resultString ="";
+        if(list == null && list.size() == 0){
+            System.out.println("list中的内容为空！");
+        }else{
+            String[] strArrStrings = new String[list.size()];
+            for(int i=0;i<=list.size()-1;i++){
+                strArrStrings[i] = String.valueOf(list.get(i));
+            }
+            for(int j=0;j<=strArrStrings.length-1;j++){
+                if(j < strArrStrings.length-1){
+                    resultString += strArrStrings[j] + ",";
+                }else{
+                    resultString += strArrStrings[j];
+                }
+            }
+            System.out.println("最后拼接的字符串：" + resultString);
+        }
+        return resultString;
     }
 }

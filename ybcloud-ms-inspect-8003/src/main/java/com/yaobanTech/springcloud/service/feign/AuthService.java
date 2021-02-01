@@ -13,4 +13,6 @@ public interface AuthService {
     RespBean getCurrentUser(@RequestParam("token") String token);
     @GetMapping("/user/userRight/getCurrentUserAndRole")
     RespBean getCurrentUserAndRole(@RequestParam("token") String token);
+    @GetMapping("/user/userRight/getAll")
+    RespBean getAll(@RequestParam("token") String token,@RequestParam("type") Integer type);
 }

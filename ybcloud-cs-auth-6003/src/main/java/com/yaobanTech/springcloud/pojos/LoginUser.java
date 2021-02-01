@@ -1,6 +1,5 @@
-package com.yaobanTech.springcloud.entity;
+package com.yaobanTech.springcloud.pojos;
 
-import com.yaobanTech.springcloud.entity.ClientTypeEnum;
 import java.util.Date;
 import java.util.List;
 

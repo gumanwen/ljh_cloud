@@ -20,7 +20,7 @@ spring:
             validation-timeout: 3000
             login-timeout: 5
     application:
-        name: gatewayService
+        name: pipeNet-Inspect-Service
     cloud:
         nacos:
             discovery:
@@ -98,9 +98,9 @@ eureka:
         fetch-registry: true
         register-with-eureka: true
         service-url:
-            defaultZone: http://localhost:9002/eureka
+            defaultZone: http://user:password@218.17.45.99:18861/eureka
     instance:
-        hostname: 192.168.50.103
+        hostname: 47.92.144.224
         prefer-ip-address: true
-        instance-id: 192.168.50.103:8888
-        ip-address: 192.168.50.103
+        instance-id: 47.92.144.224:9000
+        ip-address: 47.92.144.224

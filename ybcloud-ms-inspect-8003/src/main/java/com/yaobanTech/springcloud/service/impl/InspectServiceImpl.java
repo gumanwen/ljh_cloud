@@ -17,6 +17,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yaobanTech.springcloud.service.feign.*;
 import com.yaobanTech.springcloud.utils.DateUtils;
 import com.yaobanTech.springcloud.utils.FieldUtils;
+import com.yaobanTech.springcloud.utils.UrlUtils;
 import io.jsonwebtoken.Jwts;
 import io.micrometer.core.instrument.util.JsonUtils;
 import io.swagger.models.auth.In;
@@ -81,23 +82,17 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
 
     @Value("${server.port}")
     private String port;
+
+    @Autowired
+    private UrlUtils urlUtils;
+
     @Override
     public RespBean getPlanInspect(String type,long pageNo,long pageSize,HttpServletRequest request) throws IllegalAccessException, UnsupportedEncodingException {
-
-        logger.info("清远用户token="+request.getHeader("TW-AUTH-HEADER"));
-        String tokenT = request.getHeader("TW-AUTH-HEADER");
-        LoginUser loginUser = null;
-        if(FieldUtils.isStringNotEmpty(tokenT)){
-            tokenT = URLDecoder.decode(tokenT,"UTF-8");
-            loginUser = JSON.parseObject(tokenT,LoginUser.class);
-            logger.info("清远用户信息="+loginUser.toString());
-        }
-        String header = request.getHeader("Authorization");
-        String token =  StringUtils.substringAfter(header, "Bearer ");
-        RespBean feignRespBean = authService.getCurrentUserAndRole(token);
-        HashMap<Object,Object> feignMap = (HashMap<Object, Object>) feignRespBean.getObj();
-        String username = (String) feignMap.get("username");
-        String roles = (String) feignMap.get("roles");
+        String username = null;
+        String roles = null;
+        LoginUser u = urlUtils.getAll(request);
+        username = u.getLoginname();
+        roles = u.getRoleLists();
         //根据当前登陆人:班组员 bzy
         String date = dateFormat.format(new Date());
         String status =null;
@@ -108,7 +103,11 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         List<Inspect> list = new ArrayList<>();
         List<Map<String,Object>> resultList = new ArrayList<>();
         Map<String,Object> result = new HashMap<>();
-        if(roles.indexOf("BZZ")== -1){//班组长
+        if(FieldUtils.isStringNotEmpty(roles)){
+            if(roles.indexOf("BZZ")== -1){//班组长
+                queryWrapper.eq("inspect_person",username);
+            }
+        }else{
             queryWrapper.eq("inspect_person",username);
         }
         IPage<Inspect> page = new Page<Inspect>(pageNo,pageSize);

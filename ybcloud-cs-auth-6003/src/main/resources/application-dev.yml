@@ -60,3 +60,5 @@ management:
 ribbon:
     ConnectTimeout: 30000
     ReadTimeout: 7000
+qyserver:
+    ipAdd: http://119.135.180.178:8850/api/auth/user/get
