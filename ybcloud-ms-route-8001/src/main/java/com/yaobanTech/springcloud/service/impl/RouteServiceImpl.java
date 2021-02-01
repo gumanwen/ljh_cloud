@@ -1,10 +1,7 @@
 package com.yaobanTech.springcloud.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.yaobanTech.springcloud.domain.BizRoute;
-import com.yaobanTech.springcloud.domain.BizSignPoint;
-import com.yaobanTech.springcloud.domain.FieldUtils;
-import com.yaobanTech.springcloud.domain.RespBean;
+import com.yaobanTech.springcloud.domain.*;
 import com.yaobanTech.springcloud.domain.enumDef.EnumMenu;
 import com.yaobanTech.springcloud.repository.BizRouteRepository;
 import com.yaobanTech.springcloud.repository.BizSignPointRepository;
@@ -131,47 +128,90 @@ public class RouteServiceImpl {
         return RespBean.ok("删除成功！",i);
     }
 
-    public RespBean findCondition(String waterManagementOffice,String pointInspectionType,
-                                  String planInspectionMileage,String createdTime,
-                                  String routeName,
-                                  String routeType) {
+    public RespBean findCondition(HashMap<String,Object> hashMap,HttpServletRequest request) {
+        //获取当前用户
+        String header = request.getHeader("Authorization");
+        String token =  StringUtils.substringAfter(header, "Bearer ");
+        String user = (String) oauthService.getCurrentUser(token).getObj();
+        if(oauthService.getCurrentUser(token).getStatus() == 500){
+            throw new RuntimeException("Feign调用权限服务失败");
+        }
+        RouteCondition routeCondition = JSONObject.parseObject(JSONObject.toJSONString(hashMap.get("form")), RouteCondition.class);
         Specification<BizRoute> spec = new Specification<BizRoute>() {
             @Override
             public Predicate toPredicate(Root<BizRoute> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-                Predicate predicate = null;
+                List<Predicate> predicates = new ArrayList<>();
                 //从root取属性
                 //cb构造查询条件
                 //cb连接查询条件
-                if(waterManagementOffice != null){
-                    Predicate p1 = cb.equal(root.get("waterManagementOffice"), waterManagementOffice);
-                     predicate = cb.and(p1);
+                if(routeCondition.getWaterManagementOffice() != null){
+                    Predicate p1 = cb.equal(root.get("waterManagementOffice"), routeCondition.getWaterManagementOffice());
+                    predicates.add(p1);
                 }
-                if(pointInspectionType != null){
-                    Predicate p2 = cb.equal(root.get("pointInspectionType"), pointInspectionType);
-                    predicate = cb.and(p2);
+                if(routeCondition.getPointInspectionType() != null){
+                    Predicate p2 = cb.equal(root.get("pointInspectionType"), routeCondition.getPointInspectionType());
+                    predicates.add(p2);
                 }
-                if(planInspectionMileage != null){
-                    Predicate p3 = cb.equal(root.get("planInspectionMileage"), planInspectionMileage);
-                    predicate = cb.and(p3);
+                if(routeCondition.getPlanInspectionMileageStart() != null){
+
+                    Predicate p3 = cb.ge(root.get("planInspectionMileage"), routeCondition.getPlanInspectionMileageStart());
+                    predicates.add(p3);
                 }
-                if(createdTime != null){
-                    Predicate p4 = cb.equal(root.get("createdTime"), createdTime);
-                    predicate = cb.and(p4);
+                if(routeCondition.getPlanInspectionMileageEnd() != null){
+
+                    Predicate p3 = cb.le(root.get("planInspectionMileage"), routeCondition.getPlanInspectionMileageEnd());
+                    predicates.add(p3);
                 }
-                if(routeName != null){
-                    Predicate p5 = cb.equal(root.get("routeName"), routeName);
-                    predicate = cb.and(p5);
+                if(routeCondition.getCreatedTimeStart() != null){
+                    Predicate p4 = cb.greaterThanOrEqualTo(root.get("createdTime"), routeCondition.getCreatedTimeStart());
+                    predicates.add(p4);
                 }
-                if(routeType != null){
-                    Predicate p6 = cb.equal(root.get("routeType"), routeType);
-                    predicate = cb.and(p6);
+                if(routeCondition.getCreatedTimeEnd() != null){
+                    Predicate p4 = cb.lessThanOrEqualTo(root.get("createdTime"), routeCondition.getCreatedTimeEnd());
+                    predicates.add(p4);
                 }
-                return predicate;
+                if(routeCondition.getRouteName() != null){
+                    Predicate p5 = cb.equal(root.get("routeName"), routeCondition.getRouteName());
+                    predicates.add(p5);
+                }
+                if(routeCondition.getRouteType() != null){
+                    Predicate p6 = cb.equal(root.get("routeType"), routeCondition.getRouteType());
+                    predicates.add(p6);
+                }
+                return cb.and(predicates.toArray(new Predicate[predicates.size()]));
             }
         };
+        //排序
         Sort sort = Sort.by(Sort.Direction.DESC,"createdTime");
-        List<BizRoute> routeList = bizRouteRepository.findAll(spec,sort);
-       return RespBean.ok("查询成功！",routeList);
+        List<BizRoute> list = bizRouteRepository.findAll(spec,sort);
+        //查询附件
+        if(!list.isEmpty()){
+            for (int i = 0; i < list.size(); i++) {
+                BizRoute route = list.get(i);
+                List<BizSignPoint> points = route.getBizSignPoints();
+                if(points.size()>0){
+                    for(int j =0; j<points.size();j++){
+                        //获取报建文件列表
+                        if(FieldUtils.isObjectNotEmpty(points.get(j).getFileType())) {
+                            RespBean respBean = fileService.selectOneByPid(String.valueOf((Integer) points.get(j).getId()), (String) points.get(j).getFileType());
+                            List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) respBean.getObj();
+                            if(respBean.getStatus() == 500){
+                                throw new RuntimeException("Feign调用文件服务失败");
+                            }
+                            points.get(j).setFileList(fileList);
+                        }
+                    }
+                }
+                Map waterOfficeMenu = (Map) findEnum(route.getWaterManagementOffice()).getObj();
+                Map routeTypeMenu = (Map) findEnum(route.getRouteType()).getObj();
+                Map pointInspectionTypeMenu = (Map) findEnum(route.getPointInspectionType()).getObj();
+                route.setRouteTypeMenu(routeTypeMenu);
+                route.setWaterOfficeMenu(waterOfficeMenu);
+                route.setPointInspectionTypeMenu(pointInspectionTypeMenu);
+                route.setRouteCreator(user);
+            }
+        }
+       return RespBean.ok("查询成功！",list);
     }
 
     @Transactional

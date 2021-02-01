@@ -95,16 +95,15 @@ public class PlanController {
         return planService.findEnum(code);
     }
 
-//    @ApiOperation("测试事务")
-//    @GetMapping("testFeign")
-//    public RespBean testFeign(@RequestParam Integer routeId){
-//        return planService.testFeign(routeId);
-//    }
-
-//    @ApiOperation("条件查询")
-//    @GetMapping("findConditon")
-//    public RespBean findCondition(@RequestBody FindCondition findCondition){
-//        return planService.findCondition(findCondition);
-//    }
+    @ApiOperation("条件查询")
+    @GetMapping("findConditon")
+    public RespBean findCondition(@RequestParam String routeName,@RequestParam String waterManagementOffice,
+                                  @RequestParam String planPorid,@RequestParam String planType,
+                                  @RequestParam String startTimeOfPCT,@RequestParam String endTimeOfPCT,
+                                  @RequestParam String startTimeOfPST,@RequestParam String endTimeOfPST,
+                                  @RequestParam String startTimeOfPET,@RequestParam String endTimeOfPET,
+                                  HttpServletRequest request){
+        return planService.findCondition(routeName,waterManagementOffice,planPorid,planType,startTimeOfPCT,endTimeOfPCT,startTimeOfPST,endTimeOfPST,startTimeOfPET,endTimeOfPET,request);
+    }
 
 }

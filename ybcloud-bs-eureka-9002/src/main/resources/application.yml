@@ -2,7 +2,7 @@ server:
     port: 9002 #服务端口
 spring:
     datasource:
-        url: jdbc:sqlserver://localhost:1433;DatabaseName=kmtysw
+        url: jdbc:sqlserver://192.168.50.103:1433;DatabaseName=kmtysw
         username: sa
         password: yaobanTech3131 #yaobanTech3131
         driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver

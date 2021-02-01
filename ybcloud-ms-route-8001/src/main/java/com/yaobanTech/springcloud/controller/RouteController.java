@@ -76,6 +76,12 @@ public class RouteController {
         return routeService.findEnum(code);
     }
 
+    @ApiOperation("条件查询路线信息")
+    @PostMapping("findCondition")
+    public RespBean findCondition(@RequestBody HashMap<String,Object> hashMap,HttpServletRequest request){
+        return routeService.findCondition(hashMap,request);
+    }
+
 //    @ApiOperation("测试事务")
 //    @GetMapping("testFeign")
 //    public RespBean testFeign(@RequestParam Integer routeId){

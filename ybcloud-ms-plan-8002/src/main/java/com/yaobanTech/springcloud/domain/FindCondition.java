@@ -2,13 +2,14 @@ package com.yaobanTech.springcloud.domain;
 
 import java.util.Date;
 
+
 public class FindCondition {
 
     private String routeName;
+    private String waterManagementOffice;
     private String planPorid;
     private String planType;
     private String mainKey;
-    private String waterManagementOffice;
     private Date planCreatedTime;
     private String startTime;
     private String endTime;

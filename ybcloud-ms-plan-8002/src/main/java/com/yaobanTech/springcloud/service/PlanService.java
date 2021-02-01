@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -240,52 +241,37 @@ public class PlanService {
         return RespBean.ok("查询成功！", map);
     }
 
-    @GlobalTransactional
-    public RespBean testFeign(Integer routeId){
-       bizPlanRepository.testFeign(routeId);
-       routeService.testFeign(routeId);
-        return RespBean.ok("测试成功！", RootContext.getXID());
-    }
+    public RespBean findCondition(String routeName, String waterManagementOffice, String planPorid, String planType,
+                                  String startTimeOfPCT, String endTimeOfPCT,
+                                  String startTimeOfPST, String endTimeOfPST,
+                                  String startTimeOfPET, String endTimeOfPET, HttpServletRequest request) {
+        //获取当前用户
+        String header = request.getHeader("Authorization");
+        String token = StringUtils.substringAfter(header, "Bearer ");
+        String user = (String) oauthService.getCurrentUser(token).getObj();
+        String chineseName = (String) oauthService.getChineseName(user).getObj();
 
-//    public RespBean findCondition(FindCondition findCondition) {
-//        Specification<BizRoute> spec = new Specification<BizRoute>() {
-//            @Override
-//            public Predicate toPredicate(Root<BizRoute> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-//                Predicate predicate = null;
-//                //从root取属性
-//                //cb构造查询条件
-//                //cb连接查询条件
-//                if(waterManagementOffice != null){
-//                    Predicate p1 = cb.equal(root.get("waterManagementOffice"), waterManagementOffice);
-//                    predicate = cb.and(p1);
+        //查询计划列表
+        List<Map<String, Object>> list = bizPlanRepository.findCondition(routeName,waterManagementOffice,planPorid,planType,startTimeOfPCT,endTimeOfPCT,startTimeOfPST,endTimeOfPST,startTimeOfPET,endTimeOfPET);
+//        if(!list.isEmpty()){
+//            for (int i = 0; i < list.size(); i++) {
+//                BizPlan plan = list.get(i);
+//                plan.setPlanCreatedBy(chineseName);
+//                Map map = (Map) findEnum(plan.getPlanType()).getObj();
+//                Map ps = (Map) findEnum(plan.getPlanStatus()).getObj();
+//                Map pp = (Map) findEnum(plan.getPlanPorid()).getObj();
+//                plan.setPlanTypeMenu(map);
+//                plan.setPlanStatusMenu(ps);
+//                plan.setPlanPoridMenu(pp);
+//                RespBean respBean = routeService.findDetail(plan.getRouteId());
+//                Object o = respBean.getObj();
+//                if(respBean.getStatus() == 500){
+//                    throw new RuntimeException("Feign调用路线服务失败！");
 //                }
-//                if(pointInspectionType != null){
-//                    Predicate p2 = cb.equal(root.get("pointInspectionType"), pointInspectionType);
-//                    predicate = cb.and(p2);
-//                }
-//                if(planInspectionMileage != null){
-//                    Predicate p3 = cb.equal(root.get("planInspectionMileage"), planInspectionMileage);
-//                    predicate = cb.and(p3);
-//                }
-//                if(createdTime != null){
-//                    Predicate p4 = cb.equal(root.get("createdTime"), createdTime);
-//                    predicate = cb.and(p4);
-//                }
-//                if(routeName != null){
-//                    Predicate p5 = cb.equal(root.get("routeName"), routeName);
-//                    predicate = cb.and(p5);
-//                }
-//                if(routeType != null){
-//                    Predicate p6 = cb.equal(root.get("routeType"), routeType);
-//                    predicate = cb.and(p6);
-//                }
-//                return predicate;
+//                plan.setRouteObj(o);
 //            }
-//        };
-//        Sort sort = Sort.by(Sort.Direction.DESC,"createdTime");
-//        List<BizRoute> routeList = bizRouteRepository.findAll(spec,sort);
-//        return RespBean.ok("查询成功！",routeList);
-//    }
-
+//        }
+        return RespBean.ok("查询成功！", list);
+    }
 
 }

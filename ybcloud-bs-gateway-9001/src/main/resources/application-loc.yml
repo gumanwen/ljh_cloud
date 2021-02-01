@@ -57,11 +57,11 @@ spring:
                   predicates:
                       - Path=/file/**
                 - id: ms-route
-                  uri: http://192.168.50.103:8001 #负载均衡 动态路由
+                  uri: http://192.168.50.91:8001 #负载均衡 动态路由
                   predicates:
                       - Path=/api/route/**
                 - id: ms-plan
-                  uri: http://192.168.50.103:8002 #负载均衡 动态路由
+                  uri: http://192.168.50.91:8002 #负载均衡 动态路由
                   predicates:
                       - Path=/api/plan/**
                 - id: ms-inspect
