@@ -9,9 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @FeignClient(value ="auth2Service",fallback = OauthServiceFallBack.class)
 public interface OauthService {
-    @GetMapping("/user/userRight/getNameByUsername")
-    RespBean getChineseName(@RequestParam("username")  String username);
+    @GetMapping("/user/userRight/getAll")
+    RespBean getAll(@RequestParam("token") String token,@RequestParam("type") Integer type);
 
-    @GetMapping("/user/userRight/getCurrentUser")
-    RespBean getCurrentUser(@RequestParam("token") String token);
 }

@@ -1,6 +1,7 @@
 package com.yaobanTech.springcloud.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.yaobanTech.springcloud.ToolUtils.UrlUtils;
 import com.yaobanTech.springcloud.domain.*;
 import com.yaobanTech.springcloud.domain.enumDef.EnumMenu;
 import com.yaobanTech.springcloud.repository.BizRouteRepository;
@@ -19,6 +20,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 @Service
@@ -47,15 +49,26 @@ public class RouteServiceImpl {
     @Lazy
     private FileService fileService;
 
+    @Autowired
+    private UrlUtils urlUtils;
+
     @GlobalTransactional
-    public RespBean saveRoute(HashMap<String,Object> param,HttpServletRequest request) {
+    public RespBean saveRoute(HashMap<String,Object> param,HttpServletRequest request) throws UnsupportedEncodingException {
         String header = request.getHeader("Authorization");
         String token =  StringUtils.substringAfter(header, "Bearer ");
-        String user = (String) oauthService.getCurrentUser(token).getObj();
-        if(oauthService.getCurrentUser(token).getStatus() == 500){
+        LoginUser u = urlUtils.getAll(request);
+        String user =u.getLoginname();
+        /*if(oauthService.getCurrentUser(token).getStatus() == 500){
             throw new RuntimeException("Feign调用权限服务失败");
+        }*/
+        BizRoute bizRoute = null;
+        if(param != null){
+            bizRoute = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizRoute.class);
+            BizRoute route = bizRouteRepository.findExit(bizRoute.getRouteName(),bizRoute.getWaterManagementOffice());
+            if(route != null){
+                return RespBean.error("该用水管理所下路线名称已存在,请修改路线名重试！");
+            }
         }
-        BizRoute bizRoute = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizRoute.class);
         if(bizRoute != null && !bizRoute.getBizSignPoints().isEmpty() && bizRoute.getId() == null) {
             try {
                 List<BizSignPoint> pointList = bizRoute.getBizSignPoints();
@@ -128,14 +141,15 @@ public class RouteServiceImpl {
         return RespBean.ok("删除成功！",i);
     }
 
-    public RespBean findCondition(HashMap<String,Object> hashMap,HttpServletRequest request) {
+    public RespBean findCondition(HashMap<String,Object> hashMap,HttpServletRequest request) throws UnsupportedEncodingException {
         //获取当前用户
         String header = request.getHeader("Authorization");
         String token =  StringUtils.substringAfter(header, "Bearer ");
-        String user = (String) oauthService.getCurrentUser(token).getObj();
-        if(oauthService.getCurrentUser(token).getStatus() == 500){
+        LoginUser u = urlUtils.getAll(request);
+        String user = u.getLoginname();
+        /*if(oauthService.getCurrentUser(token).getStatus() == 500){
             throw new RuntimeException("Feign调用权限服务失败");
-        }
+        }*/
         RouteCondition routeCondition = JSONObject.parseObject(JSONObject.toJSONString(hashMap.get("form")), RouteCondition.class);
         Specification<BizRoute> spec = new Specification<BizRoute>() {
             @Override
@@ -215,17 +229,18 @@ public class RouteServiceImpl {
     }
 
     @Transactional
-    public RespBean findAll(HttpServletRequest request){
+    public RespBean findAll(HttpServletRequest request) throws UnsupportedEncodingException {
         String header = request.getHeader("Authorization");
         String token =  StringUtils.substringAfter(header, "Bearer ");
-        String user = (String) oauthService.getCurrentUser(token).getObj();
-        if(oauthService.getCurrentUser(token).getStatus() == 500){
+        LoginUser u = urlUtils.getAll(request);
+        String user = u.getLoginname();
+        /*if(oauthService.getCurrentUser(token).getStatus() == 500){
             throw new RuntimeException("Feign调用权限服务失败");
-        }
-        String chineseName = (String) oauthService.getChineseName(user).getObj();
-        if(oauthService.getChineseName(user).getStatus() == 500){
+        }*/
+        String chineseName = u.getName();
+        /*if(oauthService.getChineseName(user).getStatus() == 500){
             throw new RuntimeException("Feign调用权限服务失败");
-        }
+        }*/
         List<BizRoute> list = bizRouteRepository.findList(user);
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
@@ -257,17 +272,18 @@ public class RouteServiceImpl {
     }
 
     @Transactional
-    public RespBean findExitAll(HttpServletRequest request){
+    public RespBean findExitAll(HttpServletRequest request) throws UnsupportedEncodingException {
         String header = request.getHeader("Authorization");
         String token =  StringUtils.substringAfter(header, "Bearer ");
-        String user = (String) oauthService.getCurrentUser(token).getObj();
-        if(oauthService.getCurrentUser(token).getStatus() == 500){
+        LoginUser u = urlUtils.getAll(request);
+        String user = u.getLoginname();
+        /*if(oauthService.getCurrentUser(token).getStatus() == 500){
             throw new RuntimeException("Feign调用权限服务失败");
-        }
-        String chineseName = (String) oauthService.getChineseName(user).getObj();
-        if(oauthService.getChineseName(user).getStatus() == 500){
+        }*/
+        String chineseName = u.getName();
+        /*if(oauthService.getChineseName(user).getStatus() == 500){
             throw new RuntimeException("Feign调用权限服务失败");
-        }
+        }*/
         List<BizRoute> list = bizRouteRepository.findExitList(user);
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
@@ -303,7 +319,7 @@ public class RouteServiceImpl {
         return RespBean.ok("查询成功！",selection);
     }
 
-    @Transactional
+
     public RespBean findDetail(Integer id){
         BizRoute br = bizRouteRepository.findDetail(id);
         List<BizSignPoint> pointList = (List<BizSignPoint>) signPointService.findList(br.getId()).getObj();
@@ -331,7 +347,6 @@ public class RouteServiceImpl {
             br.setWaterOfficeMenu(waterOfficeMenu);
             br.setBizSignPoints(pointList);
             br.setPointInspectionTypeMenu(pointInspectionTypeMenu);
-            return RespBean.ok("查询成功！",br);
         }
         return RespBean.ok("查询成功！",br);
     }

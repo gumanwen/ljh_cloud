@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -44,13 +45,13 @@ public class HiddenDangerPointController {
 
     @ApiOperation("查询隐患点详情")
     @GetMapping("findDetail")
-    public RespBean findDetail(@RequestParam Integer id){
-        return hiddenDangerPointService.findDetail(id);
+    public RespBean findDetail(@RequestParam Integer id,HttpServletRequest request){
+        return hiddenDangerPointService.findDetail(id,request);
     }
 
     @ApiOperation("查询角色所有隐患点列表")
     @GetMapping("findListByUser")
-    public RespBean findListByUser(HttpServletRequest request){
+    public RespBean findListByUser(HttpServletRequest request) throws UnsupportedEncodingException {
         return hiddenDangerPointService.findListByUser(request);
     }
 

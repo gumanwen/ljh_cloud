@@ -1,6 +1,5 @@
 package com.yaobanTech.springcloud.controller;
 
-import com.yaobanTech.springcloud.domain.FindCondition;
 import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.service.InspectService;
 import com.yaobanTech.springcloud.service.PlanService;
@@ -12,6 +11,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
 @RestController
@@ -61,7 +61,7 @@ public class PlanController {
 
     @ApiOperation("查询计划列表")
     @GetMapping("findAll")
-    public RespBean findAll(HttpServletRequest request) {
+    public RespBean findAll(HttpServletRequest request) throws UnsupportedEncodingException {
         return planService.findAll(request);
     }
 
@@ -102,7 +102,7 @@ public class PlanController {
                                   @RequestParam String startTimeOfPCT,@RequestParam String endTimeOfPCT,
                                   @RequestParam String startTimeOfPST,@RequestParam String endTimeOfPST,
                                   @RequestParam String startTimeOfPET,@RequestParam String endTimeOfPET,
-                                  HttpServletRequest request){
+                                  HttpServletRequest request) throws UnsupportedEncodingException {
         return planService.findCondition(routeName,waterManagementOffice,planPorid,planType,startTimeOfPCT,endTimeOfPCT,startTimeOfPST,endTimeOfPST,startTimeOfPET,endTimeOfPET,request);
     }
 

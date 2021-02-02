@@ -1,7 +1,6 @@
 package com.yaobanTech.springcloud.repository;
 
 import com.yaobanTech.springcloud.domain.BizPlan;
-import com.yaobanTech.springcloud.domain.FindCondition;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -49,7 +48,7 @@ public interface BizPlanRepository extends JpaRepository<BizPlan,Integer>, JpaSp
             "AND (?9 is null or ?9='' or b.end_time >= ?9 ) " +
             "AND (?10 is null or ?10='' or b.end_time <= ?10 ) " +
             "ORDER BY b.start_time DESC",nativeQuery = true)
-    List<Map<String,Object>> findCondition(String routeName, String waterManagementOffice, String planPorid, String planType,
+    List<BizPlan> findCondition(String routeName, String waterManagementOffice, String planPorid, String planType,
                                            String startTimeOfPCT, String endTimeOfPCT,
                                            String startTimeOfPST, String endTimeOfPST,
                                            String startTimeOfPET, String endTimeOfPET);

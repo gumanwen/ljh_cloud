@@ -1,8 +1,10 @@
 package com.yaobanTech.springcloud.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.yaobanTech.springcloud.ToolUtils.UrlUtils;
 import com.yaobanTech.springcloud.domain.BizHiddenDangerPointEntity;
 import com.yaobanTech.springcloud.domain.BizSuggestionEntity;
+import com.yaobanTech.springcloud.domain.LoginUser;
 import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.repository.BizHiddenDangerPointRepository;
 import com.yaobanTech.springcloud.repository.SuggestionRepository;
@@ -15,6 +17,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +44,10 @@ public class HiddenDangerPointServiceImpl {
     @Lazy
     private RedisService redisService;
 
+    @Autowired
+    @Lazy
+    private UrlUtils urlUtils;
+
     @GlobalTransactional
     public RespBean saveHiddenDangerPoint(HashMap<String,Object> param,HttpServletRequest request) {
         BizHiddenDangerPointEntity bizHiddenDangerPointEntity = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizHiddenDangerPointEntity.class);
@@ -58,12 +65,11 @@ public class HiddenDangerPointServiceImpl {
                 }else{
                     return RespBean.error("用水管理所参数不符合系统约定，生成编号异常！");
                 }
-                String header = request.getHeader("Authorization");
-                String token =  StringUtils.substringAfter(header, "Bearer ");
-                String user = (String) oauthService.getCurrentUser(token).getObj();
-                if(oauthService.getCurrentUser(token).getStatus() == 500){
+                LoginUser u = urlUtils.getAll(request);
+                String user = u.getLoginname();
+                /*if(oauthService.getCurrentUser(token).getStatus() == 500){
                     throw new RuntimeException("Feign调用权限服务失败");
-                }
+                }*/
                 bizHiddenDangerPointEntity.setCommitDate(new Date());
                 bizHiddenDangerPointEntity.setEnabled(1);
                 bizHiddenDangerPointEntity.setHiddenDangerStatus("未跟进");
@@ -114,18 +120,19 @@ public class HiddenDangerPointServiceImpl {
     }
 
     @GlobalTransactional
-    public RespBean findDetail(Integer id) {
+    public RespBean findDetail(Integer id,HttpServletRequest request) {
         BizHiddenDangerPointEntity bdpe = null;
         if(id != null) {
             try {
                 bdpe = hiddenDangerPointRepository.findHiddenDangerPoint(id);
                 List<BizSuggestionEntity> suggestionEntityList = suggestionRepository.findList(bdpe.getHiddenDangerPointCode());
-                String chineseName = (String) oauthService.getChineseName(bdpe.getCommitBy()).getObj();
+                LoginUser u = urlUtils.getAll(request);
+                String chineseName = u.getName();
                 bdpe.setCommitBy(chineseName);
                 bdpe.setHandleAdvice(suggestionEntityList);
-                if(oauthService.getChineseName(bdpe.getCommitBy()).getStatus() == 500){
+                /*if(oauthService.getChineseName(bdpe.getCommitBy()).getStatus() == 500){
                     throw new RuntimeException("Feign调用权限服务失败");
-                }
+                }*/
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("查询失败！");
@@ -137,17 +144,13 @@ public class HiddenDangerPointServiceImpl {
     }
 
     @Transactional(propagation= Propagation.NOT_SUPPORTED)
-    public RespBean findListByUser(HttpServletRequest request) {
+    public RespBean findListByUser(HttpServletRequest request) throws UnsupportedEncodingException {
         String header = request.getHeader("Authorization");
         String token =  StringUtils.substringAfter(header, "Bearer ");
-        String user = (String) oauthService.getCurrentUser(token).getObj();
-        if(oauthService.getCurrentUser(token).getStatus() == 500){
-            throw new RuntimeException("Feign调用权限服务失败");
-        }
-        String chineseName = (String) oauthService.getChineseName(user).getObj();
-        if(oauthService.getChineseName(user).getStatus() == 500){
-            throw new RuntimeException("Feign调用权限服务失败");
-        }
+        LoginUser u = urlUtils.getAll(request);
+        String chineseName = u.getName();
+        String user = u.getLoginname();
+
         List<BizHiddenDangerPointEntity> list = hiddenDangerPointRepository.findList(user);
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {

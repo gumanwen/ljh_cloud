@@ -7,9 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(value ="auth2Service" )
 public interface OauthService {
-    @GetMapping("/user/userRight/getNameByUsername")
-    RespBean getChineseName(@RequestParam("username")  String username);
-
-    @GetMapping("/user/userRight/getCurrentUser")
-    RespBean getCurrentUser(@RequestParam("token") String token);
+    @GetMapping("/user/userRight/getAll")
+    RespBean getAll(@RequestParam("token") String token,@RequestParam("type") Integer type);
 }
+

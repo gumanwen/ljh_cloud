@@ -1,6 +1,7 @@
 package com.yaobanTech.springcloud.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.yaobanTech.springcloud.ToolUtils.UrlUtils;
 import com.yaobanTech.springcloud.domain.*;
 import com.yaobanTech.springcloud.domain.enumDef.EnumMenu;
 import com.yaobanTech.springcloud.repository.BizRouteRepository;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 @Service
@@ -39,6 +41,10 @@ public class SignPointServiceImpl {
     @Autowired
     @Lazy
     private FileService fileService;
+
+    @Autowired
+    @Lazy
+    private UrlUtils urlUtils;
 
     public RespBean saveSignPoint(HashMap<String,Object> param) {
         BizSignPoint bizSignPoint = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizSignPoint.class);
@@ -113,17 +119,10 @@ public class SignPointServiceImpl {
     }
 
     @GlobalTransactional
-    public RespBean findListByUser(HttpServletRequest request) {
-        String header = request.getHeader("Authorization");
-        String token =  StringUtils.substringAfter(header, "Bearer ");
-        String user = (String) oauthService.getCurrentUser(token).getObj();
-        if(oauthService.getCurrentUser(token).getStatus() == 500){
-            throw new RuntimeException("Feign调用权限服务失败");
-        }
-        String chineseName = (String) oauthService.getChineseName(user).getObj();
-        if(oauthService.getChineseName(user).getStatus() == 500){
-            throw new RuntimeException("Feign调用权限服务失败");
-        }
+    public RespBean findListByUser(HttpServletRequest request) throws UnsupportedEncodingException {
+        LoginUser u = urlUtils.getAll(request);
+        String user = u.getLoginname();
+        String chineseName = u.getName();
         List<BizRoute> routeList = bizRouteRepository.findList(user);
         List<BizSignPoint> list = new ArrayList<>();
         if(!routeList.isEmpty()){
