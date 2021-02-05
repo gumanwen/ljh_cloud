@@ -10,8 +10,4 @@ public class RouteServiceFallBack implements RouteService{
         return RespBean.error("调用路线服务失败！");
     }
 
-    @Override
-    public String testFeign(Integer routeId) {
-        return "fallBack";
-    }
 }

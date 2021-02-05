@@ -67,7 +67,7 @@ public class PlanController {
 
     @ApiOperation("查询计划详情")
     @GetMapping("findById")
-    public RespBean findById(@RequestParam Integer id) {
+    public RespBean findById(@RequestParam Integer id) throws UnsupportedEncodingException {
         return planService.findById(id);
     }
 

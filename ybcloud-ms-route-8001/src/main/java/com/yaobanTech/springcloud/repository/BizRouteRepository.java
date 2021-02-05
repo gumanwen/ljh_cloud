@@ -33,11 +33,4 @@ public interface BizRouteRepository extends JpaRepository<BizRoute,Integer>, Jpa
     @Query(value = "select new map(b.id,b.routeName) from BizRoute b where b.enabled = 1 and b.waterManagementOffice = ?1")
     List<HashMap<String,Object>> findSelection(String code);
 
-    @Modifying
-    @Query("update BizRoute t set t.enabled = t.enabled + 1 where t.id = ?1")
-    Integer testFeign(Integer id);
-
-
-
-
 }

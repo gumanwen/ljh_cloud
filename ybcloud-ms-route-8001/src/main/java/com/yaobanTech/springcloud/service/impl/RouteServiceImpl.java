@@ -5,14 +5,15 @@ import com.yaobanTech.springcloud.ToolUtils.UrlUtils;
 import com.yaobanTech.springcloud.domain.*;
 import com.yaobanTech.springcloud.domain.enumDef.EnumMenu;
 import com.yaobanTech.springcloud.repository.BizRouteRepository;
+import com.yaobanTech.springcloud.repository.BizSignPointMapper;
 import com.yaobanTech.springcloud.repository.BizSignPointRepository;
-import io.seata.spring.annotation.GlobalTransactional;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -35,6 +36,10 @@ public class RouteServiceImpl {
 
     @Autowired
     @Lazy
+    private BizSignPointMapper bizSignPointMapper;
+
+    @Autowired
+    @Lazy
     private SignPointServiceImpl signPointService;
 
     @Autowired
@@ -52,7 +57,7 @@ public class RouteServiceImpl {
     @Autowired
     private UrlUtils urlUtils;
 
-    @GlobalTransactional
+    @Transactional
     public RespBean saveRoute(HashMap<String,Object> param,HttpServletRequest request) throws UnsupportedEncodingException {
         String header = request.getHeader("Authorization");
         String token =  StringUtils.substringAfter(header, "Bearer ");
@@ -141,12 +146,11 @@ public class RouteServiceImpl {
         return RespBean.ok("删除成功！",i);
     }
 
+    @org.springframework.transaction.annotation.Transactional(propagation= Propagation.NOT_SUPPORTED)
     public RespBean findCondition(HashMap<String,Object> hashMap,HttpServletRequest request) throws UnsupportedEncodingException {
         //获取当前用户
-        String header = request.getHeader("Authorization");
-        String token =  StringUtils.substringAfter(header, "Bearer ");
         LoginUser u = urlUtils.getAll(request);
-        String user = u.getLoginname();
+        String chineseName = (String)oauthService.getChineseName(u.getLoginname()).getObj();
         /*if(oauthService.getCurrentUser(token).getStatus() == 500){
             throw new RuntimeException("Feign调用权限服务失败");
         }*/
@@ -222,25 +226,18 @@ public class RouteServiceImpl {
                 route.setRouteTypeMenu(routeTypeMenu);
                 route.setWaterOfficeMenu(waterOfficeMenu);
                 route.setPointInspectionTypeMenu(pointInspectionTypeMenu);
-                route.setRouteCreator(user);
+                route.setRouteCreator(chineseName);
             }
         }
        return RespBean.ok("查询成功！",list);
     }
 
-    @Transactional
+
+    @org.springframework.transaction.annotation.Transactional(propagation= Propagation.NOT_SUPPORTED)
     public RespBean findAll(HttpServletRequest request) throws UnsupportedEncodingException {
-        String header = request.getHeader("Authorization");
-        String token =  StringUtils.substringAfter(header, "Bearer ");
         LoginUser u = urlUtils.getAll(request);
         String user = u.getLoginname();
-        /*if(oauthService.getCurrentUser(token).getStatus() == 500){
-            throw new RuntimeException("Feign调用权限服务失败");
-        }*/
-        String chineseName = u.getName();
-        /*if(oauthService.getChineseName(user).getStatus() == 500){
-            throw new RuntimeException("Feign调用权限服务失败");
-        }*/
+        String chineseName = (String)oauthService.getChineseName(u.getLoginname()).getObj();
         List<BizRoute> list = bizRouteRepository.findList(user);
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
@@ -265,25 +262,17 @@ public class RouteServiceImpl {
                 route.setRouteTypeMenu(routeTypeMenu);
                 route.setWaterOfficeMenu(waterOfficeMenu);
                 route.setPointInspectionTypeMenu(pointInspectionTypeMenu);
-                route.setRouteCreator(user);
+                route.setRouteCreator(chineseName);
             }
         }
         return RespBean.ok("查询成功！",list);
     }
 
-    @Transactional
+    @org.springframework.transaction.annotation.Transactional(propagation= Propagation.NOT_SUPPORTED)
     public RespBean findExitAll(HttpServletRequest request) throws UnsupportedEncodingException {
-        String header = request.getHeader("Authorization");
-        String token =  StringUtils.substringAfter(header, "Bearer ");
         LoginUser u = urlUtils.getAll(request);
         String user = u.getLoginname();
-        /*if(oauthService.getCurrentUser(token).getStatus() == 500){
-            throw new RuntimeException("Feign调用权限服务失败");
-        }*/
-        String chineseName = u.getName();
-        /*if(oauthService.getChineseName(user).getStatus() == 500){
-            throw new RuntimeException("Feign调用权限服务失败");
-        }*/
+        String chineseName = (String)oauthService.getChineseName(u.getLoginname()).getObj();
         List<BizRoute> list = bizRouteRepository.findExitList(user);
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
@@ -309,6 +298,7 @@ public class RouteServiceImpl {
                 route.setWaterOfficeMenu(waterOfficeMenu);
                 route.setPointInspectionTypeMenu(pointInspectionTypeMenu);
                 route.setRouteCreator(user);
+                route.setRouteCreator(chineseName);
             }
         }
         return RespBean.ok("查询成功！",list);
@@ -319,12 +309,13 @@ public class RouteServiceImpl {
         return RespBean.ok("查询成功！",selection);
     }
 
-
-    public RespBean findDetail(Integer id){
+    @org.springframework.transaction.annotation. Transactional(propagation= Propagation.NOT_SUPPORTED)
+    public RespBean findDetail(Integer id) throws UnsupportedEncodingException {
         BizRoute br = bizRouteRepository.findDetail(id);
-        List<BizSignPoint> pointList = (List<BizSignPoint>) signPointService.findList(br.getId()).getObj();
         if(br != null) {
+            List<BizSignPoint> pointList = (List<BizSignPoint>) signPointService.findList(br.getId()).getObj();
             List<BizSignPoint> list = br.getBizSignPoints();
+            String chineseName = (String)oauthService.getChineseName(br.getRouteCreator()).getObj();
             //获取报建文件列表
             if(list.size()>0){
                 for(int i =0; i<list.size(); i++){
@@ -347,6 +338,7 @@ public class RouteServiceImpl {
             br.setWaterOfficeMenu(waterOfficeMenu);
             br.setBizSignPoints(pointList);
             br.setPointInspectionTypeMenu(pointInspectionTypeMenu);
+            br.setRouteCreator(chineseName);
         }
         return RespBean.ok("查询成功！",br);
     }
@@ -390,12 +382,27 @@ public class RouteServiceImpl {
         return RespBean.ok("查询成功！", map);
     }
 
-//    public RespBean testFeign(Integer Id){
-//
-//      bizRouteRepository.testFeign(Id);
-//
-//      return RespBean.ok("修改成功！",RootContext.getXID());
-//    }
-
+    public RespBean findRouteIds(String waterManagementOffice,String routeName,String pointInspectionType,String planName ,String planPorid,String planType){
+        if("".equals(waterManagementOffice)){
+            waterManagementOffice = null;
+        }
+        if("".equals(routeName)){
+            routeName = null;
+        }
+        if("".equals(pointInspectionType)){
+            pointInspectionType = null;
+        }
+        if("".equals(planName)){
+            planName = null;
+        }
+        if("".equals(planPorid)){
+            planPorid = null;
+        }
+        if("".equals(planType)){
+            planType = null;
+        }
+        List<HashMap<String, Object>> ids = bizSignPointMapper.findRouteIds(waterManagementOffice, routeName, pointInspectionType, planName, planPorid, planType);
+        return RespBean.ok("查询成功！",ids);
+    }
 
 }

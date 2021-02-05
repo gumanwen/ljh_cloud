@@ -126,8 +126,8 @@ public class HiddenDangerPointServiceImpl {
             try {
                 bdpe = hiddenDangerPointRepository.findHiddenDangerPoint(id);
                 List<BizSuggestionEntity> suggestionEntityList = suggestionRepository.findList(bdpe.getHiddenDangerPointCode());
-                LoginUser u = urlUtils.getAll(request);
-                String chineseName = u.getName();
+                String user = bdpe.getCommitBy();
+                String chineseName = (String)oauthService.getChineseName(user).getObj();
                 bdpe.setCommitBy(chineseName);
                 bdpe.setHandleAdvice(suggestionEntityList);
                 /*if(oauthService.getChineseName(bdpe.getCommitBy()).getStatus() == 500){
@@ -145,8 +145,6 @@ public class HiddenDangerPointServiceImpl {
 
     @Transactional(propagation= Propagation.NOT_SUPPORTED)
     public RespBean findListByUser(HttpServletRequest request) throws UnsupportedEncodingException {
-        String header = request.getHeader("Authorization");
-        String token =  StringUtils.substringAfter(header, "Bearer ");
         LoginUser u = urlUtils.getAll(request);
         String chineseName = u.getName();
         String user = u.getLoginname();

@@ -43,7 +43,7 @@ public class RouteController {
 
     @ApiOperation("查询路线详情")
     @GetMapping("findDetail")
-    public RespBean findDetail(@RequestParam Integer id){
+    public RespBean findDetail(@RequestParam Integer id) throws UnsupportedEncodingException {
         return routeService.findDetail(id);
     }
 
@@ -83,10 +83,11 @@ public class RouteController {
         return routeService.findCondition(hashMap,request);
     }
 
-//    @ApiOperation("测试事务")
-//    @GetMapping("testFeign")
-//    public RespBean testFeign(@RequestParam Integer routeId){
-//        return routeService.testFeign(routeId);
-//    }
+    @ApiOperation("条件查询路线id列表")
+    @GetMapping("findRouteIds")
+    public RespBean findRouteIds(@RequestParam String waterManagementOffice,@RequestParam String routeName,@RequestParam String pointInspectionType,
+    @RequestParam String planName ,@RequestParam String planPorid,@RequestParam String planType) throws UnsupportedEncodingException {
+        return routeService.findRouteIds(waterManagementOffice,routeName,pointInspectionType,planName,planPorid,planType);
+    }
 
 }

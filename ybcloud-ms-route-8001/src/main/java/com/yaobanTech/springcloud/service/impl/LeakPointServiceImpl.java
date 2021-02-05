@@ -28,6 +28,10 @@ public class LeakPointServiceImpl {
 
     @Autowired
     @Lazy
+    private OauthService oauthService;
+
+    @Autowired
+    @Lazy
     private FileService fileService;
 
     @Autowired
@@ -111,8 +115,8 @@ public class LeakPointServiceImpl {
         if(id != null) {
             try {
                 blpe = leakPointRepository.findBizLeakPointEntity(id);
-                LoginUser u = urlUtils.getAll(request);
-                String chineseName = u.getName();
+                String user = blpe.getCommitBy();
+                String chineseName = (String)oauthService.getChineseName(user).getObj();
                 blpe.setCommitBy(chineseName);
             } catch (Exception e) {
                 e.printStackTrace();

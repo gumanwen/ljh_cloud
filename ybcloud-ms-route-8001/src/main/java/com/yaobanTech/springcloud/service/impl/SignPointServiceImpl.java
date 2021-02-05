@@ -62,6 +62,7 @@ public class SignPointServiceImpl {
         return RespBean.ok("保存成功！");
     }
 
+    @Transactional
     public RespBean updateSignPoint(HashMap<String,Object> param) {
         BizSignedPoint bizSignedPoint = null;
         Integer id = null;
@@ -107,7 +108,6 @@ public class SignPointServiceImpl {
         if(id != null) {
             try {
                  byId = signPointRepository.findSignPointById(id);
-
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("查询失败！");

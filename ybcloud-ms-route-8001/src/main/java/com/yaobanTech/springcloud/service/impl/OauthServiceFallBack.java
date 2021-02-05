@@ -7,6 +7,11 @@ import org.springframework.stereotype.Component;
 public class OauthServiceFallBack implements OauthService{
 
     @Override
+    public RespBean getChineseName(String username) {
+        return RespBean.error("调用权限服务失败！");
+    }
+
+    @Override
     public RespBean getAll(String token, Integer type) {
         return RespBean.error("调用权限服务失败！");
     }

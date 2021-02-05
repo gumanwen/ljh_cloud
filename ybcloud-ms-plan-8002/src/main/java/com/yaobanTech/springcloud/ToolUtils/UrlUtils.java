@@ -21,8 +21,10 @@ public class UrlUtils {
 
     @Value("${qyserver.ipAdd}")
     private String qyIP;
+
     @Autowired
     private OauthService authService;
+
     public LoginUser getAll(HttpServletRequest request) throws UnsupportedEncodingException {
         Integer ttype = null;
         //String tokenT = request.getHeader("TW-AUTH-HEADER");
