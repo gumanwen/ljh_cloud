@@ -117,7 +117,7 @@ public class LeakPointServiceImpl {
                 blpe = leakPointRepository.findBizLeakPointEntity(id);
                 String user = blpe.getCommitBy();
                 String chineseName = (String)oauthService.getChineseName(user).getObj();
-                blpe.setCommitBy(chineseName);
+                blpe.setCommitByCN(chineseName);
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("查询失败！");
@@ -138,7 +138,7 @@ public class LeakPointServiceImpl {
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
                 BizLeakPointEntity bizLeakPointEntity = list.get(i);
-                bizLeakPointEntity.setCommitBy(chineseName);
+                bizLeakPointEntity.setCommitByCN(chineseName);
 //                if(points.size()>0){
 //                    for(int j =0; j<points.size();j++){
 //                        //获取报建文件列表

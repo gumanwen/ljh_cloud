@@ -2,6 +2,7 @@ package com.yaobanTech.springcloud.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -131,6 +132,12 @@ public class BizLeakPointEntity {
    @Column(name = "leak_point_status" )
 	private String leakPointStatus;
 
+   /**
+	 * 提交人
+	 */
+    @Transient
+	private String commitByCN;
+
 	public BizLeakPointEntity() {
 	}
 
@@ -152,6 +159,14 @@ public class BizLeakPointEntity {
 		this.endDate = endDate;
 		this.enabled = enabled;
 		this.leakPointStatus = leakPointStatus;
+	}
+
+	public String getCommitByCN() {
+		return commitByCN;
+	}
+
+	public void setCommitByCN(String commitByCN) {
+		this.commitByCN = commitByCN;
 	}
 
 	public Date getEndDate() {

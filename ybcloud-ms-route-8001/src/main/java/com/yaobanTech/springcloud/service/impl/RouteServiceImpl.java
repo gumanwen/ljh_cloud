@@ -14,13 +14,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
@@ -103,15 +103,8 @@ public class RouteServiceImpl {
         BizRoute bizRoute = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizRoute.class);
         if(bizRoute.getId() != null && !bizRoute.getBizSignPoints().isEmpty()) {
             try {
-                List<BizSignPoint> pointList = bizRoute.getBizSignPoints();
-//                for (int i = 0; i <pointList.size() ; i++) {
-//                    Integer id = pointList.get(i).getId();
-//                    if(id == null || "".equals(id)){
-//                        return RespBean.error("签到点ID为空,修改失败！");
-//                    }
-//                }
-                List<BizSignPoint> list = bizSignPointRepository.saveAll(bizRoute.getBizSignPoints());
-                BizRoute route = bizRouteRepository.save(bizRoute);
+               bizSignPointRepository.saveAll(bizRoute.getBizSignPoints());
+               bizRouteRepository.save(bizRoute);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -123,7 +116,6 @@ public class RouteServiceImpl {
         return RespBean.ok("修改成功！",bizRoute.getBizSignPoints());
     }
 
-    @Transactional
     public RespBean deleteRoute(Integer id) {
         Integer i = null;
         if(id != null) {
@@ -146,7 +138,7 @@ public class RouteServiceImpl {
         return RespBean.ok("删除成功！",i);
     }
 
-    @org.springframework.transaction.annotation.Transactional(propagation= Propagation.NOT_SUPPORTED)
+    @Transactional(propagation= Propagation.NOT_SUPPORTED)
     public RespBean findCondition(HashMap<String,Object> hashMap,HttpServletRequest request) throws UnsupportedEncodingException {
         //获取当前用户
         LoginUser u = urlUtils.getAll(request);
@@ -226,14 +218,14 @@ public class RouteServiceImpl {
                 route.setRouteTypeMenu(routeTypeMenu);
                 route.setWaterOfficeMenu(waterOfficeMenu);
                 route.setPointInspectionTypeMenu(pointInspectionTypeMenu);
-                route.setRouteCreator(chineseName);
+                route.setRouteCreatorCN(chineseName);
             }
         }
        return RespBean.ok("查询成功！",list);
     }
 
 
-    @org.springframework.transaction.annotation.Transactional(propagation= Propagation.NOT_SUPPORTED)
+    @Transactional(propagation= Propagation.NOT_SUPPORTED)
     public RespBean findAll(HttpServletRequest request) throws UnsupportedEncodingException {
         LoginUser u = urlUtils.getAll(request);
         String user = u.getLoginname();
@@ -262,13 +254,13 @@ public class RouteServiceImpl {
                 route.setRouteTypeMenu(routeTypeMenu);
                 route.setWaterOfficeMenu(waterOfficeMenu);
                 route.setPointInspectionTypeMenu(pointInspectionTypeMenu);
-                route.setRouteCreator(chineseName);
+                route.setRouteCreatorCN(chineseName);
             }
         }
         return RespBean.ok("查询成功！",list);
     }
 
-    @org.springframework.transaction.annotation.Transactional(propagation= Propagation.NOT_SUPPORTED)
+    @Transactional(propagation= Propagation.NOT_SUPPORTED)
     public RespBean findExitAll(HttpServletRequest request) throws UnsupportedEncodingException {
         LoginUser u = urlUtils.getAll(request);
         String user = u.getLoginname();
@@ -298,7 +290,7 @@ public class RouteServiceImpl {
                 route.setWaterOfficeMenu(waterOfficeMenu);
                 route.setPointInspectionTypeMenu(pointInspectionTypeMenu);
                 route.setRouteCreator(user);
-                route.setRouteCreator(chineseName);
+                route.setRouteCreatorCN(chineseName);
             }
         }
         return RespBean.ok("查询成功！",list);
@@ -309,7 +301,7 @@ public class RouteServiceImpl {
         return RespBean.ok("查询成功！",selection);
     }
 
-    @org.springframework.transaction.annotation. Transactional(propagation= Propagation.NOT_SUPPORTED)
+    @Transactional(propagation= Propagation.NOT_SUPPORTED)
     public RespBean findDetail(Integer id) throws UnsupportedEncodingException {
         BizRoute br = bizRouteRepository.findDetail(id);
         if(br != null) {
@@ -338,7 +330,7 @@ public class RouteServiceImpl {
             br.setWaterOfficeMenu(waterOfficeMenu);
             br.setBizSignPoints(pointList);
             br.setPointInspectionTypeMenu(pointInspectionTypeMenu);
-            br.setRouteCreator(chineseName);
+            br.setRouteCreatorCN(chineseName);
         }
         return RespBean.ok("查询成功！",br);
     }

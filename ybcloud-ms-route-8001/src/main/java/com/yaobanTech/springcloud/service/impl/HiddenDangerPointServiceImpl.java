@@ -128,7 +128,7 @@ public class HiddenDangerPointServiceImpl {
                 List<BizSuggestionEntity> suggestionEntityList = suggestionRepository.findList(bdpe.getHiddenDangerPointCode());
                 String user = bdpe.getCommitBy();
                 String chineseName = (String)oauthService.getChineseName(user).getObj();
-                bdpe.setCommitBy(chineseName);
+                bdpe.setCommitByCN(chineseName);
                 bdpe.setHandleAdvice(suggestionEntityList);
                 /*if(oauthService.getChineseName(bdpe.getCommitBy()).getStatus() == 500){
                     throw new RuntimeException("Feign调用权限服务失败");
@@ -153,7 +153,7 @@ public class HiddenDangerPointServiceImpl {
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
                 BizHiddenDangerPointEntity bizHiddenDangerPointEntity = list.get(i);
-                bizHiddenDangerPointEntity.setCommitBy(chineseName);
+                bizHiddenDangerPointEntity.setCommitByCN(chineseName);;
                 List<BizSuggestionEntity> suggestionEntityList = suggestionRepository.findList(bizHiddenDangerPointEntity.getHiddenDangerPointCode());
                 bizHiddenDangerPointEntity.setHandleAdvice(suggestionEntityList);
 //                if(points.size()>0){

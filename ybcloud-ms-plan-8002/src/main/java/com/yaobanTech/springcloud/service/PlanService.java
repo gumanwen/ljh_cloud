@@ -8,14 +8,13 @@ import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.domain.enumDef.EnumMenu;
 import com.yaobanTech.springcloud.repository.BizPlanMapper;
 import com.yaobanTech.springcloud.repository.BizPlanRepository;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -170,7 +169,7 @@ public class PlanService {
         return RespBean.ok("查询成功！",routeId);
     }
 
-    @org.springframework.transaction.annotation.Transactional(propagation = Propagation.NOT_SUPPORTED)
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public RespBean findAll(HttpServletRequest request) throws UnsupportedEncodingException {
         LoginUser u = urlUtils.getAll(request);
         String user = u.getLoginname();
@@ -185,7 +184,7 @@ public class PlanService {
                 plan.setPlanTypeMenu(map);
                 plan.setPlanStatusMenu(ps);
                 plan.setPlanPoridMenu(pp);
-                plan.setPlanCreatedBy(chineseName);
+                plan.setPlanCreatedByCN(chineseName);
                 RespBean respBean = routeService.findDetail(plan.getRouteId());
                 Object o = respBean.getObj();
                 if(respBean.getStatus() == 500){
@@ -202,7 +201,7 @@ public class PlanService {
         return RespBean.ok("查询成功！",selection);
     }
 
-    @org.springframework.transaction.annotation.Transactional(propagation = Propagation.NOT_SUPPORTED)
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public RespBean findById(Integer id) throws UnsupportedEncodingException {
         BizPlan bp = bizPlanRepository.findDetail(id);
         if(bp != null) {
@@ -214,7 +213,7 @@ public class PlanService {
             bp.setPlanTypeMenu(map);
             bp.setPlanStatusMenu(ps);
             bp.setPlanPoridMenu(pp);
-            bp.setPlanCreatedBy(chineseName);
+            bp.setPlanCreatedByCN(chineseName);
             RespBean respBean = routeService.findDetail(bp.getRouteId());
             Object o = respBean.getObj();
             if(respBean.getStatus() == 500){
@@ -271,7 +270,7 @@ public class PlanService {
         return RespBean.ok("查询成功！", map);
     }
 
-    @org.springframework.transaction.annotation.Transactional(propagation = Propagation.NOT_SUPPORTED)
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public RespBean findCondition(String routeName, String waterManagementOffice, String planPorid, String planType,
                                   String startTimeOfPCT, String endTimeOfPCT,
                                   String startTimeOfPST, String endTimeOfPST,
@@ -322,7 +321,7 @@ public class PlanService {
                 plan.setPlanTypeMenu(map);
                 plan.setPlanStatusMenu(ps);
                 plan.setPlanPoridMenu(pp);
-                plan.setPlanCreatedBy(chineseName);
+                plan.setPlanCreatedByCN(chineseName);
                 RespBean respBean = routeService.findDetail(plan.getRouteId());
                 Object o = respBean.getObj();
                 if(respBean.getStatus() == 500){
