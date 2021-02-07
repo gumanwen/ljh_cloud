@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
 @RestController
@@ -24,7 +25,7 @@ public class RouteController {
 
     @ApiOperation("保存巡查路线")
     @PostMapping("add")
-    public RespBean saveRoute(@RequestBody HashMap<String,Object> param,HttpServletRequest request){
+    public RespBean saveRoute(@RequestBody HashMap<String,Object> param,HttpServletRequest request) throws UnsupportedEncodingException {
         return routeService.saveRoute(param,request);
     }
 
@@ -42,19 +43,19 @@ public class RouteController {
 
     @ApiOperation("查询路线详情")
     @GetMapping("findDetail")
-    public RespBean findDetail(@RequestParam Integer id){
+    public RespBean findDetail(@RequestParam Integer id) throws UnsupportedEncodingException {
         return routeService.findDetail(id);
     }
 
     @ApiOperation("查询路线列表")
     @GetMapping("findList")
-    public RespBean findList(HttpServletRequest request){
+    public RespBean findList(HttpServletRequest request) throws UnsupportedEncodingException {
         return routeService.findAll(request);
     }
 
     @ApiOperation("查询未删除路线列表")
     @GetMapping("findExitList")
-    public RespBean findExitList(HttpServletRequest request){
+    public RespBean findExitList(HttpServletRequest request) throws UnsupportedEncodingException {
         return routeService.findExitAll(request);
     }
 
@@ -76,10 +77,17 @@ public class RouteController {
         return routeService.findEnum(code);
     }
 
-//    @ApiOperation("测试事务")
-//    @GetMapping("testFeign")
-//    public RespBean testFeign(@RequestParam Integer routeId){
-//        return routeService.testFeign(routeId);
-//    }
+    @ApiOperation("条件查询路线信息")
+    @PostMapping("findCondition")
+    public RespBean findCondition(@RequestBody HashMap<String,Object> hashMap,HttpServletRequest request) throws UnsupportedEncodingException {
+        return routeService.findCondition(hashMap,request);
+    }
+
+    @ApiOperation("条件查询路线id列表")
+    @GetMapping("findRouteIds")
+    public RespBean findRouteIds(@RequestParam String waterManagementOffice,@RequestParam String routeName,@RequestParam String pointInspectionType,
+    @RequestParam String planName ,@RequestParam String planPorid,@RequestParam String planType) throws UnsupportedEncodingException {
+        return routeService.findRouteIds(waterManagementOffice,routeName,pointInspectionType,planName,planPorid,planType);
+    }
 
 }

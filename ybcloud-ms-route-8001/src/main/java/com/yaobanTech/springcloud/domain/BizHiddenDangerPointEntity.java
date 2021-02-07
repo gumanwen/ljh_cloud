@@ -173,6 +173,12 @@ public class BizHiddenDangerPointEntity {
 	@Transient
 	private List<BizSuggestionEntity> handleAdvice;
 
+	/**
+	 * 提交人
+	 */
+	@Transient
+	private String commitByCN;
+
 
 
 	public BizHiddenDangerPointEntity() {
@@ -199,6 +205,14 @@ public class BizHiddenDangerPointEntity {
 		this.commitBy = commitBy;
 		this.commitDate = commitDate;
 		this.enabled = enabled;
+	}
+
+	public String getCommitByCN() {
+		return commitByCN;
+	}
+
+	public void setCommitByCN(String commitByCN) {
+		this.commitByCN = commitByCN;
 	}
 
 	public List<BizSuggestionEntity> getHandleAdvice() {

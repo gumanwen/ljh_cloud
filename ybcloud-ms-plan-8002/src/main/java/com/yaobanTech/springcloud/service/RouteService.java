@@ -10,7 +10,4 @@ public interface RouteService {
     @GetMapping("/api/route/way/findDetail")
     RespBean findDetail(@RequestParam Integer id);
 
-    @GetMapping("/api/route/way/testFeign")
-    String testFeign(@RequestParam Integer routeId);
-
 }

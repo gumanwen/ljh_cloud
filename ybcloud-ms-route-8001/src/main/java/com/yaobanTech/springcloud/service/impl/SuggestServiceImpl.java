@@ -1,7 +1,9 @@
 package com.yaobanTech.springcloud.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.yaobanTech.springcloud.ToolUtils.UrlUtils;
 import com.yaobanTech.springcloud.domain.BizSuggestionEntity;
+import com.yaobanTech.springcloud.domain.LoginUser;
 import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.repository.BizHiddenDangerPointRepository;
 import com.yaobanTech.springcloud.repository.BizLeakPointRepository;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -32,22 +35,19 @@ public class SuggestServiceImpl {
     @Autowired
     @Lazy
     private BizLeakPointRepository leakPointRepository;
-
+    
     @Autowired
     @Lazy
-    private OauthService oauthService;
+    private UrlUtils urlUtils;
 
     @GlobalTransactional
     public RespBean saveSuggestion(HashMap<String,Object> param,HttpServletRequest request) {
         BizSuggestionEntity bizSuggestionEntity = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizSuggestionEntity.class);
         if(bizSuggestionEntity != null && bizSuggestionEntity.getFCode() != null) {
             try {
-                String header = request.getHeader("Authorization");
-                String token =  StringUtils.substringAfter(header, "Bearer ");
-                String user = (String) oauthService.getCurrentUser(token).getObj();
-                if(oauthService.getCurrentUser(token).getStatus() == 500){
-                    throw new RuntimeException("Feign调用权限服务失败");
-                }
+                LoginUser u = urlUtils.getAll(request);
+                String user = u.getLoginname();
+                String chineseName = u.getName();
                 bizSuggestionEntity.setCommitDate(new Date());
                 bizSuggestionEntity.setEnabled(1);
                 bizSuggestionEntity.setCommitBy(user);
@@ -103,16 +103,15 @@ public class SuggestServiceImpl {
     }
 
     @GlobalTransactional
-    public RespBean findDetail(Integer id) {
+    public RespBean findDetail(Integer id,HttpServletRequest request) {
         BizSuggestionEntity bse = null;
         if(id != null) {
             try {
                 bse = suggestionRepository.findBizSuggestionEntity(id);
-                String chineseName = (String) oauthService.getChineseName(bse.getCommitBy()).getObj();
+                LoginUser u = urlUtils.getAll(request);
+                String chineseName = u.getName();
                 bse.setCommitBy(chineseName);
-                if(oauthService.getChineseName(bse.getCommitBy()).getStatus() == 500){
-                    throw new RuntimeException("Feign调用权限服务失败");
-                }
+
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("查询失败！");
@@ -124,17 +123,12 @@ public class SuggestServiceImpl {
     }
 
     @GlobalTransactional
-    public RespBean findListByFCode(String fCode,HttpServletRequest request) {
+    public RespBean findListByFCode(String fCode,HttpServletRequest request) throws UnsupportedEncodingException {
         String header = request.getHeader("Authorization");
         String token =  StringUtils.substringAfter(header, "Bearer ");
-        String user = (String) oauthService.getCurrentUser(token).getObj();
-        if(oauthService.getCurrentUser(token).getStatus() == 500){
-            throw new RuntimeException("Feign调用权限服务失败");
-        }
-        String chineseName = (String) oauthService.getChineseName(user).getObj();
-        if(oauthService.getChineseName(user).getStatus() == 500){
-            throw new RuntimeException("Feign调用权限服务失败");
-        }
+        LoginUser u = urlUtils.getAll(request);
+        String user = u.getLoginname();
+        String chineseName = u.getName();
         List<BizSuggestionEntity> list = suggestionRepository.findList(fCode);
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {

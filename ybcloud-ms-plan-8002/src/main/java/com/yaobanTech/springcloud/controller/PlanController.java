@@ -1,6 +1,5 @@
 package com.yaobanTech.springcloud.controller;
 
-import com.yaobanTech.springcloud.domain.FindCondition;
 import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.service.InspectService;
 import com.yaobanTech.springcloud.service.PlanService;
@@ -12,6 +11,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
 @RestController
@@ -61,13 +61,13 @@ public class PlanController {
 
     @ApiOperation("查询计划列表")
     @GetMapping("findAll")
-    public RespBean findAll(HttpServletRequest request) {
+    public RespBean findAll(HttpServletRequest request) throws UnsupportedEncodingException {
         return planService.findAll(request);
     }
 
     @ApiOperation("查询计划详情")
     @GetMapping("findById")
-    public RespBean findById(@RequestParam Integer id) {
+    public RespBean findById(@RequestParam Integer id) throws UnsupportedEncodingException {
         return planService.findById(id);
     }
 
@@ -95,16 +95,15 @@ public class PlanController {
         return planService.findEnum(code);
     }
 
-//    @ApiOperation("测试事务")
-//    @GetMapping("testFeign")
-//    public RespBean testFeign(@RequestParam Integer routeId){
-//        return planService.testFeign(routeId);
-//    }
-
-//    @ApiOperation("条件查询")
-//    @GetMapping("findConditon")
-//    public RespBean findCondition(@RequestBody FindCondition findCondition){
-//        return planService.findCondition(findCondition);
-//    }
+    @ApiOperation("条件查询")
+    @GetMapping("findConditon")
+    public RespBean findCondition(@RequestParam String routeName,@RequestParam String waterManagementOffice,
+                                  @RequestParam String planPorid,@RequestParam String planType,
+                                  @RequestParam String startTimeOfPCT,@RequestParam String endTimeOfPCT,
+                                  @RequestParam String startTimeOfPST,@RequestParam String endTimeOfPST,
+                                  @RequestParam String startTimeOfPET,@RequestParam String endTimeOfPET,
+                                  HttpServletRequest request) throws UnsupportedEncodingException {
+        return planService.findCondition(routeName,waterManagementOffice,planPorid,planType,startTimeOfPCT,endTimeOfPCT,startTimeOfPST,endTimeOfPST,startTimeOfPET,endTimeOfPET,request);
+    }
 
 }

@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
 @RestController
@@ -42,13 +43,13 @@ public class SuggestController {
 
     @ApiOperation("查询意见详情")
     @GetMapping("findDetail")
-    public RespBean findDetail(@RequestParam Integer id){
-        return suggestService.findDetail(id);
+    public RespBean findDetail(@RequestParam Integer id,HttpServletRequest request){
+        return suggestService.findDetail(id,request);
     }
 
     @ApiOperation("查询外键对应所有意见")
     @GetMapping("findListByUser")
-    public RespBean findListByUser(@RequestParam String fCode,HttpServletRequest request){
+    public RespBean findListByUser(@RequestParam String fCode,HttpServletRequest request) throws UnsupportedEncodingException {
         return suggestService.findListByFCode(fCode,request);
     }
 

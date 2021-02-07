@@ -1,7 +1,9 @@
 package com.yaobanTech.springcloud.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.yaobanTech.springcloud.ToolUtils.UrlUtils;
 import com.yaobanTech.springcloud.domain.BizLeakPointEntity;
+import com.yaobanTech.springcloud.domain.LoginUser;
 import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.repository.BizLeakPointRepository;
 import io.seata.spring.annotation.GlobalTransactional;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +38,9 @@ public class LeakPointServiceImpl {
     @Lazy
     private RedisService redisService;
 
+    @Autowired
+    private UrlUtils urlUtils;
+
     @GlobalTransactional
     public RespBean saveLeakPoint(HashMap<String,Object> param,HttpServletRequest request) {
         BizLeakPointEntity bizLeakPointEntity = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizLeakPointEntity.class);
@@ -54,10 +60,8 @@ public class LeakPointServiceImpl {
                 }
                 String header = request.getHeader("Authorization");
                 String token =  StringUtils.substringAfter(header, "Bearer ");
-                String user = (String) oauthService.getCurrentUser(token).getObj();
-                if(oauthService.getCurrentUser(token).getStatus() == 500){
-                    throw new RuntimeException("Feign调用权限服务失败");
-                }
+                LoginUser u = urlUtils.getAll(request);
+                String user = u.getLoginname();
                 bizLeakPointEntity.setCommitDate(new Date());
                 bizLeakPointEntity.setEnabled(1);
                 bizLeakPointEntity.setCommitBy(user);
@@ -106,17 +110,14 @@ public class LeakPointServiceImpl {
         return RespBean.ok("删除成功！");
     }
 
-    public RespBean findDetail(Integer id) {
+    public RespBean findDetail(Integer id,HttpServletRequest request) {
         BizLeakPointEntity blpe = null;
         if(id != null) {
             try {
                 blpe = leakPointRepository.findBizLeakPointEntity(id);
-                RespBean bean = oauthService.getChineseName(blpe.getCommitBy());
-                String chineseName = (String)bean.getObj();
-                blpe.setCommitBy(chineseName);
-                if(bean.getStatus() == 500){
-                    throw new RuntimeException("Feign调用权限服务失败");
-                }
+                String user = blpe.getCommitBy();
+                String chineseName = (String)oauthService.getChineseName(user).getObj();
+                blpe.setCommitByCN(chineseName);
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("查询失败！");
@@ -128,22 +129,16 @@ public class LeakPointServiceImpl {
     }
 
      @Transactional(propagation= Propagation.NOT_SUPPORTED)
-     public RespBean findListByUser(HttpServletRequest request) {
-        String header = request.getHeader("Authorization");
-        String token =  StringUtils.substringAfter(header, "Bearer ");
-        String user = (String) oauthService.getCurrentUser(token).getObj();
-        if(oauthService.getCurrentUser(token).getStatus() == 500){
-            throw new RuntimeException("Feign调用权限服务失败");
-        }
-        String chineseName = (String) oauthService.getChineseName(user).getObj();
-        if(oauthService.getChineseName(user).getStatus() == 500){
-            throw new RuntimeException("Feign调用权限服务失败");
-        }
+     public RespBean findListByUser(HttpServletRequest request) throws UnsupportedEncodingException {
+        LoginUser u = urlUtils.getAll(request);
+        String user = u.getLoginname();
+        String chineseName = u.getName();
+
         List<BizLeakPointEntity> list = leakPointRepository.findOfList(user);
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
                 BizLeakPointEntity bizLeakPointEntity = list.get(i);
-                bizLeakPointEntity.setCommitBy(chineseName);
+                bizLeakPointEntity.setCommitByCN(chineseName);
 //                if(points.size()>0){
 //                    for(int j =0; j<points.size();j++){
 //                        //获取报建文件列表

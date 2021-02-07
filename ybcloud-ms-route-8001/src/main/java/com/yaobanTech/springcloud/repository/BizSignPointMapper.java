@@ -2,8 +2,13 @@ package com.yaobanTech.springcloud.repository;
 
 import com.yaobanTech.springcloud.domain.BizSignPoint;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.List;
 
 @Mapper
 @Component
@@ -79,4 +84,17 @@ public interface BizSignPointMapper {
             "where id = #{id}",
             "</script>"})
     void update(BizSignPoint bizSignPoint);
+
+    @Select(value="SELECT b.route_id as routeIds,b.id as planIds " +
+            "FROM `ybcloud-ms-plan-8002`.`biz_plan` b " +
+            "JOIN `ybcloud-ms-route-8001`.`biz_route` a ON a.id = b.route_id " +
+            "WHERE 1=1 " +
+            "AND IF(#{waterManagementOffice} is not null,water_management_office = #{waterManagementOffice},1=1) " +
+            "AND IF(#{routeName} is not null,route_name = #{routeName},1=1) " +
+            "AND IF(#{pointInspectionType} is not null,point_inspection_type = #{pointInspectionType},1=1) " +
+            "AND IF(#{planName} is not null,plan_name = #{planName},1=1) " +
+            "AND IF(#{planPorid} is not null,plan_porid = #{planPorid},1=1) " +
+            "AND IF(#{planType} is not null,plan_type = #{planType},1=1) ")
+
+    List<HashMap<String,Object>> findRouteIds(String waterManagementOffice, String routeName, String pointInspectionType, String planName , String planPorid, String planType);
 }

@@ -1,31 +1,24 @@
 package com.yaobanTech.springcloud.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.yaobanTech.springcloud.ToolUtils.UrlUtils;
 import com.yaobanTech.springcloud.domain.BizPlan;
-import com.yaobanTech.springcloud.domain.FindCondition;
+import com.yaobanTech.springcloud.domain.LoginUser;
 import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.domain.enumDef.EnumMenu;
 import com.yaobanTech.springcloud.repository.BizPlanMapper;
 import com.yaobanTech.springcloud.repository.BizPlanRepository;
-import io.seata.core.context.RootContext;
-import io.seata.spring.annotation.GlobalTransactional;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-@Transactional
 @Service
 public class PlanService {
 
@@ -51,55 +44,90 @@ public class PlanService {
 
     @Autowired
     @Lazy
+    private UrlUtils urlUtils;
+    @Autowired
+    @Lazy
     private PlanMapper planMapper;
 
     SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+
     public RespBean savePlan(HashMap<String,Object> param, HttpServletRequest request) {
-        BizPlan bizPlan = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizPlan.class);
-        if(bizPlan != null) {
-            try {
-                bizPlan.setEnabled(1);
-                bizPlan.setPlanStatus("11");
-                bizPlan.setPlanCreatedTime(new Date());
-                String header = request.getHeader("Authorization");
-                String token =  StringUtils.substringAfter(header, "Bearer ");
-                String user = (String) oauthService.getCurrentUser(token).getObj();
-                bizPlan.setPlanCreatedBy(user);
-                BizPlan plan = bizPlanRepository.save(bizPlan);
-                String code = bizPlan.getPlanPorid();
-                EnumMenu key = EnumMenu.getEnumByKey(code);
-                String desc = key.getDesc();
-                String period = desc.substring(0, 1);
-                HashMap<String,Object> map = new HashMap<>();
-                map.put("routeId",bizPlan.getRouteId());
-                map.put("planId",bizPlan.getId());
-                map.put("startTime",dateFormat.format(bizPlan.getStartTime()));
-                map.put("endTime",dateFormat.format(bizPlan.getEndTime()));
-                map.put("period",period);
-                inspectService.sendInspectInfo(map);
-            } catch (Exception
-                    e) {
-                e.printStackTrace();
-                return RespBean.error("保存失败！");
+        BizPlan bizPlan = null;
+        Boolean flag = false;
+        if(param != null){
+            bizPlan = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizPlan.class);
+            List<String> list = bizPlanRepository.findPlanName(bizPlan.getRouteId());
+            if(!list.isEmpty()){
+                for (int i = 0; i < list.size(); i++) {
+                    String planName = list.get(i);
+                    if(planName.equals(bizPlan.getPlanName())){
+                        flag = true;
+                    }
+                }
             }
-        }else{
-            return RespBean.error("数据为空！");
+            if(flag == false){
+                if(bizPlan != null) {
+                    try {
+                        bizPlan.setEnabled(1);
+                        bizPlan.setPlanStatus("11");
+                        bizPlan.setPlanCreatedTime(new Date());
+                        LoginUser u = urlUtils.getAll(request);
+                        String user = u.getLoginname();
+                        bizPlan.setPlanCreatedBy(user);
+                        BizPlan plan = bizPlanRepository.save(bizPlan);
+                        String code = bizPlan.getPlanPorid();
+                        EnumMenu key = EnumMenu.getEnumByKey(code);
+                        String desc = key.getDesc();
+                        String period = desc.substring(0, 1);
+                        HashMap<String,Object> map = new HashMap<>();
+                        map.put("routeId",bizPlan.getRouteId());
+                        map.put("planId",bizPlan.getId());
+                        map.put("startTime",dateFormat.format(bizPlan.getStartTime()));
+                        map.put("endTime",dateFormat.format(bizPlan.getEndTime()));
+                        map.put("period",period);
+                        inspectService.sendInspectInfo(map);
+                    } catch (Exception
+                            e) {
+                        e.printStackTrace();
+                        return RespBean.error("保存失败！");
+                    }
+                }else{
+                    return RespBean.error("数据为空！");
+                }
+            }else{
+                return RespBean.error("该路线下已有重名计划,请修改计划名重试!");
+            }
         }
         return RespBean.ok("保存成功！");
     }
 
     public RespBean updatePlan(HashMap<String,Object> param) {
-        BizPlan bizPlan = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizPlan.class);
-        if(bizPlan.getId() != null) {
-            try {
-                bizPlanMapper.update(bizPlan);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return RespBean.error("修改失败！");
+        BizPlan bizPlan = null;
+        Boolean flag = false;
+        if(param != null){
+            bizPlan = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizPlan.class);
+            List<String> list = bizPlanRepository.findPlanName(bizPlan.getRouteId());
+            if(!list.isEmpty()){
+                for (int i = 0; i < list.size(); i++) {
+                    String planName = list.get(i);
+                    if(planName.equals(bizPlan.getPlanName())){
+                        flag = true;
+                    }
+                }
             }
-        }else{
-            return RespBean.error("id为空！");
+        }
+        if(flag == false){
+            if(bizPlan.getId() != null) {
+                try {
+                    bizPlanMapper.update(bizPlan);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return RespBean.error("修改失败！");
+                }
+            }else{
+                return RespBean.error("id为空！");
+            }
         }
         return RespBean.ok("修改成功！");
     }
@@ -141,23 +169,22 @@ public class PlanService {
         return RespBean.ok("查询成功！",routeId);
     }
 
-    @GlobalTransactional
-    public RespBean findAll(HttpServletRequest request){
-        String header = request.getHeader("Authorization");
-        String token =  StringUtils.substringAfter(header, "Bearer ");
-        String user = (String) oauthService.getCurrentUser(token).getObj();
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public RespBean findAll(HttpServletRequest request) throws UnsupportedEncodingException {
+        LoginUser u = urlUtils.getAll(request);
+        String user = u.getLoginname();
         List<BizPlan> list = planMapper.findAll(user);
-        String chineseName = (String) oauthService.getChineseName(user).getObj();
+        String chineseName = (String)oauthService.getChineseName(u.getLoginname()).getObj();
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
                 BizPlan plan = list.get(i);
-                plan.setPlanCreatedBy(chineseName);
                 Map map = (Map) findEnum(plan.getPlanType()).getObj();
                 Map ps = (Map) findEnum(plan.getPlanStatus()).getObj();
                 Map pp = (Map) findEnum(plan.getPlanPorid()).getObj();
                 plan.setPlanTypeMenu(map);
                 plan.setPlanStatusMenu(ps);
                 plan.setPlanPoridMenu(pp);
+                plan.setPlanCreatedByCN(chineseName);
                 RespBean respBean = routeService.findDetail(plan.getRouteId());
                 Object o = respBean.getObj();
                 if(respBean.getStatus() == 500){
@@ -174,16 +201,19 @@ public class PlanService {
         return RespBean.ok("查询成功！",selection);
     }
 
-    @Transactional
-    public RespBean findById(Integer id){
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public RespBean findById(Integer id) throws UnsupportedEncodingException {
         BizPlan bp = bizPlanRepository.findDetail(id);
         if(bp != null) {
+            String user = bp.getPlanCreatedBy();
+            String chineseName = (String)oauthService.getChineseName(user).getObj();
             Map map = (Map) findEnum(bp.getPlanType()).getObj();
             Map ps = (Map) findEnum(bp.getPlanStatus()).getObj();
             Map pp = (Map) findEnum(bp.getPlanPorid()).getObj();
             bp.setPlanTypeMenu(map);
             bp.setPlanStatusMenu(ps);
             bp.setPlanPoridMenu(pp);
+            bp.setPlanCreatedByCN(chineseName);
             RespBean respBean = routeService.findDetail(bp.getRouteId());
             Object o = respBean.getObj();
             if(respBean.getStatus() == 500){
@@ -240,52 +270,67 @@ public class PlanService {
         return RespBean.ok("查询成功！", map);
     }
 
-    @GlobalTransactional
-    public RespBean testFeign(Integer routeId){
-       bizPlanRepository.testFeign(routeId);
-       routeService.testFeign(routeId);
-        return RespBean.ok("测试成功！", RootContext.getXID());
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public RespBean findCondition(String routeName, String waterManagementOffice, String planPorid, String planType,
+                                  String startTimeOfPCT, String endTimeOfPCT,
+                                  String startTimeOfPST, String endTimeOfPST,
+                                  String startTimeOfPET, String endTimeOfPET, HttpServletRequest request) throws UnsupportedEncodingException {
+        //获取当前用户
+        LoginUser u = urlUtils.getAll(request);
+        String user = u.getLoginname();
+        String chineseName = (String)oauthService.getChineseName(user).getObj();
+        if("null".equals(routeName)){
+            routeName = null;
+        }
+        if("null".equals(waterManagementOffice)){
+            waterManagementOffice = null;
+        }
+        if("null".equals(planPorid)){
+            planPorid = null;
+        }
+        if("null".equals(planType)){
+            planType = null;
+        }
+        if("null".equals(startTimeOfPCT)){
+            startTimeOfPCT = null;
+        }
+        if("null".equals(endTimeOfPCT)){
+            endTimeOfPCT = null;
+        }
+        if("null".equals(startTimeOfPST)){
+            startTimeOfPST = null;
+        }
+        if("null".equals(endTimeOfPST)){
+            endTimeOfPST = null;
+        }
+        if("null".equals(startTimeOfPET)){
+            startTimeOfPET = null;
+        }
+        if("null".equals(endTimeOfPET)){
+            endTimeOfPET = null;
+        }
+
+        //查询计划列表
+        List<BizPlan> list = bizPlanRepository.findCondition(routeName,waterManagementOffice,planPorid,planType,startTimeOfPCT,endTimeOfPCT,startTimeOfPST,endTimeOfPST,startTimeOfPET,endTimeOfPET);
+        if(!list.isEmpty()){
+            for (int i = 0; i < list.size(); i++) {
+                BizPlan plan = list.get(i);
+                Map map = (Map) findEnum(plan.getPlanType()).getObj();
+                Map ps = (Map) findEnum(plan.getPlanStatus()).getObj();
+                Map pp = (Map) findEnum(plan.getPlanPorid()).getObj();
+                plan.setPlanTypeMenu(map);
+                plan.setPlanStatusMenu(ps);
+                plan.setPlanPoridMenu(pp);
+                plan.setPlanCreatedByCN(chineseName);
+                RespBean respBean = routeService.findDetail(plan.getRouteId());
+                Object o = respBean.getObj();
+                if(respBean.getStatus() == 500){
+                    throw new RuntimeException("Feign调用路线服务失败！");
+                }
+                plan.setRouteObj(o);
+            }
+        }
+        return RespBean.ok("查询成功！", list);
     }
-
-//    public RespBean findCondition(FindCondition findCondition) {
-//        Specification<BizRoute> spec = new Specification<BizRoute>() {
-//            @Override
-//            public Predicate toPredicate(Root<BizRoute> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-//                Predicate predicate = null;
-//                //从root取属性
-//                //cb构造查询条件
-//                //cb连接查询条件
-//                if(waterManagementOffice != null){
-//                    Predicate p1 = cb.equal(root.get("waterManagementOffice"), waterManagementOffice);
-//                    predicate = cb.and(p1);
-//                }
-//                if(pointInspectionType != null){
-//                    Predicate p2 = cb.equal(root.get("pointInspectionType"), pointInspectionType);
-//                    predicate = cb.and(p2);
-//                }
-//                if(planInspectionMileage != null){
-//                    Predicate p3 = cb.equal(root.get("planInspectionMileage"), planInspectionMileage);
-//                    predicate = cb.and(p3);
-//                }
-//                if(createdTime != null){
-//                    Predicate p4 = cb.equal(root.get("createdTime"), createdTime);
-//                    predicate = cb.and(p4);
-//                }
-//                if(routeName != null){
-//                    Predicate p5 = cb.equal(root.get("routeName"), routeName);
-//                    predicate = cb.and(p5);
-//                }
-//                if(routeType != null){
-//                    Predicate p6 = cb.equal(root.get("routeType"), routeType);
-//                    predicate = cb.and(p6);
-//                }
-//                return predicate;
-//            }
-//        };
-//        Sort sort = Sort.by(Sort.Direction.DESC,"createdTime");
-//        List<BizRoute> routeList = bizRouteRepository.findAll(spec,sort);
-//        return RespBean.ok("查询成功！",routeList);
-//    }
-
 
 }

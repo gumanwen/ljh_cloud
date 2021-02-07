@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -55,7 +56,7 @@ public class SignPointController {
 
     @ApiOperation("查询角色所有签到点列表")
     @GetMapping("findListByUser")
-    public RespBean findListByUser(HttpServletRequest request){
+    public RespBean findListByUser(HttpServletRequest request) throws UnsupportedEncodingException {
         return signPointService.findListByUser(request);
     }
 

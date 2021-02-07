@@ -162,6 +162,12 @@ public class BizRoute  implements Serializable {
 	private Map<String,Object> pointInspectionTypeMenu;
 
 	/**
+	 * 路线制定人
+	 */
+	@Transient
+	private String routeCreatorCN;
+
+	/**
 	 * 签到点
 	 */
    	@OneToMany(targetEntity = BizSignPoint.class,fetch = FetchType.EAGER)
@@ -188,6 +194,15 @@ public class BizRoute  implements Serializable {
 		this.location = location;
 		this.pointInspectionType = pointInspectionType;
 		this.bizSignPoints = bizSignPoints;
+	}
+
+
+	public String getRouteCreatorCN() {
+		return routeCreatorCN;
+	}
+
+	public void setRouteCreatorCN(String routeCreatorCN) {
+		this.routeCreatorCN = routeCreatorCN;
 	}
 
 	public Map<String, Object> getPointInspectionTypeMenu() {
