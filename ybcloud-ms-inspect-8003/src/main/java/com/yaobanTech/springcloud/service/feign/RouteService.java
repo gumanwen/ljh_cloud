@@ -35,4 +35,7 @@ public interface RouteService {
     /*新增任务签到点*/
     @GetMapping("/api/route/signPoint/taskPoint")
     RespBean taskPoint(@RequestParam("taskIds") List<String> taskIds, @RequestParam("routeId") Integer routeId);
+    @GetMapping("/api/route/way/findRouteIds")
+    RespBean findRouteIds(@RequestParam("waterManagementOffice") String waterManagementOffice,@RequestParam("routeName") String routeName,@RequestParam("pointInspectionType") String pointInspectionType,
+                          @RequestParam("planName") String planName ,@RequestParam("planPorid") String planPorid,@RequestParam("planType") String planType);
 }

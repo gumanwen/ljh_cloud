@@ -41,9 +41,9 @@ public class InspectController {
     private IInspectService iInspectService;
 
     @ApiOperation("app & web:获取计划任务列表")
-    @GetMapping("/plan/getAllInspect")
-    public RespBean getPlanInspect(String type,long pageNo,long pageSize,HttpServletRequest request) throws IllegalAccessException, UnsupportedEncodingException {
-        return iInspectService.getPlanInspect(type, pageNo, pageSize,request);
+    @PostMapping("/plan/getAllInspect")
+    public RespBean getPlanInspect(long pageNo,long pageSize,@RequestBody Map<String, Object> params,HttpServletRequest request) throws IllegalAccessException, UnsupportedEncodingException {
+        return iInspectService.getPlanInspect(pageNo, pageSize, params, request);
     }
 
     @ApiOperation("web:根据计划编号获取计划任务列表")
@@ -112,7 +112,7 @@ public class InspectController {
 
     @ApiOperation("web：派发")
     @PostMapping("/task/send")
-    public RespBean send(@RequestBody Map<String, Object> params,HttpServletRequest request) {
+    public RespBean send(@RequestBody Map<String, Object> params,HttpServletRequest request) throws UnsupportedEncodingException {
         //调用route的rest接口
         return iInspectService.send(params,request);
     }

@@ -20,7 +20,7 @@ import java.util.Map;
  */
 public interface IInspectService extends IService<Inspect> {
 
-    RespBean getPlanInspect(String type,long pageNo,long pageSize,HttpServletRequest request) throws IllegalAccessException, UnsupportedEncodingException;
+    RespBean getPlanInspect(long pageNo,long pageSize,Map<String, Object> params ,HttpServletRequest request) throws IllegalAccessException, UnsupportedEncodingException;
 
     RespBean getTempInspect(String type);
 
@@ -42,7 +42,7 @@ public interface IInspectService extends IService<Inspect> {
 
     RespBean autoCreate(Map<String, Object> params) throws ParseException;
 
-    RespBean send(Map<String, Object> params,HttpServletRequest request);
+    RespBean send(Map<String, Object> params,HttpServletRequest request) throws UnsupportedEncodingException;
 
     RespBean send1(HttpServletRequest request);
 

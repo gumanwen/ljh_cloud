@@ -27,6 +27,14 @@ public class FieldUtils {
         };
         return null;
     }
+
+    public static Object ifObjectEmptyToNullStr(Object obj) {
+        String str = ObjectUtils.toString(obj, "");
+        if(StringUtils.isNotBlank(str)){
+            return obj;
+        };
+        return "";
+    }
     /**
      * 判断字符串是不是为空
      *

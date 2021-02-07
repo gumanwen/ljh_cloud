@@ -87,7 +87,10 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
     private UrlUtils urlUtils;
 
     @Override
-    public RespBean getPlanInspect(String type,long pageNo,long pageSize,HttpServletRequest request) throws IllegalAccessException, UnsupportedEncodingException {
+    public RespBean getPlanInspect(long pageNo,long pageSize, Map<String, Object> params,HttpServletRequest request) throws IllegalAccessException, UnsupportedEncodingException {
+        Map map = (Map) params;
+        RespBean feignRespBean = new RespBean();
+        String type =null;
         String username = null;
         String roles = null;
         LoginUser u = urlUtils.getAll(request);
@@ -98,20 +101,64 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         String status =null;
         //创建对象
         QueryWrapper<Inspect> queryWrapper = new QueryWrapper<>();
+        if(FieldUtils.isObjectNotEmpty(map)){
+            type = String.valueOf(map.get("status"));
+            if(FieldUtils.isObjectNotEmpty(map.get("modifyBy"))){queryWrapper.eq("modify_by",map.get("modifyBy"));}
+            if(FieldUtils.isObjectNotEmpty(map.get("begin_d1"))){
+                Date begin_d1 =  new Date(Long.parseLong((String) map.get("begin_d1")));
+                queryWrapper.apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),begin_time,20) >= convert(varchar(20),'"+begin_d1+"',20)");}
+            if(FieldUtils.isObjectNotEmpty(map.get("begin_d2"))){
+                Date begin_d2 =  new Date(Long.parseLong((String) map.get("begin_d2")));
+                queryWrapper.apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),begin_time,20) <= convert(varchar(20),'"+begin_d2+"',20)");}
+            if(FieldUtils.isObjectNotEmpty(map.get("end_d1"))){
+                Date end_d1 =  new Date(Long.parseLong((String) map.get("end_d1")));
+                queryWrapper.apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),end_time,20) >= convert(varchar(20),'"+end_d1+"',20)");}
+            if(FieldUtils.isObjectNotEmpty(map.get("end_d2"))){
+                Date end_d2 =  new Date(Long.parseLong((String) map.get("end_d2")));
+                queryWrapper.apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),end_time,20) <= convert(varchar(20),'"+end_d2+"',20)");}
+            feignRespBean = routeService.findRouteIds((String)FieldUtils.ifObjectEmptyToNullStr(map.get("waterManagementOffice")),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("routeName")),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("pointInspectionType")),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("planName")),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("planPorid")),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("planType")));
+        }
+        List<HashMap<String,Object>> feignMap = (List<HashMap<String, Object>>) feignRespBean.getObj();
+        /*if (FieldUtils.isObjectNotEmpty(feignMap)){
+            if(feignMap.size()>0){
+                *//*for (int i = 0; i < feignMap.size(); i++) {
+                    *//**//*if (i == 0) {
+                        queryWrapper.eq("route_id", feignMap.get(0).get("routeIds"));
+                        queryWrapper.eq("plan_id", feignMap.get(0).get("planIds"));
+                    } else {*//**//*
+                    Integer routeIds = Integer.valueOf((Integer) feignMap.get(i).get("routeIds"));
+                    Integer planIds = Integer.valueOf((Integer) feignMap.get(i).get("planIds"));
+                    queryWrapper.and(inspectQueryWrapper -> inspectQueryWrapper.or(wrapper -> wrapper.eq("plan_id", routeIds).eq("plan_id", planIds)));
+
+                }*//*
+            }else{
+                queryWrapper.eq("route_id","");
+                queryWrapper.eq("plan_id","");
+            }
+        }*/
+        queryWrapper.and(wrapper -> {
+            for(HashMap<String,Object> info: feignMap){
+                wrapper.or()
+                        .eq("route_id",info.get("routeIds"))
+                        .eq("plan_id",info.get("planIds"));
+            }
+        });
         RespBean respBean = new RespBean();
         queryWrapper.eq("task_type","计划任务");
         List<Inspect> list = new ArrayList<>();
         List<Map<String,Object>> resultList = new ArrayList<>();
         Map<String,Object> result = new HashMap<>();
+        logger.info("该用户的角色="+roles);
         if(FieldUtils.isStringNotEmpty(roles)){
             if(roles.indexOf("BZZ")== -1){//班组长
-                queryWrapper.eq("inspect_person",username);
+                //queryWrapper.eq("inspect_person",username);
             }
         }else{
-            queryWrapper.eq("inspect_person",username);
+            //queryWrapper.eq("inspect_person",username);
         }
         IPage<Inspect> page = new Page<Inspect>(pageNo,pageSize);
         page =inspectMapper.selectPage(page,queryWrapper);
+        //type  0:未处理 1：处理中 2：已完成 3：已延期 4：未派发 5：已派发 6：已终止
         if("0".equals(type)){
             //获取未处理的列表
             queryWrapper.apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),begin_time,20) > convert(varchar(20),'"+date+"',20)");
@@ -120,7 +167,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
             respBean.setMsg("未处理列表");
         }else if("1".equals(type)){
             //获取处理中的列表
-            queryWrapper.lt("complete_rate","100").apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),begin_time,20) <= convert(varchar(20),'"+date+"',20)");
+            queryWrapper.lt("complete_rate", "100").apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),begin_time,20) <= convert(varchar(20),'"+date+"',20)");
             list= inspectMapper.selectPage(page,queryWrapper).getRecords();
             status = "处理中";
             respBean.setMsg("处理中列表");
@@ -353,7 +400,6 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
             }else{
                 return RespBean.error("计划开始时间，计划结束时间或计划周期不完整，创建不了任务！map="+map+",re="+re);
             }
-
         }else{
             return RespBean.error("参数为空！");
         }
@@ -476,10 +522,10 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
 
     @Override
     @Transactional
-    public RespBean send(Map<String, Object> params,HttpServletRequest request) {
-        String header = request.getHeader("Authorization");
-        String token =  StringUtils.substringAfter(header, "Bearer ");
-        String name = (String) authService.getNameByUsername((String) authService.getCurrentUser(token).getObj()).getObj();
+    public RespBean send(Map<String, Object> params,HttpServletRequest request) throws UnsupportedEncodingException {
+
+        LoginUser u = urlUtils.getAll(request);
+        String name = u.getName();
         if(FieldUtils.isObjectNotEmpty(params) && FieldUtils.isObjectNotEmpty(params.get("form"))) {
             Map map = new HashMap();
             map = (Map) params.get("form");
