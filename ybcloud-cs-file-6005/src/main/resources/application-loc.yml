@@ -25,7 +25,7 @@ spring:
         nacos:
             discovery:
                 server-addr: 192.168.50.91:8848 #Nacos作为服务中心地址
-                ip: 192.168.50.103
+                ip: 192.168.50.167
             config:
                 server-addr: 192.168.50.91:8848
                 #file-extension: properties
@@ -45,7 +45,7 @@ mybatis-plus:
         call-setters-on-nulls: true
 server:
     port: 6005
-    ip: 192.168.50.103
+    ip: 192.168.50.167
     max-http-header-size: 8192
 web:
     upload-path: C:/fujian/
