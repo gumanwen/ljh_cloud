@@ -13,16 +13,16 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 @Service
-@Transactional
 public class SuggestServiceImpl {
     @Autowired
     @Lazy
@@ -102,7 +102,7 @@ public class SuggestServiceImpl {
         return RespBean.ok("删除成功！");
     }
 
-    @GlobalTransactional
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public RespBean findDetail(Integer id,HttpServletRequest request) {
         BizSuggestionEntity bse = null;
         if(id != null) {
@@ -122,7 +122,7 @@ public class SuggestServiceImpl {
         return RespBean.ok("查询成功！",bse);
     }
 
-    @GlobalTransactional
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public RespBean findListByFCode(String fCode,HttpServletRequest request) throws UnsupportedEncodingException {
         String header = request.getHeader("Authorization");
         String token =  StringUtils.substringAfter(header, "Bearer ");

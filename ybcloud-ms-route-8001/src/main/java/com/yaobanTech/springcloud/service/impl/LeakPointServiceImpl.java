@@ -66,7 +66,7 @@ public class LeakPointServiceImpl {
                 bizLeakPointEntity.setEnabled(1);
                 bizLeakPointEntity.setCommitBy(user);
                 bizLeakPointEntity.setLeakPointCode(leakPointCode);
-               leakPointRepository.save(bizLeakPointEntity);
+                leakPointRepository.save(bizLeakPointEntity);
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("保存失败！");
@@ -110,6 +110,7 @@ public class LeakPointServiceImpl {
         return RespBean.ok("删除成功！");
     }
 
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public RespBean findDetail(Integer id,HttpServletRequest request) {
         BizLeakPointEntity blpe = null;
         if(id != null) {
