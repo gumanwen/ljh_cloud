@@ -2,12 +2,14 @@ package com.yaobanTech.springcloud.service;
 
 import com.yaobanTech.springcloud.entity.Inspect;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.yaobanTech.springcloud.entity.Test;
 import com.yaobanTech.springcloud.entity.utils.RespBean;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -53,4 +55,8 @@ public interface IInspectService extends IService<Inspect> {
     RespBean stop(String inspectTaskId);
 
     RespBean delete(String inspectTaskId);
+
+    List<Test> digui(Integer gid);
+
+    RespBean bijiao(Integer gid);
 }

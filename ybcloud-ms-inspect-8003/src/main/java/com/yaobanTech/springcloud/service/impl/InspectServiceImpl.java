@@ -7,11 +7,14 @@ import com.alibaba.nacos.client.utils.JSONUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
 import com.yaobanTech.springcloud.entity.Inspect;
 import com.yaobanTech.springcloud.entity.LoginUser;
+import com.yaobanTech.springcloud.entity.Test;
 import com.yaobanTech.springcloud.entity.utils.RedisGeneratorCode;
 import com.yaobanTech.springcloud.entity.utils.RespBean;
 import com.yaobanTech.springcloud.mapper.InspectMapper;
+import com.yaobanTech.springcloud.mapper.TestMapper;
 import com.yaobanTech.springcloud.service.IInspectService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yaobanTech.springcloud.service.feign.*;
@@ -22,6 +25,7 @@ import io.jsonwebtoken.Jwts;
 import io.micrometer.core.instrument.util.JsonUtils;
 import io.swagger.models.auth.In;
 import org.apache.commons.lang.StringUtils;
+import org.bouncycastle.util.io.TeeInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +55,10 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
 
     @Autowired
     private InspectMapper inspectMapper;
+
+
+    @Autowired
+    private TestMapper testMapper;
 
     @Autowired
     @Lazy
@@ -136,15 +144,18 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                 queryWrapper.eq("plan_id","");
             }
         }*/
-        queryWrapper.and(wrapper -> {
-            for(HashMap<String,Object> info: feignMap){
-                wrapper.or()
-                        .eq("route_id",info.get("routeIds"))
-                        .eq("plan_id",info.get("planIds"));
-            }
-        });
-        RespBean respBean = new RespBean();
+
         queryWrapper.eq("task_type","计划任务");
+        if(feignMap.size()>0){
+            queryWrapper.and(wrapper -> {
+                for(HashMap<String,Object> info: feignMap){
+                    wrapper.or()
+                            .eq("route_id",info.get("routeIds"))
+                            .eq("plan_id",info.get("planIds"));
+                }
+            });
+        }
+        RespBean respBean = new RespBean();
         List<Inspect> list = new ArrayList<>();
         List<Map<String,Object>> resultList = new ArrayList<>();
         Map<String,Object> result = new HashMap<>();
@@ -382,6 +393,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                         Inspect inspect = new Inspect();
                         String inspect_task_id = "";
                         inspect_task_id = redisGeneratorCode.createGenerateCode("计划任务","JH",true,4);
+                        logger.info("生成的任务编号："+inspect_task_id +"           ------------------------");
                         inspect.setInspectTaskId(inspect_task_id);
                         inspect.setBeginTime(daydateFormat.format(DateUtils.daysAdd(start,cycle*i)));
                         inspect.setDeadTime(daydateFormat.format(DateUtils.daysAdd(start,cycle*(i+1))));
@@ -618,5 +630,94 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
     @Override
     public RespBean delete(String inspectTaskId) {
         return null;
+    }
+
+
+
+    @Override
+    public List<Test> digui(Integer gid) {
+        //1:查询出该gid对应的s/t
+        HashMap<String,Object> map = new HashMap<>();
+        List<Test> alllist = new ArrayList<>();
+        List<Test> list = new ArrayList<>();
+        List<Test> olist = new ArrayList<>();
+        List<Test> result = new ArrayList<>();
+        QueryWrapper<Test> queryWrapper = new QueryWrapper<>();
+        alllist = testMapper.selectList(queryWrapper);
+        Test test = testMapper.selectOne(queryWrapper.eq("gid",gid));
+        list.add(test);
+        result = func(alllist,list,list);
+        map.put("length",result.size());
+        map.put("list",result);
+        System.out.println(result.size());
+        return result;
+    }
+
+    @Override
+    public RespBean bijiao(Integer gid) {
+        List<Test> result1 = new ArrayList<>();
+        List<Test> result2 = new ArrayList<>();
+        List<Test> result3 = new ArrayList<>();
+        result1 = digui(1562);
+        result3 =digui(1562);
+        result2 = digui(390);
+
+        for (int i = 0; i < result1.size(); i++) {
+            boolean flag = false;
+            for (int j = 0; j < result2.size(); j++) {
+                if(result1.get(i).getGid().equals(result2.get(j).getGid())){
+                    result3.remove(result1.get(i));
+                    flag = true;
+                }else{
+                }
+            }
+            if(!flag){
+                //System.out.println(result1.get(i).getGid());
+            }
+        }
+        return RespBean.ok("").setObj(result3);
+    }
+
+    //数组递归方法
+    public List<Test> func(List<Test> alllist,List<Test> list,List<Test> olist) {
+        List<Test> newlist = new ArrayList<>();
+        boolean flag = false;
+        for (int i = 0; i < list.size(); i++) {
+            //第一次 ： list s:154 t:367
+            //
+            for (int j = 0; j < alllist.size(); j++) {
+                if(list.get(i).getTarget().equals(alllist.get(j).getTarget())||
+                        list.get(i).getSource().equals(alllist.get(j).getSource())||
+                        list.get(i).getSource().equals(alllist.get(j).getTarget())||
+                        list.get(i).getTarget().equals(alllist.get(j).getSource())){
+                    olist.add(alllist.get(j));
+                    newlist.add(alllist.get(j));
+                    flag = true;
+                }
+            }
+            alllist.removeAll(newlist);
+        }
+        newlist.removeAll(olist);
+        if(flag){
+            func(alllist,newlist,olist);
+        }
+        return olist;
+    }
+
+    //数据库递归方法
+    public List<Test> func1(List<Test> alllist,List<Test> list,List<Test> olist) {
+        List<Test> newlist = new ArrayList<>();
+        boolean flag = false;
+        for (int i = 0; i < list.size(); i++) {
+            //第一次 ： list s:154 t:367
+            //
+            flag = true;
+            alllist.removeAll(newlist);
+        }
+        newlist.removeAll(olist);
+        if(flag){
+            func(alllist,newlist,olist);
+        }
+        return olist;
     }
 }

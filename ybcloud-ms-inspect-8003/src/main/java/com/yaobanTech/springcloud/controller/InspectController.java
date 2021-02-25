@@ -1,6 +1,7 @@
 package com.yaobanTech.springcloud.controller;
 
 
+import com.yaobanTech.springcloud.entity.Test;
 import com.yaobanTech.springcloud.entity.utils.RespBean;
 import com.yaobanTech.springcloud.service.IInspectService;
 import com.yaobanTech.springcloud.service.feign.AuthService;
@@ -9,11 +10,13 @@ import com.yaobanTech.springcloud.service.feign.RouteService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -172,6 +175,19 @@ public class InspectController {
     @GetMapping("/delete")
     public RespBean delete (String inspectTaskId){
         return iInspectService.delete(inspectTaskId);
+    }
+
+    @ApiOperation("gis：测试递归")
+    @GetMapping("/digui")
+    @Cacheable("cache1")
+    public List<Test> digui(Integer gid){
+        return iInspectService.digui(gid);
+    }
+
+    @ApiOperation("gis：测试递归")
+    @GetMapping("/bijiao")
+    public RespBean bijiao(Integer gid){
+        return iInspectService.bijiao(gid);
     }
 }
 
