@@ -1,16 +1,14 @@
 package com.yaobanTech.springcloud.domain;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.transaction.annotation.Transactional;
-
 import javax.persistence.*;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @Description  
- * @Author  yuxy
- * @Date 2021-01-22 14:07:11
+ * @Author yuxy
+ * @Date 2021-02-24 09:15:46
  */
 
 @Entity
@@ -98,27 +96,17 @@ public class BizLeakPointEntity {
    @Column(name = "commit_by" )
 	private String commitBy;
 
+   /**
+	 * 提交人员(中文)
+	 */
+   @Transient
+	private String commitByCN;
+
 	/**
 	 * 提交时间
 	 */
-	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(
-			pattern = "yyyy-MM-dd HH:mm:ss",
-			timezone = "GMT+8"
-	)
    @Column(name = "commit_Date" )
 	private Date commitDate;
-
-   /**
-	 * 结束时间
-	 */
-   @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-   @JsonFormat(
-		   pattern = "yyyy-MM-dd HH:mm:ss",
-		   timezone = "GMT+8"
-   )
-   @Column(name = "end_Date" )
-	private Date endDate;
 
 	/**
 	 * 是否有效
@@ -126,22 +114,64 @@ public class BizLeakPointEntity {
    @Column(name = "enabled" )
 	private Integer enabled;
 
-   /**
+	/**
 	 * 漏点状态
 	 */
    @Column(name = "leak_point_status" )
 	private String leakPointStatus;
 
-   /**
-	 * 提交人
+	/**
+	 * 结束时间
 	 */
-    @Transient
-	private String commitByCN;
+   @Column(name = "end_date" )
+	private Date endDate;
+
+	/**
+	 * 详细地址
+	 */
+   @Column(name = "address" )
+	private String address;
+
+	/**
+	 * 横坐标
+	 */
+   @Column(name = "x" )
+	private String X;
+
+	/**
+	 * 纵坐标
+	 */
+   @Column(name = "y" )
+	private String Y;
+
+	/**
+	 * 部门
+	 */
+   @Column(name = "dept" )
+	private String dept;
+
+   /**
+	 * 附件
+	 */
+   @Transient
+	private List<HashMap<String,Object>> attachment;
+
+	/**
+	 * 巡查任务记录
+	 */
+	@Transient
+	private List<HashMap<String,Object>> checkRecord;
+
+	/**
+	 * 处理记录
+	 */
+	@Transient
+	private List<HashMap<String,Object>> handleRecord;
 
 	public BizLeakPointEntity() {
 	}
 
-	public BizLeakPointEntity(Integer id, String leakPointCode, Integer routeId, String waterUseOffice, String equipmentName, String equipmentSize, String abnormalPhenomena, String abnormalReason, String currentPosition, String autoGetPositon, String memo, String assetType, String commitBy, Date commitDate, Date endDate, Integer enabled, String leakPointStatus) {
+	public BizLeakPointEntity(Integer id, String leakPointCode, Integer routeId, String waterUseOffice, String equipmentName, String equipmentSize, String abnormalPhenomena, String abnormalReason, String currentPosition, String autoGetPositon, String memo, String assetType, String commitBy, Date commitDate, Integer enabled, String leakPointStatus, Date endDate, String address, String x, String y, String dept) {
 		this.id = id;
 		this.leakPointCode = leakPointCode;
 		this.routeId = routeId;
@@ -156,9 +186,37 @@ public class BizLeakPointEntity {
 		this.assetType = assetType;
 		this.commitBy = commitBy;
 		this.commitDate = commitDate;
-		this.endDate = endDate;
 		this.enabled = enabled;
 		this.leakPointStatus = leakPointStatus;
+		this.endDate = endDate;
+		this.address = address;
+		X = x;
+		Y = y;
+		this.dept = dept;
+	}
+
+	public List<HashMap<String, Object>> getCheckRecord() {
+		return checkRecord;
+	}
+
+	public void setCheckRecord(List<HashMap<String, Object>> checkRecord) {
+		this.checkRecord = checkRecord;
+	}
+
+	public List<HashMap<String, Object>> getHandleRecord() {
+		return handleRecord;
+	}
+
+	public void setHandleRecord(List<HashMap<String, Object>> handleRecord) {
+		this.handleRecord = handleRecord;
+	}
+
+	public List<HashMap<String, Object>> getAttachment() {
+		return attachment;
+	}
+
+	public void setAttachment(List<HashMap<String, Object>> attachment) {
+		this.attachment = attachment;
 	}
 
 	public String getCommitByCN() {
@@ -167,22 +225,6 @@ public class BizLeakPointEntity {
 
 	public void setCommitByCN(String commitByCN) {
 		this.commitByCN = commitByCN;
-	}
-
-	public Date getEndDate() {
-		return endDate;
-	}
-
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}
-
-	public String getLeakPointStatus() {
-		return leakPointStatus;
-	}
-
-	public void setLeakPointStatus(String leakPointStatus) {
-		this.leakPointStatus = leakPointStatus;
 	}
 
 	public Integer getId() {
@@ -305,26 +347,52 @@ public class BizLeakPointEntity {
 		this.enabled = enabled;
 	}
 
-	@Override
-	public String toString() {
-		return "BizLeakPointEntity{" +
-				"id=" + id +
-				", leakPointCode='" + leakPointCode + '\'' +
-				", routeId=" + routeId +
-				", waterUseOffice='" + waterUseOffice + '\'' +
-				", equipmentName='" + equipmentName + '\'' +
-				", equipmentSize='" + equipmentSize + '\'' +
-				", abnormalPhenomena='" + abnormalPhenomena + '\'' +
-				", abnormalReason='" + abnormalReason + '\'' +
-				", currentPosition='" + currentPosition + '\'' +
-				", autoGetPositon='" + autoGetPositon + '\'' +
-				", memo='" + memo + '\'' +
-				", assetType='" + assetType + '\'' +
-				", commitBy='" + commitBy + '\'' +
-				", commitDate=" + commitDate +
-				", endDate=" + endDate +
-				", enabled=" + enabled +
-				", leakPointStatus='" + leakPointStatus + '\'' +
-				'}';
+	public String getLeakPointStatus() {
+		return this.leakPointStatus;
 	}
+
+	public void setLeakPointStatus(String leakPointStatus) {
+		this.leakPointStatus = leakPointStatus;
+	}
+
+	public Date getEndDate() {
+		return this.endDate;
+	}
+
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
+
+	public String getAddress() {
+		return this.address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getX() {
+		return this.X;
+	}
+
+	public void setX(String X) {
+		this.X = X;
+	}
+
+	public String getY() {
+		return this.Y;
+	}
+
+	public void setY(String Y) {
+		this.Y = Y;
+	}
+
+	public String getDept() {
+		return this.dept;
+	}
+
+	public void setDept(String dept) {
+		this.dept = dept;
+	}
+
 }

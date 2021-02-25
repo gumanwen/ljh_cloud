@@ -108,7 +108,7 @@ public class RouteServiceImpl {
 
             } catch (Exception e) {
                 e.printStackTrace();
-                return RespBean.error("保存失败！");
+                return RespBean.error("修改失败！");
             }
         }else{
             return RespBean.error("id为空或签到点信息为空！");

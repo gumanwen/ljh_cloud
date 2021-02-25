@@ -16,7 +16,7 @@ import java.util.HashMap;
 @RestController
 @RefreshScope
 @Api(description = "意见接口")
-@RequestMapping("/api/suggestion")
+@RequestMapping("/api/route/suggestion")
 public class SuggestController {
 
     @Autowired
