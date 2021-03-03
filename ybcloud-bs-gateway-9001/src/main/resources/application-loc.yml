@@ -37,23 +37,23 @@ spring:
                     enabled: true #动态路由
             routes:
                 - id: cs-auth
-                  uri: http://192.168.50.167:6003 #负载均衡 动态路由
+                  uri: http://192.168.50.169:6003 #负载均衡 动态路由
                   predicates:
                       - Path=/user/**
                 - id: cs-auth
-                  uri: http://192.168.50.167:6003 #负载均衡 动态路由
+                  uri: http://192.168.50.169:6003 #负载均衡 动态路由
                   predicates:
                       - Path=/oauth/**
                 - id: cs-activiti
-                  uri: http://192.168.50.167:6001 #负载均衡 动态路由
+                  uri: http://192.168.50.169:6001 #负载均衡 动态路由
                   predicates:
                       - Path=/api/activiti/**
                 - id: cs-file
-                  uri: http://192.168.50.167:6005 #负载均衡 动态路由
+                  uri: http://192.168.50.169:6005 #负载均衡 动态路由
                   predicates:
                       - Path=/api/file/**
                 - id: cs-file1
-                  uri: http://192.168.50.167:6005 #负载均衡 动态路由
+                  uri: http://192.168.50.169:6005 #负载均衡 动态路由
                   predicates:
                       - Path=/file/**
                 - id: ms-route
@@ -65,7 +65,7 @@ spring:
                   predicates:
                       - Path=/api/plan/**
                 - id: ms-inspect
-                  uri: http://192.168.50.167:8003 #负载均衡 动态路由
+                  uri: http://192.168.50.169:8003 #负载均衡 动态路由
                   predicates:
                       - Path=/api/inspect/**
 mybatis:

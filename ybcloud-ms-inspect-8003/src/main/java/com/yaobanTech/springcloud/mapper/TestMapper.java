@@ -17,6 +17,6 @@ import org.springframework.stereotype.Component;
 @Component
 public interface TestMapper extends BaseMapper<Test> {
 
-    //获取班组员的未处理列表
+
 
 }

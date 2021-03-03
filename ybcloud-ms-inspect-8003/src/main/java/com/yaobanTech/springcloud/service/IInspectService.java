@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -56,7 +57,7 @@ public interface IInspectService extends IService<Inspect> {
 
     RespBean delete(String inspectTaskId);
 
-    List<Test> digui(Integer gid);
+    RespBean digui(Integer gid);
 
     RespBean bijiao(Integer gid);
 }

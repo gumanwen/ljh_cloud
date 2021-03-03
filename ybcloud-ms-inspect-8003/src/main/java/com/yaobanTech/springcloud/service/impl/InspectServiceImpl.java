@@ -632,33 +632,12 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         return null;
     }
 
-
-
-    @Override
-    public List<Test> digui(Integer gid) {
-        //1:查询出该gid对应的s/t
-        HashMap<String,Object> map = new HashMap<>();
-        List<Test> alllist = new ArrayList<>();
-        List<Test> list = new ArrayList<>();
-        List<Test> olist = new ArrayList<>();
-        List<Test> result = new ArrayList<>();
-        QueryWrapper<Test> queryWrapper = new QueryWrapper<>();
-        alllist = testMapper.selectList(queryWrapper);
-        Test test = testMapper.selectOne(queryWrapper.eq("gid",gid));
-        list.add(test);
-        result = func(alllist,list,list);
-        map.put("length",result.size());
-        map.put("list",result);
-        System.out.println(result.size());
-        return result;
-    }
-
     @Override
     public RespBean bijiao(Integer gid) {
         List<Test> result1 = new ArrayList<>();
         List<Test> result2 = new ArrayList<>();
         List<Test> result3 = new ArrayList<>();
-        result1 = digui(1562);
+        /*result1 = digui(1562);
         result3 =digui(1562);
         result2 = digui(390);
 
@@ -674,18 +653,65 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
             if(!flag){
                 //System.out.println(result1.get(i).getGid());
             }
-        }
+        }*/
         return RespBean.ok("").setObj(result3);
     }
 
+    @Override
+    public RespBean digui(Integer gid) {
+        //1:查询出该gid对应的s/t
+        HashMap<String,Object> map = new HashMap<>();
+        List<Test> alllist = new ArrayList<>();
+        HashSet<Test> oalllist = new HashSet<>();
+        HashSet<Test> allnewlist = new HashSet<>();
+        HashSet<Test> list = new HashSet<>();
+        HashSet<Test> result = new HashSet<>();
+        QueryWrapper<Test> queryWrapper = new QueryWrapper<>();
+        alllist = testMapper.selectList(queryWrapper);
+        Test test = testMapper.selectOne(queryWrapper.eq("gid",gid));
+        for (int i = 0; i < alllist.size(); i++) {
+            if(!alllist.get(i).getGid().equals(test.getGid())){
+                allnewlist.add(alllist.get(i));
+            }
+            oalllist.add(alllist.get(i));
+        }
+        allnewlist.remove(test);
+        list.add(test);
+        result = func(allnewlist,list,list);
+        oalllist.removeAll(result);
+        map.put("length",oalllist.size());
+        map.put("list",oalllist);
+        System.out.println(oalllist.size());
+        return RespBean.ok("").setObj(map);
+    }
+
     //数组递归方法
-    public List<Test> func(List<Test> alllist,List<Test> list,List<Test> olist) {
-        List<Test> newlist = new ArrayList<>();
+    public HashSet<Test> func(HashSet<Test> alllist,HashSet<Test> list,HashSet<Test> olist) {
+        HashSet<Test> newlist = new HashSet<>();
         boolean flag = false;
-        for (int i = 0; i < list.size(); i++) {
-            //第一次 ： list s:154 t:367
-            //
-            for (int j = 0; j < alllist.size(); j++) {
+        Iterator <Test> s = list.iterator();
+        while(s.hasNext()){
+            Test tests = s.next();
+            Iterator <Test> t = alllist.iterator();
+            while(t.hasNext()){
+                Test test = t.next();
+                if(tests.getSource().equals(test.getTarget()) || tests.getTarget().equals(test.getSource())
+                        ||tests.getTarget().equals(test.getTarget()) || tests.getSource().equals(test.getSource())){
+                    flag = true;
+                    olist.add(test);
+                    newlist.add(test);
+                }
+            }
+            alllist.removeAll(newlist);
+            //newlist.removeAll(olist);
+        }
+        if(flag){
+            func(alllist,newlist,olist);
+        }
+        return olist;
+        //for (   i = 0; i < list.size(); i++) {
+        //第一次 ： list s:154 t:367
+            /*for (int j = 0; j < alllist.size(); j++) {
                 if(list.get(i).getTarget().equals(alllist.get(j).getTarget())||
                         list.get(i).getSource().equals(alllist.get(j).getSource())||
                         list.get(i).getSource().equals(alllist.get(j).getTarget())||
@@ -694,14 +720,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                     newlist.add(alllist.get(j));
                     flag = true;
                 }
-            }
-            alllist.removeAll(newlist);
-        }
-        newlist.removeAll(olist);
-        if(flag){
-            func(alllist,newlist,olist);
-        }
-        return olist;
+            }*/
     }
 
     //数据库递归方法
@@ -716,8 +735,15 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         }
         newlist.removeAll(olist);
         if(flag){
-            func(alllist,newlist,olist);
+            //func(alllist,newlist,olist);
         }
         return olist;
+    }
+    //生成地图网络块
+    public RespBean create(){
+        //排序查出表中的第一条数据
+        QueryWrapper<Test> queryWrapper = new QueryWrapper<>();
+        testMapper.selectList(queryWrapper);
+        return RespBean.ok("分析成功，一共生成"+"条");
     }
 }

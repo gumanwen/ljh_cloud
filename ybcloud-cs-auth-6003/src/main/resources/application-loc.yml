@@ -23,7 +23,7 @@ spring:
         nacos:
             discovery:
                 server-addr: 192.168.50.91:8848
-                ip: 192.168.50.167
+                ip: 192.168.50.169
             config:
                 server-addr: 192.168.50.91:8848
                 file-extension: properties
@@ -52,7 +52,7 @@ mybatis-plus:
         call-setters-on-nulls: true
 server:
     port: 6003
-    ip: 192.168.50.167
+    ip: 192.168.50.169
 management:
     endpoint:
         health:

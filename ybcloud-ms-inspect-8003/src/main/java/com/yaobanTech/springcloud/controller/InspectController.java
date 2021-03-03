@@ -16,6 +16,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -179,8 +180,8 @@ public class InspectController {
 
     @ApiOperation("gis：测试递归")
     @GetMapping("/digui")
-    @Cacheable("cache1")
-    public List<Test> digui(Integer gid){
+    /*@Cacheable("cache1")*/
+    public RespBean digui(Integer gid){
         return iInspectService.digui(gid);
     }
 
