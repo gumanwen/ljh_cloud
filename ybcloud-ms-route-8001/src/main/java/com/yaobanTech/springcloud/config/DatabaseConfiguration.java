@@ -1,7 +1,6 @@
 package com.yaobanTech.springcloud.config;
 
 import com.alibaba.druid.pool.DruidDataSource;
-//import com.bstek.ureport.console.UReportServlet;
 import io.seata.rm.datasource.DataSourceProxy;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -36,12 +35,12 @@ public class DatabaseConfiguration {
         return pds0;
     }
 
-    /**
-     * ureport2报表Servlet配置
-     */
-    /*@Bean
-    public ServletRegistrationBean<Servlet> ureport2Servlet(){
-        return new ServletRegistrationBean<>(new UReportServlet(), "/ureport/*");
-    }*/
+//    /**
+//     * ureport2报表Servlet配置
+//     */
+//    @Bean
+//    public ServletRegistrationBean<Servlet> ureport2Servlet(){
+//        return new ServletRegistrationBean<>(new UReportServlet(), "/ureport/*");
+//    }
 
 }
