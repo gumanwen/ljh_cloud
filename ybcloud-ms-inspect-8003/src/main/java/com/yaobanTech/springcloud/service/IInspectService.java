@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,8 @@ public interface IInspectService extends IService<Inspect> {
 
     RespBean findSignedList(Integer routeId, String inspectTaskId);
 
+    RespBean getTaskListByTime(Date begin_time1, Date begin_time2, Date dead_time1, Date dead_time2,String checkMan);
+
     RespBean stop(String inspectTaskId);
 
     RespBean delete(String inspectTaskId);
@@ -60,4 +63,5 @@ public interface IInspectService extends IService<Inspect> {
     RespBean digui(Integer gid);
 
     RespBean bijiao(Integer gid);
+
 }

@@ -16,6 +16,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -183,6 +184,12 @@ public class InspectController {
     /*@Cacheable("cache1")*/
     public RespBean digui(Integer gid){
         return iInspectService.digui(gid);
+    }
+
+    @ApiOperation("opnefeign:根据任务开始时间过滤任务编号")
+    @GetMapping("/getTaskListByTime")
+    public RespBean getTaskListByTime(Date  taskStart1,Date taskEnd1,Date taskStart2,Date taskEnd2,String checkMan){
+        return iInspectService.getTaskListByTime(taskStart1,taskEnd1,taskStart2,taskEnd2,checkMan);
     }
 
     @ApiOperation("gis：测试递归")

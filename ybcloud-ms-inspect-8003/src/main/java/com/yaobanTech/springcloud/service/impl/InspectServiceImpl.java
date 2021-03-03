@@ -633,6 +633,27 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
     }
 
     @Override
+    public RespBean getTaskListByTime(Date begin_time1, Date begin_time2, Date dead_time1, Date dead_time2,String checkMan) {
+        QueryWrapper<Inspect> queryWrapper = new QueryWrapper<>();
+        queryWrapper.apply(FieldUtils.isStringNotEmpty(dateFormat.format(begin_time1)),"convert(varchar(20),begin_time,20) >= convert(varchar(20),'"+begin_time1+"',20)");
+        queryWrapper.apply(FieldUtils.isStringNotEmpty(dateFormat.format(begin_time2)),"convert(varchar(20),begin_time,20) <= convert(varchar(20),'"+begin_time2+"',20)");
+        queryWrapper.apply(FieldUtils.isStringNotEmpty(dateFormat.format(dead_time1)),"convert(varchar(20),end_time,20) >= convert(varchar(20),'"+dead_time1+"',20)");
+        queryWrapper.apply(FieldUtils.isStringNotEmpty(dateFormat.format(dead_time2)),"convert(varchar(20),end_time,20) <= convert(varchar(20),'"+dead_time2+"',20)");
+        queryWrapper.eq("inspect_person",checkMan);
+        List<Inspect> list = inspectMapper.selectList(queryWrapper);
+        List<HashMap<String,Object>> result = new ArrayList<>();
+        Iterator <Inspect> t = list.iterator();
+        while(t.hasNext()){
+            Inspect inspect = t.next();
+            HashMap<String,Object> map = new HashMap<>();
+            map.put("inspect_task_id",inspect.getInspectTaskId());
+            map.put("inspect_person",inspect.getInspectPerson());
+            result.add(map);
+        }
+        return RespBean.ok("").setObj(result);
+    }
+
+    @Override
     public RespBean bijiao(Integer gid) {
         List<Test> result1 = new ArrayList<>();
         List<Test> result2 = new ArrayList<>();
