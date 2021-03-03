@@ -2,11 +2,9 @@ package com.yaobanTech.springcloud.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.yaobanTech.springcloud.ToolUtils.UrlUtils;
-import com.yaobanTech.springcloud.domain.BizHiddenDangerPointEntity;
-import com.yaobanTech.springcloud.domain.BizSuggestionEntity;
-import com.yaobanTech.springcloud.domain.LoginUser;
-import com.yaobanTech.springcloud.domain.RespBean;
+import com.yaobanTech.springcloud.domain.*;
 import com.yaobanTech.springcloud.repository.BizHiddenDangerPointRepository;
+import com.yaobanTech.springcloud.repository.BizSignPointMapper;
 import com.yaobanTech.springcloud.repository.SuggestionRepository;
 import io.seata.spring.annotation.GlobalTransactional;
 import org.apache.commons.lang.StringUtils;
@@ -31,6 +29,14 @@ public class HiddenDangerPointServiceImpl {
     @Autowired
     @Lazy
     private SuggestionRepository suggestionRepository;
+
+    @Autowired
+    @Lazy
+    private BizSignPointMapper bizSignPointMapper;
+
+    @Autowired
+    @Lazy
+    private RouteServiceImpl routeService;
 
     @Autowired
     @Lazy
@@ -86,6 +92,7 @@ public class HiddenDangerPointServiceImpl {
         return RespBean.ok("保存成功！");
     }
 
+    @Transactional
     public RespBean updateHiddenDangerPoint(HashMap<String,Object> param) {
         BizHiddenDangerPointEntity bizHiddenDangerPointEntity = null;
         if(!param.isEmpty() && param.get("form") != null) {
@@ -119,7 +126,7 @@ public class HiddenDangerPointServiceImpl {
         return RespBean.ok("删除成功！");
     }
 
-    @GlobalTransactional
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public RespBean findDetail(Integer id,HttpServletRequest request) {
         BizHiddenDangerPointEntity bdpe = null;
         if(id != null) {
@@ -128,6 +135,14 @@ public class HiddenDangerPointServiceImpl {
                 List<BizSuggestionEntity> suggestionEntityList = suggestionRepository.findList(bdpe.getHiddenDangerPointCode());
                 String user = bdpe.getCommitBy();
                 String chineseName = (String)oauthService.getChineseName(user).getObj();
+                HashMap<String,Object> hiddenDangerStatusEnum = (HashMap)routeService.findEnum(bdpe.getHiddenDangerStatus()).getObj();
+                HashMap<String,Object> projectTypeEnum = (HashMap)routeService.findEnum(bdpe.getProjectType()).getObj();
+                HashMap<String,Object> riskLevelEnum = (HashMap)routeService.findEnum(bdpe.getRiskLevel()).getObj();
+                HashMap<String,Object> constructionTypeEnum = (HashMap)routeService.findEnum(bdpe.getConstructionType()).getObj();
+                bdpe.setHiddenDangerPointStatusEnum(hiddenDangerStatusEnum);
+                bdpe.setProjectTypeEnum(projectTypeEnum);
+                bdpe.setRiskLevelEnum(riskLevelEnum);
+                bdpe.setConstructionTypeEnum(constructionTypeEnum);
                 bdpe.setCommitByCN(chineseName);
                 bdpe.setHandleAdvice(suggestionEntityList);
                 /*if(oauthService.getChineseName(bdpe.getCommitBy()).getStatus() == 500){
@@ -155,7 +170,16 @@ public class HiddenDangerPointServiceImpl {
                 BizHiddenDangerPointEntity bizHiddenDangerPointEntity = list.get(i);
                 bizHiddenDangerPointEntity.setCommitByCN(chineseName);;
                 List<BizSuggestionEntity> suggestionEntityList = suggestionRepository.findList(bizHiddenDangerPointEntity.getHiddenDangerPointCode());
+                HashMap<String,Object> hiddenDangerStatusEnum = (HashMap)routeService.findEnum(bizHiddenDangerPointEntity.getHiddenDangerStatus()).getObj();
+                HashMap<String,Object> projectTypeEnum = (HashMap)routeService.findEnum(bizHiddenDangerPointEntity.getProjectType()).getObj();
+                HashMap<String,Object> riskLevelEnum = (HashMap)routeService.findEnum(bizHiddenDangerPointEntity.getRiskLevel()).getObj();
+                HashMap<String,Object> constructionTypeEnum = (HashMap)routeService.findEnum(bizHiddenDangerPointEntity.getConstructionType()).getObj();
+                bizHiddenDangerPointEntity.setHiddenDangerPointStatusEnum(hiddenDangerStatusEnum);
+                bizHiddenDangerPointEntity.setProjectTypeEnum(projectTypeEnum);
+                bizHiddenDangerPointEntity.setRiskLevelEnum(riskLevelEnum);
+                bizHiddenDangerPointEntity.setConstructionTypeEnum(constructionTypeEnum);
                 bizHiddenDangerPointEntity.setHandleAdvice(suggestionEntityList);
+
 //                if(points.size()>0){
 //                    for(int j =0; j<points.size();j++){
 //                        //获取报建文件列表
@@ -175,6 +199,63 @@ public class HiddenDangerPointServiceImpl {
 //                    }
 //                }
             }
+        }
+        return RespBean.ok("查询成功！",list);
+    }
+
+    @Transactional
+    public RespBean ignore(String hiddenDangerPointCode) {
+        if(hiddenDangerPointCode != null) {
+            hiddenDangerPointRepository.updateHiddenDangerPointStatus(hiddenDangerPointCode);
+            return RespBean.ok("修改成功！");
+        }else{
+            return RespBean.error("Id为空！");
+        }
+    }
+
+    @Transactional(propagation= Propagation.NOT_SUPPORTED)
+    public RespBean findCondition(HiddenDangerPointQuery hiddenDangerPointQuery, HttpServletRequest request) throws UnsupportedEncodingException {
+        List<BizHiddenDangerPointEntity> list = null;
+        if(hiddenDangerPointQuery != null){
+            LoginUser u = urlUtils.getAll(request);
+            String user = u.getLoginname();
+            String chineseName = u.getName();
+            list = bizSignPointMapper.hiddenDangerPointQuery(hiddenDangerPointQuery);
+            if(!list.isEmpty()){
+                for (int i = 0; i < list.size(); i++) {
+                    BizHiddenDangerPointEntity hiddenDangerPointEntity = list.get(i);
+                    HashMap<String,Object> hiddenDangerStatusEnum = (HashMap)routeService.findEnum(hiddenDangerPointEntity.getHiddenDangerStatus()).getObj();
+                    HashMap<String,Object> projectTypeEnum = (HashMap)routeService.findEnum(hiddenDangerPointEntity.getProjectType()).getObj();
+                    HashMap<String,Object> riskLevelEnum = (HashMap)routeService.findEnum(hiddenDangerPointEntity.getRiskLevel()).getObj();
+                    HashMap<String,Object> constructionTypeEnum = (HashMap)routeService.findEnum(hiddenDangerPointEntity.getConstructionType()).getObj();
+                    hiddenDangerPointEntity.setHiddenDangerPointStatusEnum(hiddenDangerStatusEnum);
+                    hiddenDangerPointEntity.setProjectTypeEnum(projectTypeEnum);
+                    hiddenDangerPointEntity.setRiskLevelEnum(riskLevelEnum);
+                    hiddenDangerPointEntity.setConstructionTypeEnum(constructionTypeEnum);
+                    hiddenDangerPointEntity.setCommitByCN(chineseName);
+
+//                if(points.size()>0){
+//                    for(int j =0; j<points.size();j++){
+//                        //获取报建文件列表
+//                        if(FieldUtils.isObjectNotEmpty(points.get(j).getFileType())) {
+//                            RespBean respBean = fileService.selectOneByPid(String.valueOf((Integer) points.get(j).getId()), (String) points.get(j).getFileType());
+//                            List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) respBean.getObj();
+//                            if(respBean.getStatus() == 500){
+//                                throw new RuntimeException("Feign调用文件服务失败");
+//                            }
+//                            Map signPointTypeEnum = (Map) EnumMenu.findEnum(points.get(j).getSignPointType()).getObj();
+//                            points.get(j).setFileList(fileList);
+//                            points.get(j).setWaterUseOfficeEnum(waterManagementOfficeEnum);
+//                            points.get(j).setSignPointTypeEnum(pointInspectionTypeEnum);
+//                            points.get(j).setRouteTypeEnum(routeTypeEnum);
+//                        }
+//                        list.add(points.get(j));
+//                    }
+//                }
+                }
+            }
+        }else {
+            return RespBean.error("查询条件为空！");
         }
         return RespBean.ok("查询成功！",list);
     }

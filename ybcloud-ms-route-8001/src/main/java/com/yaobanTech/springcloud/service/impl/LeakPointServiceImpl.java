@@ -3,9 +3,11 @@ package com.yaobanTech.springcloud.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.yaobanTech.springcloud.ToolUtils.UrlUtils;
 import com.yaobanTech.springcloud.domain.BizLeakPointEntity;
+import com.yaobanTech.springcloud.domain.LeakPointQuery;
 import com.yaobanTech.springcloud.domain.LoginUser;
 import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.repository.BizLeakPointRepository;
+import com.yaobanTech.springcloud.repository.BizSignPointMapper;
 import io.seata.spring.annotation.GlobalTransactional;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +21,21 @@ import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class LeakPointServiceImpl {
     @Autowired
     @Lazy
     private BizLeakPointRepository leakPointRepository;
+
+    @Autowired
+    @Lazy
+    private BizSignPointMapper bizSignPointMapper;
+
+    @Autowired
+    @Lazy
+    private RouteServiceImpl routeService;
 
     @Autowired
     @Lazy
@@ -65,6 +76,7 @@ public class LeakPointServiceImpl {
                 bizLeakPointEntity.setCommitDate(new Date());
                 bizLeakPointEntity.setEnabled(1);
                 bizLeakPointEntity.setCommitBy(user);
+                bizLeakPointEntity.setLeakPointStatus("未跟进");
                 bizLeakPointEntity.setLeakPointCode(leakPointCode);
                 leakPointRepository.save(bizLeakPointEntity);
             } catch (Exception e) {
@@ -77,6 +89,7 @@ public class LeakPointServiceImpl {
         return RespBean.ok("保存成功！");
     }
 
+    @Transactional
     public RespBean updateBizLeakPointEntity(HashMap<String,Object> param) {
         BizLeakPointEntity bizLeakPointEntity = null;
         if(!param.isEmpty() && param.get("form") != null) {
@@ -94,6 +107,16 @@ public class LeakPointServiceImpl {
         return RespBean.ok("修改成功！");
         }else{
             return RespBean.error("参数为空！");
+        }
+    }
+
+    @Transactional
+    public RespBean ignore(String leakPointCode) {
+        if(leakPointCode != null) {
+             leakPointRepository.updateLeakPointStatus(leakPointCode);
+             return RespBean.ok("修改成功！");
+        }else{
+            return RespBean.error("Id为空！");
         }
     }
 
@@ -118,7 +141,11 @@ public class LeakPointServiceImpl {
                 blpe = leakPointRepository.findBizLeakPointEntity(id);
                 String user = blpe.getCommitBy();
                 String chineseName = (String)oauthService.getChineseName(user).getObj();
+                HashMap<String,Object> leakPointStatusEnum = (HashMap)routeService.findEnum(blpe.getLeakPointStatus()).getObj();
+                HashMap<String,Object> abnormalPhenomenaEnum = (HashMap)routeService.findEnum(blpe.getAbnormalPhenomena()).getObj();
                 blpe.setCommitByCN(chineseName);
+                blpe.setAbnormalPhenomenaEnum(abnormalPhenomenaEnum);
+                blpe.setLeakPointStatusEnum(leakPointStatusEnum);
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("查询失败！");
@@ -139,7 +166,11 @@ public class LeakPointServiceImpl {
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
                 BizLeakPointEntity bizLeakPointEntity = list.get(i);
+                HashMap<String,Object> leakPointStatusEnum = (HashMap)routeService.findEnum(bizLeakPointEntity.getLeakPointStatus()).getObj();
+                HashMap<String,Object> abnormalPhenomenaEnum = (HashMap)routeService.findEnum(bizLeakPointEntity.getAbnormalPhenomena()).getObj();
                 bizLeakPointEntity.setCommitByCN(chineseName);
+                bizLeakPointEntity.setLeakPointStatusEnum(leakPointStatusEnum);
+                bizLeakPointEntity.setAbnormalPhenomenaEnum(abnormalPhenomenaEnum);
 //                if(points.size()>0){
 //                    for(int j =0; j<points.size();j++){
 //                        //获取报建文件列表
@@ -159,6 +190,48 @@ public class LeakPointServiceImpl {
 //                    }
 //                }
             }
+        }
+        return RespBean.ok("查询成功！",list);
+    }
+
+    @Transactional(propagation= Propagation.NOT_SUPPORTED)
+     public RespBean findCondition(LeakPointQuery leakPointQuery,HttpServletRequest request) throws UnsupportedEncodingException {
+        List<BizLeakPointEntity> list = null;
+        if(leakPointQuery != null){
+            LoginUser u = urlUtils.getAll(request);
+            String user = u.getLoginname();
+            String chineseName = u.getName();
+            list = bizSignPointMapper.leakPointQuery(leakPointQuery);
+            if(!list.isEmpty()){
+                for (int i = 0; i < list.size(); i++) {
+                    BizLeakPointEntity bizLeakPointEntity = list.get(i);
+                    HashMap<String,Object> leakPointStatusEnum = (HashMap)routeService.findEnum(bizLeakPointEntity.getLeakPointStatus()).getObj();
+                    HashMap<String,Object> abnormalPhenomenaEnum = (HashMap)routeService.findEnum(bizLeakPointEntity.getAbnormalPhenomena()).getObj();
+                    bizLeakPointEntity.setCommitByCN(chineseName);
+                    bizLeakPointEntity.setLeakPointStatusEnum(leakPointStatusEnum);
+                    bizLeakPointEntity.setAbnormalPhenomenaEnum(abnormalPhenomenaEnum);
+//                if(points.size()>0){
+//                    for(int j =0; j<points.size();j++){
+//                        //获取报建文件列表
+//                        if(FieldUtils.isObjectNotEmpty(points.get(j).getFileType())) {
+//                            RespBean respBean = fileService.selectOneByPid(String.valueOf((Integer) points.get(j).getId()), (String) points.get(j).getFileType());
+//                            List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) respBean.getObj();
+//                            if(respBean.getStatus() == 500){
+//                                throw new RuntimeException("Feign调用文件服务失败");
+//                            }
+//                            Map signPointTypeEnum = (Map) EnumMenu.findEnum(points.get(j).getSignPointType()).getObj();
+//                            points.get(j).setFileList(fileList);
+//                            points.get(j).setWaterUseOfficeEnum(waterManagementOfficeEnum);
+//                            points.get(j).setSignPointTypeEnum(pointInspectionTypeEnum);
+//                            points.get(j).setRouteTypeEnum(routeTypeEnum);
+//                        }
+//                        list.add(points.get(j));
+//                    }
+//                }
+                }
+            }
+       }else {
+            return RespBean.error("查询条件为空！");
         }
         return RespBean.ok("查询成功！",list);
     }

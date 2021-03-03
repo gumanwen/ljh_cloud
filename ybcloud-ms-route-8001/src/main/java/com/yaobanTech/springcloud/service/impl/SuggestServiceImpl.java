@@ -108,9 +108,11 @@ public class SuggestServiceImpl {
         if(id != null) {
             try {
                 bse = suggestionRepository.findBizSuggestionEntity(id);
-                LoginUser u = urlUtils.getAll(request);
-                String chineseName = u.getName();
-                bse.setCommitBy(chineseName);
+                if(bse != null){
+                    LoginUser u = urlUtils.getAll(request);
+                    String chineseName = u.getName();
+                    bse.setCommitBy(chineseName);
+                }
 
             } catch (Exception e) {
                 e.printStackTrace();

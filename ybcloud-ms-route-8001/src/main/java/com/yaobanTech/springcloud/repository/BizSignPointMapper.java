@@ -1,6 +1,6 @@
 package com.yaobanTech.springcloud.repository;
 
-import com.yaobanTech.springcloud.domain.BizSignPoint;
+import com.yaobanTech.springcloud.domain.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -97,4 +97,50 @@ public interface BizSignPointMapper {
             "AND IF(#{planType} is not null,plan_type = #{planType},1=1) ")
 
     List<HashMap<String,Object>> findRouteIds(String waterManagementOffice, String routeName, String pointInspectionType, String planName , String planPorid, String planType);
+
+    @Select(value="SELECT a.* " +
+            "FROM `ybcloud-ms-route-8001`.`biz_leak_point` a " +
+            "WHERE a.enabled = 1 " +
+            "AND IF(#{assetType} is not null,  a.asset_type = #{assetType},1=1)" +
+            "AND IF(#{equipmentSize} is not null, a.equipment_size = #{equipmentSize},1=1 ) " +
+            "AND IF(#{leakPointStatus} is not null, a.leak_point_status = #{leakPointStatus},1=1 ) " +
+            "AND IF(#{waterUseOffice} is not null, a.water_use_office = #{waterUseOffice},1=1 ) " +
+            "ORDER BY a.commit_Date DESC")
+    List<BizLeakPointEntity> leakPointQuery(LeakPointQuery leakPointQuery);
+
+    @Select(value="SELECT a.* " +
+            "FROM `ybcloud-ms-route-8001`.`biz_hidden_danger_point` a " +
+            "WHERE a.enabled = 1 " +
+            "AND IF(#{assetType} is not null,  a.asset_type = #{assetType},1=1)" +
+            "AND IF(#{equipmentSize} is not null, a.equipment_size = #{equipmentSize},1=1 ) " +
+            "AND IF(#{hiddenDangerPointStatus} is not null, a.hidden_danger_point_status = #{hiddenDangerPointStatus},1=1 ) " +
+            "AND IF(#{waterUseOffice} is not null, a.water_use_office = #{waterUseOffice},1=1 ) " +
+            "AND IF(#{commitDate} is not null, a.commit_date >= #{commitDate},1=1 ) " +
+            "AND IF(#{endDate} is not null, a.end_date <= #{endDate},1=1 ) " +
+            "AND IF(#{hiddenDangerPointStatus} is not null, a.hidden_danger_point_status = #{hiddenDangerPointStatus},1=1 ) " +
+            "AND IF(#{riskLevel} is not null, a.risk_level = #{riskLevel},1=1 ) " +
+            "AND IF(#{projectType} is not null, a.project_type = #{projectType},1=1 ) " +
+            "AND IF(#{constructionType} is not null, a.construction_type = #{constructionType},1=1 ) " +
+            "AND IF(#{networkNotification} is not null, a.network_notification = #{networkNotification},1=1 ) " +
+            "ORDER BY a.commit_Date DESC")
+    List<BizHiddenDangerPointEntity> hiddenDangerPointQuery(HiddenDangerPointQuery hiddenDangerPointQuery);
+
+    @Select(value="SELECT a.*,b.plan_name,c.* " +
+            "FROM `ybcloud-ms-route-8001`.`biz_route` a " +
+            "JOIN `ybcloud-ms-plan-8002`.`biz_plan` b ON a.id = b.route_id " +
+            "JOIN `ybcloud-ms-route-8001`.`biz_signed_point` c ON a.id = c.route_id " +
+            "WHERE a.enabled = 1 and b.enabled = 1 and c.enable = 1" +
+            "AND IF(#{waterUserOffice} is not null,  a.water_management_office = #{waterUserOffice},1=1)" +
+            "AND IF(#{routeName} is not null, a.route_name = #{routeName},1=1 ) " +
+            "AND IF(#{routeType} is not null, a.route_type = #{routeType},1=1 ) " +
+            "AND IF(#{pointInspectionType} is not null, a.point_inspection_type = #{pointInspectionType},1=1 ) " +
+            "AND IF(#{planName} is not null, b.plan_name = #{planName},1=1 ) " +
+            "AND IF(#{signDateStart} is not null, c.signed_time >= #{signDateStart},1=1 ) " +
+            "AND IF(#{signDateEnd} is not null, c.signed_time <= #{signDateEnd},1=1 ) " +
+            "AND IF(#{signPointType} is not null, c.sign_point_type = #{signPointType},1=1 ) " +
+            "AND IF(#{pipeDiameter} is not null, c.pipe_diameter = #{pipeDiameter},1=1 ) " +
+            "AND IF(#{signStatus} is not null, c.sign_status = #{signStatus},1=1 ) " +
+            "AND IF(#{hiddenCode} is not null, c.trouble_code = #{hiddenCode},1=1 ) " +
+            "ORDER BY c.modify_time DESC")
+    List<HashMap<String,Object>> findCondition(SignPointQuery signPointQuery);
 }

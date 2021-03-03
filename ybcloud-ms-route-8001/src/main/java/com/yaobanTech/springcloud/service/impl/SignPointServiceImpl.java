@@ -36,7 +36,15 @@ public class SignPointServiceImpl {
 
     @Autowired
     @Lazy
+    private BizSignPointMapper bizSignPointMapper;
+
+    @Autowired
+    @Lazy
     private OauthService oauthService;
+
+    @Autowired
+    @Lazy
+    private InspectService inspectService;
 
     @Autowired
     @Lazy
@@ -73,7 +81,8 @@ public class SignPointServiceImpl {
             try {
                 bizSignedPoint.setModifyTime(new Date());
                 signPointRepository.save(signPoint);
-                bizSignedPoint.setSignPointStatus("已签到");
+                bizSignedPoint.setSignPointStatus("合格");
+                bizSignedPoint.setSignedTime(new Date());
                 BizSignedPoint signedPoint = signedPointRepository.save(bizSignedPoint);
                 id = signedPoint.getId();
             } catch (Exception e) {
@@ -228,7 +237,7 @@ public class SignPointServiceImpl {
                     hashMap.put("fileType","");
                     BizSignedPoint bizSignedPoint = JSONObject.parseObject(JSONObject.toJSONString(hashMap), BizSignedPoint.class);
                     bizSignedPoint.setId(null);
-                    bizSignedPoint.setSignPointStatus("未签到");
+                    bizSignedPoint.setSignPointStatus("不合格");
                     bizSignedPoint.setEnabled(1);
                     signedPointRepository.save(bizSignedPoint);
                 }
@@ -236,6 +245,25 @@ public class SignPointServiceImpl {
             return RespBean.ok("新建成功！");
         }
         return RespBean.error("新建异常！任务Id或路线Id不能为空！");
+    }
+
+    public RespBean findCondition(HashMap<String,Object> map) {
+        SignPointQuery signPointQuery = null;
+        List<HashMap<String, Object>> maps = null;
+        if(map != null){
+            signPointQuery = JSONObject.parseObject(JSONObject.toJSONString(map.get("form")), SignPointQuery.class);
+            if(signPointQuery.getTaskStart1() != null || signPointQuery.getTaskEnd1() != null||
+                    signPointQuery.getTaskStart2() != null || signPointQuery.getTaskEnd2() != null || signPointQuery.getCheckMan() != null){
+                RespBean respBean = inspectService.getTaskIds(signPointQuery.getTaskStart1(), signPointQuery.getTaskEnd1(), signPointQuery.getTaskStart2(), signPointQuery.getTaskEnd2(),signPointQuery.getCheckMan());
+                List<HashMap<String,Object>> list = (List)respBean.getObj();
+
+            }else{
+                 maps = bizSignPointMapper.findCondition(signPointQuery);
+            }
+        }else {
+            return RespBean.error("查询参数对象为空！");
+        }
+        return RespBean.ok("查询成功",maps);
     }
 
     public  RespBean findEnum(String code){

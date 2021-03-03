@@ -178,6 +178,17 @@ public class BizSignedPoint implements Serializable {
 	private Date modifyTime;
 
 	/**
+	 * 签到时间
+	 */
+	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(
+			pattern = "yyyy-MM-dd HH:mm:ss",
+			timezone = "GMT+8"
+	)
+	@Column(name = "signed_time" )
+	private Date signedTime;
+
+	/**
 	 * 任务表id
 	 */
 	@Column(name = "task_id" )
@@ -230,6 +241,14 @@ public class BizSignedPoint implements Serializable {
 		this.pointInspectionType = pointInspectionType;
 		this.signPointStatus = signPointStatus;
 		this.modifyTime = modifyTime;
+	}
+
+	public Date getSignedTime() {
+		return signedTime;
+	}
+
+	public void setSignedTime(Date signedTime) {
+		this.signedTime = signedTime;
 	}
 
 	public List<HashMap<String, Object>> getFileList() {

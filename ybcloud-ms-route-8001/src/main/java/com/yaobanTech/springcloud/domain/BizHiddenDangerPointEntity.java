@@ -5,6 +5,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -86,9 +87,9 @@ public class BizHiddenDangerPointEntity {
 	private String constructionCompanyAgentPhone;
 
 	/**
-	 * 管网口径
+	 * 设备口径
 	 */
-   @Column(name = "network_size" )
+   @Column(name = "equipment_size" )
 	private String networkSize;
 
 	/**
@@ -147,7 +148,7 @@ public class BizHiddenDangerPointEntity {
 	/**
 	 * 隐患状态
 	 */
-	@Column(name = "hidden_danger_status" )
+	@Column(name = "hidden_danger_point_status" )
 	private String hiddenDangerStatus;
 
 	/**
@@ -179,6 +180,30 @@ public class BizHiddenDangerPointEntity {
 	@Transient
 	private String commitByCN;
 
+	/**
+	 * 隐患点状态枚举
+	 */
+	@Transient
+	private HashMap<String,Object> hiddenDangerPointStatusEnum;
+
+	/**
+	 * 工地类型枚举
+	 */
+	@Transient
+	private HashMap<String,Object> projectTypeEnum;
+
+	/**
+	 * 风险等级枚举
+	 */
+	@Transient
+	private HashMap<String,Object> riskLevelEnum;
+
+	/**
+	 * 施工方式枚举
+	 */
+	@Transient
+	private HashMap<String,Object> constructionTypeEnum;
+
 
 
 	public BizHiddenDangerPointEntity() {
@@ -205,6 +230,38 @@ public class BizHiddenDangerPointEntity {
 		this.commitBy = commitBy;
 		this.commitDate = commitDate;
 		this.enabled = enabled;
+	}
+
+	public HashMap<String, Object> getHiddenDangerPointStatusEnum() {
+		return hiddenDangerPointStatusEnum;
+	}
+
+	public void setHiddenDangerPointStatusEnum(HashMap<String, Object> hiddenDangerPointStatusEnum) {
+		this.hiddenDangerPointStatusEnum = hiddenDangerPointStatusEnum;
+	}
+
+	public HashMap<String, Object> getProjectTypeEnum() {
+		return projectTypeEnum;
+	}
+
+	public void setProjectTypeEnum(HashMap<String, Object> projectTypeEnum) {
+		this.projectTypeEnum = projectTypeEnum;
+	}
+
+	public HashMap<String, Object> getRiskLevelEnum() {
+		return riskLevelEnum;
+	}
+
+	public void setRiskLevelEnum(HashMap<String, Object> riskLevelEnum) {
+		this.riskLevelEnum = riskLevelEnum;
+	}
+
+	public HashMap<String, Object> getConstructionTypeEnum() {
+		return constructionTypeEnum;
+	}
+
+	public void setConstructionTypeEnum(HashMap<String, Object> constructionTypeEnum) {
+		this.constructionTypeEnum = constructionTypeEnum;
 	}
 
 	public String getCommitByCN() {

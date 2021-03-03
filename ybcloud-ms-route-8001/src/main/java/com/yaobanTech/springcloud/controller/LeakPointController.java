@@ -1,5 +1,6 @@
 package com.yaobanTech.springcloud.controller;
 
+import com.yaobanTech.springcloud.domain.LeakPointQuery;
 import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.service.impl.LeakPointServiceImpl;
 import io.swagger.annotations.Api;
@@ -51,6 +52,18 @@ public class LeakPointController {
     @GetMapping("findListByUser")
     public RespBean findListByUser(HttpServletRequest request) throws UnsupportedEncodingException {
         return leakPointService.findListByUser(request);
+    }
+
+    @ApiOperation("条件查询漏点列表")
+    @PostMapping("findCondition")
+    public RespBean findCondition(@RequestBody LeakPointQuery leakPointQuery,HttpServletRequest request) throws UnsupportedEncodingException {
+        return leakPointService.findCondition(leakPointQuery,request);
+    }
+
+    @ApiOperation("忽略漏点")
+    @GetMapping("ignore")
+    public RespBean ignore(@RequestParam String leakPointCode) throws UnsupportedEncodingException {
+        return leakPointService.ignore(leakPointCode);
     }
 
 }

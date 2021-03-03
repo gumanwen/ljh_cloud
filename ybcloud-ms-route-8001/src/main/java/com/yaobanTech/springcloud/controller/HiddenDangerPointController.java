@@ -1,5 +1,7 @@
 package com.yaobanTech.springcloud.controller;
 
+import com.yaobanTech.springcloud.domain.HiddenDangerPointQuery;
+import com.yaobanTech.springcloud.domain.LeakPointQuery;
 import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.service.impl.HiddenDangerPointServiceImpl;
 import com.yaobanTech.springcloud.service.impl.SignPointServiceImpl;
@@ -53,6 +55,18 @@ public class HiddenDangerPointController {
     @GetMapping("findListByUser")
     public RespBean findListByUser(HttpServletRequest request) throws UnsupportedEncodingException {
         return hiddenDangerPointService.findListByUser(request);
+    }
+
+    @ApiOperation("忽略隐患点")
+    @GetMapping("ignore")
+    public RespBean ignore(@RequestParam String hiddenDangerPointCode) throws UnsupportedEncodingException {
+        return hiddenDangerPointService.ignore(hiddenDangerPointCode);
+    }
+
+    @ApiOperation("条件查询隐患点列表")
+    @PostMapping("findCondition")
+    public RespBean findCondition(@RequestBody HiddenDangerPointQuery hiddenDangerPointQuery, HttpServletRequest request) throws UnsupportedEncodingException {
+        return hiddenDangerPointService.findCondition(hiddenDangerPointQuery,request);
     }
 
 }
