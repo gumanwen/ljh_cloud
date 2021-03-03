@@ -238,6 +238,21 @@ public class SignPointServiceImpl {
         return RespBean.error("新建异常！任务Id或路线Id不能为空！");
     }
 
+    public RespBean findCondition(HashMap<String,Object> map) {
+        SignPointQuery signPointQuery = null;
+        if(map != null){
+            signPointQuery = JSONObject.parseObject(JSONObject.toJSONString(map.get("form")), SignPointQuery.class);
+            if(signPointQuery.getTaskStart() != null || signPointQuery.getTaskEnd() != null){
+                //调用openFeign传递参数
+            }else{
+
+            }
+        }else {
+            return RespBean.error("查询参数对象为空！");
+        }
+        return RespBean.ok("查询成功");
+    }
+
     public  RespBean findEnum(String code){
         Map<String, Object> map = new HashMap<>();
         if(code != null) {

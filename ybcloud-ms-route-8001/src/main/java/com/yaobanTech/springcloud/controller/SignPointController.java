@@ -1,6 +1,7 @@
 package com.yaobanTech.springcloud.controller;
 
 import com.yaobanTech.springcloud.domain.RespBean;
+import com.yaobanTech.springcloud.domain.SignPointQuery;
 import com.yaobanTech.springcloud.service.impl.SignPointServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -76,5 +77,11 @@ public class SignPointController {
     @GetMapping("taskPoint")
     public RespBean taskPoint(@RequestParam List<String> taskIds, @RequestParam Integer routeId ){
         return signPointService.taskPoint(taskIds,routeId);
+    }
+
+    @ApiOperation("条件查询签到点")
+    @PostMapping("findCondition")
+    public RespBean findCondition(@RequestParam HashMap<String,Object> map){
+        return signPointService.findCondition(map);
     }
 }

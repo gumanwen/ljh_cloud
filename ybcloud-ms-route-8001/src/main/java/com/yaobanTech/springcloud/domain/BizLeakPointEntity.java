@@ -168,6 +168,18 @@ public class BizLeakPointEntity {
 	@Transient
 	private List<HashMap<String,Object>> handleRecord;
 
+	/**
+	 * 漏点状态枚举
+	 */
+	@Transient
+	private HashMap<String,Object> leakPointStatusEnum;
+
+	/**
+	 * 异常现象枚举
+	 */
+	@Transient
+	private HashMap<String,Object> abnormalPhenomenaEnum;
+
 	public BizLeakPointEntity() {
 	}
 
@@ -193,6 +205,22 @@ public class BizLeakPointEntity {
 		X = x;
 		Y = y;
 		this.dept = dept;
+	}
+
+	public HashMap<String, Object> getLeakPointStatusEnum() {
+		return leakPointStatusEnum;
+	}
+
+	public void setLeakPointStatusEnum(HashMap<String, Object> leakPointStatusEnum) {
+		this.leakPointStatusEnum = leakPointStatusEnum;
+	}
+
+	public HashMap<String, Object> getAbnormalPhenomenaEnum() {
+		return abnormalPhenomenaEnum;
+	}
+
+	public void setAbnormalPhenomenaEnum(HashMap<String, Object> abnormalPhenomenaEnum) {
+		this.abnormalPhenomenaEnum = abnormalPhenomenaEnum;
 	}
 
 	public List<HashMap<String, Object>> getCheckRecord() {
