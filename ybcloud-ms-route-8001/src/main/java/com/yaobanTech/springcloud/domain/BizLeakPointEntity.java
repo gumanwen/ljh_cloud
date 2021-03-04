@@ -151,6 +151,12 @@ public class BizLeakPointEntity {
 	private String dept;
 
    /**
+	 * 操作
+	 */
+   @Column(name = "opration" )
+	private String opration;
+
+   /**
 	 * 附件
 	 */
    @Transient
@@ -183,7 +189,7 @@ public class BizLeakPointEntity {
 	public BizLeakPointEntity() {
 	}
 
-	public BizLeakPointEntity(Integer id, String leakPointCode, Integer routeId, String waterUseOffice, String equipmentName, String equipmentSize, String abnormalPhenomena, String abnormalReason, String currentPosition, String autoGetPositon, String memo, String assetType, String commitBy, Date commitDate, Integer enabled, String leakPointStatus, Date endDate, String address, String x, String y, String dept) {
+	public BizLeakPointEntity(Integer id, String leakPointCode, Integer routeId, String waterUseOffice, String equipmentName, String equipmentSize, String abnormalPhenomena, String abnormalReason, String currentPosition, String autoGetPositon, String memo, String assetType, String commitBy, String commitByCN, Date commitDate, Integer enabled, String leakPointStatus, Date endDate, String address, String x, String y, String dept, String opration, List<HashMap<String, Object>> attachment, List<HashMap<String, Object>> checkRecord, List<HashMap<String, Object>> handleRecord, HashMap<String, Object> leakPointStatusEnum, HashMap<String, Object> abnormalPhenomenaEnum) {
 		this.id = id;
 		this.leakPointCode = leakPointCode;
 		this.routeId = routeId;
@@ -197,6 +203,7 @@ public class BizLeakPointEntity {
 		this.memo = memo;
 		this.assetType = assetType;
 		this.commitBy = commitBy;
+		this.commitByCN = commitByCN;
 		this.commitDate = commitDate;
 		this.enabled = enabled;
 		this.leakPointStatus = leakPointStatus;
@@ -205,22 +212,204 @@ public class BizLeakPointEntity {
 		X = x;
 		Y = y;
 		this.dept = dept;
-	}
-
-	public HashMap<String, Object> getLeakPointStatusEnum() {
-		return leakPointStatusEnum;
-	}
-
-	public void setLeakPointStatusEnum(HashMap<String, Object> leakPointStatusEnum) {
+		this.opration = opration;
+		this.attachment = attachment;
+		this.checkRecord = checkRecord;
+		this.handleRecord = handleRecord;
 		this.leakPointStatusEnum = leakPointStatusEnum;
-	}
-
-	public HashMap<String, Object> getAbnormalPhenomenaEnum() {
-		return abnormalPhenomenaEnum;
-	}
-
-	public void setAbnormalPhenomenaEnum(HashMap<String, Object> abnormalPhenomenaEnum) {
 		this.abnormalPhenomenaEnum = abnormalPhenomenaEnum;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getLeakPointCode() {
+		return leakPointCode;
+	}
+
+	public void setLeakPointCode(String leakPointCode) {
+		this.leakPointCode = leakPointCode;
+	}
+
+	public Integer getRouteId() {
+		return routeId;
+	}
+
+	public void setRouteId(Integer routeId) {
+		this.routeId = routeId;
+	}
+
+	public String getWaterUseOffice() {
+		return waterUseOffice;
+	}
+
+	public void setWaterUseOffice(String waterUseOffice) {
+		this.waterUseOffice = waterUseOffice;
+	}
+
+	public String getEquipmentName() {
+		return equipmentName;
+	}
+
+	public void setEquipmentName(String equipmentName) {
+		this.equipmentName = equipmentName;
+	}
+
+	public String getEquipmentSize() {
+		return equipmentSize;
+	}
+
+	public void setEquipmentSize(String equipmentSize) {
+		this.equipmentSize = equipmentSize;
+	}
+
+	public String getAbnormalPhenomena() {
+		return abnormalPhenomena;
+	}
+
+	public void setAbnormalPhenomena(String abnormalPhenomena) {
+		this.abnormalPhenomena = abnormalPhenomena;
+	}
+
+	public String getAbnormalReason() {
+		return abnormalReason;
+	}
+
+	public void setAbnormalReason(String abnormalReason) {
+		this.abnormalReason = abnormalReason;
+	}
+
+	public String getCurrentPosition() {
+		return currentPosition;
+	}
+
+	public void setCurrentPosition(String currentPosition) {
+		this.currentPosition = currentPosition;
+	}
+
+	public String getAutoGetPositon() {
+		return autoGetPositon;
+	}
+
+	public void setAutoGetPositon(String autoGetPositon) {
+		this.autoGetPositon = autoGetPositon;
+	}
+
+	public String getMemo() {
+		return memo;
+	}
+
+	public void setMemo(String memo) {
+		this.memo = memo;
+	}
+
+	public String getAssetType() {
+		return assetType;
+	}
+
+	public void setAssetType(String assetType) {
+		this.assetType = assetType;
+	}
+
+	public String getCommitBy() {
+		return commitBy;
+	}
+
+	public void setCommitBy(String commitBy) {
+		this.commitBy = commitBy;
+	}
+
+	public String getCommitByCN() {
+		return commitByCN;
+	}
+
+	public void setCommitByCN(String commitByCN) {
+		this.commitByCN = commitByCN;
+	}
+
+	public Date getCommitDate() {
+		return commitDate;
+	}
+
+	public void setCommitDate(Date commitDate) {
+		this.commitDate = commitDate;
+	}
+
+	public Integer getEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(Integer enabled) {
+		this.enabled = enabled;
+	}
+
+	public String getLeakPointStatus() {
+		return leakPointStatus;
+	}
+
+	public void setLeakPointStatus(String leakPointStatus) {
+		this.leakPointStatus = leakPointStatus;
+	}
+
+	public Date getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getX() {
+		return X;
+	}
+
+	public void setX(String x) {
+		X = x;
+	}
+
+	public String getY() {
+		return Y;
+	}
+
+	public void setY(String y) {
+		Y = y;
+	}
+
+	public String getDept() {
+		return dept;
+	}
+
+	public void setDept(String dept) {
+		this.dept = dept;
+	}
+
+	public String getOpration() {
+		return opration;
+	}
+
+	public void setOpration(String opration) {
+		this.opration = opration;
+	}
+
+	public List<HashMap<String, Object>> getAttachment() {
+		return attachment;
+	}
+
+	public void setAttachment(List<HashMap<String, Object>> attachment) {
+		this.attachment = attachment;
 	}
 
 	public List<HashMap<String, Object>> getCheckRecord() {
@@ -239,188 +428,53 @@ public class BizLeakPointEntity {
 		this.handleRecord = handleRecord;
 	}
 
-	public List<HashMap<String, Object>> getAttachment() {
-		return attachment;
+	public HashMap<String, Object> getLeakPointStatusEnum() {
+		return leakPointStatusEnum;
 	}
 
-	public void setAttachment(List<HashMap<String, Object>> attachment) {
-		this.attachment = attachment;
+	public void setLeakPointStatusEnum(HashMap<String, Object> leakPointStatusEnum) {
+		this.leakPointStatusEnum = leakPointStatusEnum;
 	}
 
-	public String getCommitByCN() {
-		return commitByCN;
+	public HashMap<String, Object> getAbnormalPhenomenaEnum() {
+		return abnormalPhenomenaEnum;
 	}
 
-	public void setCommitByCN(String commitByCN) {
-		this.commitByCN = commitByCN;
+	public void setAbnormalPhenomenaEnum(HashMap<String, Object> abnormalPhenomenaEnum) {
+		this.abnormalPhenomenaEnum = abnormalPhenomenaEnum;
 	}
 
-	public Integer getId() {
-		return this.id;
+	@Override
+	public String toString() {
+		return "BizLeakPointEntity{" +
+				"id=" + id +
+				", leakPointCode='" + leakPointCode + '\'' +
+				", routeId=" + routeId +
+				", waterUseOffice='" + waterUseOffice + '\'' +
+				", equipmentName='" + equipmentName + '\'' +
+				", equipmentSize='" + equipmentSize + '\'' +
+				", abnormalPhenomena='" + abnormalPhenomena + '\'' +
+				", abnormalReason='" + abnormalReason + '\'' +
+				", currentPosition='" + currentPosition + '\'' +
+				", autoGetPositon='" + autoGetPositon + '\'' +
+				", memo='" + memo + '\'' +
+				", assetType='" + assetType + '\'' +
+				", commitBy='" + commitBy + '\'' +
+				", commitByCN='" + commitByCN + '\'' +
+				", commitDate=" + commitDate +
+				", enabled=" + enabled +
+				", leakPointStatus='" + leakPointStatus + '\'' +
+				", endDate=" + endDate +
+				", address='" + address + '\'' +
+				", X='" + X + '\'' +
+				", Y='" + Y + '\'' +
+				", dept='" + dept + '\'' +
+				", opration='" + opration + '\'' +
+				", attachment=" + attachment +
+				", checkRecord=" + checkRecord +
+				", handleRecord=" + handleRecord +
+				", leakPointStatusEnum=" + leakPointStatusEnum +
+				", abnormalPhenomenaEnum=" + abnormalPhenomenaEnum +
+				'}';
 	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public String getLeakPointCode() {
-		return this.leakPointCode;
-	}
-
-	public void setLeakPointCode(String leakPointCode) {
-		this.leakPointCode = leakPointCode;
-	}
-
-	public Integer getRouteId() {
-		return this.routeId;
-	}
-
-	public void setRouteId(Integer routeId) {
-		this.routeId = routeId;
-	}
-
-	public String getWaterUseOffice() {
-		return this.waterUseOffice;
-	}
-
-	public void setWaterUseOffice(String waterUseOffice) {
-		this.waterUseOffice = waterUseOffice;
-	}
-
-	public String getEquipmentName() {
-		return this.equipmentName;
-	}
-
-	public void setEquipmentName(String equipmentName) {
-		this.equipmentName = equipmentName;
-	}
-
-	public String getEquipmentSize() {
-		return this.equipmentSize;
-	}
-
-	public void setEquipmentSize(String equipmentSize) {
-		this.equipmentSize = equipmentSize;
-	}
-
-	public String getAbnormalPhenomena() {
-		return this.abnormalPhenomena;
-	}
-
-	public void setAbnormalPhenomena(String abnormalPhenomena) {
-		this.abnormalPhenomena = abnormalPhenomena;
-	}
-
-	public String getAbnormalReason() {
-		return this.abnormalReason;
-	}
-
-	public void setAbnormalReason(String abnormalReason) {
-		this.abnormalReason = abnormalReason;
-	}
-
-	public String getCurrentPosition() {
-		return this.currentPosition;
-	}
-
-	public void setCurrentPosition(String currentPosition) {
-		this.currentPosition = currentPosition;
-	}
-
-	public String getAutoGetPositon() {
-		return this.autoGetPositon;
-	}
-
-	public void setAutoGetPositon(String autoGetPositon) {
-		this.autoGetPositon = autoGetPositon;
-	}
-
-	public String getMemo() {
-		return this.memo;
-	}
-
-	public void setMemo(String memo) {
-		this.memo = memo;
-	}
-
-	public String getAssetType() {
-		return this.assetType;
-	}
-
-	public void setAssetType(String assetType) {
-		this.assetType = assetType;
-	}
-
-	public String getCommitBy() {
-		return this.commitBy;
-	}
-
-	public void setCommitBy(String commitBy) {
-		this.commitBy = commitBy;
-	}
-
-	public Date getCommitDate() {
-		return this.commitDate;
-	}
-
-	public void setCommitDate(Date commitDate) {
-		this.commitDate = commitDate;
-	}
-
-	public Integer getEnabled() {
-		return this.enabled;
-	}
-
-	public void setEnabled(Integer enabled) {
-		this.enabled = enabled;
-	}
-
-	public String getLeakPointStatus() {
-		return this.leakPointStatus;
-	}
-
-	public void setLeakPointStatus(String leakPointStatus) {
-		this.leakPointStatus = leakPointStatus;
-	}
-
-	public Date getEndDate() {
-		return this.endDate;
-	}
-
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}
-
-	public String getAddress() {
-		return this.address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
-	public String getX() {
-		return this.X;
-	}
-
-	public void setX(String X) {
-		this.X = X;
-	}
-
-	public String getY() {
-		return this.Y;
-	}
-
-	public void setY(String Y) {
-		this.Y = Y;
-	}
-
-	public String getDept() {
-		return this.dept;
-	}
-
-	public void setDept(String dept) {
-		this.dept = dept;
-	}
-
 }
