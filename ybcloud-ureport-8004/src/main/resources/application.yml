@@ -1,0 +1,5 @@
+server:
+    port: 8004 #服务端口
+spring:
+    application:
+        name: reportService #指定服务名
