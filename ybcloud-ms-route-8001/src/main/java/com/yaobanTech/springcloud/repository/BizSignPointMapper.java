@@ -129,8 +129,8 @@ public interface BizSignPointMapper {
             "FROM `ybcloud-ms-route-8001`.`biz_route` a " +
             "JOIN `ybcloud-ms-plan-8002`.`biz_plan` b ON a.id = b.route_id " +
             "JOIN `ybcloud-ms-route-8001`.`biz_signed_point` c ON a.id = c.route_id " +
-            "WHERE a.enabled = 1 and b.enabled = 1 and c.enable = 1" +
-            "AND IF(#{waterUserOffice} is not null,  a.water_management_office = #{waterUserOffice},1=1)" +
+            "WHERE a.enabled = 1 and b.enabled = 1 and c.enabled = 1 " +
+            "AND IF(#{waterUserOffice} is not null,  a.water_management_office = #{waterUserOffice},1=1) " +
             "AND IF(#{routeName} is not null, a.route_name = #{routeName},1=1 ) " +
             "AND IF(#{routeType} is not null, a.route_type = #{routeType},1=1 ) " +
             "AND IF(#{pointInspectionType} is not null, a.point_inspection_type = #{pointInspectionType},1=1 ) " +
@@ -139,7 +139,7 @@ public interface BizSignPointMapper {
             "AND IF(#{signDateEnd} is not null, c.signed_time <= #{signDateEnd},1=1 ) " +
             "AND IF(#{signPointType} is not null, c.sign_point_type = #{signPointType},1=1 ) " +
             "AND IF(#{pipeDiameter} is not null, c.pipe_diameter = #{pipeDiameter},1=1 ) " +
-            "AND IF(#{signStatus} is not null, c.sign_status = #{signStatus},1=1 ) " +
+            "AND IF(#{signStatus} is not null, c.sign_point_status = #{signStatus},1=1 ) " +
             "AND IF(#{hiddenCode} is not null, c.trouble_code = #{hiddenCode},1=1 ) " +
             "ORDER BY c.modify_time DESC")
     List<HashMap<String,Object>> findCondition(SignPointQuery signPointQuery);

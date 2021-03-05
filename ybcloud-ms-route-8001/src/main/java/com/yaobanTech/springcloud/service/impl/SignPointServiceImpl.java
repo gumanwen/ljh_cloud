@@ -255,7 +255,7 @@ public class SignPointServiceImpl {
             if(signPointQuery.getTaskStart1() != null || signPointQuery.getTaskEnd1() != null||
                     signPointQuery.getTaskStart2() != null || signPointQuery.getTaskEnd2() != null || signPointQuery.getCheckMan() != null){
                 RespBean respBean = inspectService.getTaskIds(signPointQuery.getTaskStart1(), signPointQuery.getTaskEnd1(), signPointQuery.getTaskStart2(), signPointQuery.getTaskEnd2(),signPointQuery.getCheckMan());
-                List<HashMap<String,Object>> list = (List)respBean.getObj();
+                Object obj = respBean.getObj();
 
             }else{
                  maps = bizSignPointMapper.findCondition(signPointQuery);

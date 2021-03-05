@@ -2,7 +2,7 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://10.1.4.23:3306/ybcloud-ms-route-8001?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://192.168.0.144:3306/ybcloud-ms-route-8001?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
     username: root
     password: 123456
     type: com.alibaba.druid.pool.DruidDataSource
@@ -26,10 +26,10 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: 10.1.4.16:8848 #Nacos作为服务中心地址
-        ip: 10.1.4.16
+        server-addr: 192.168.0.144:8848 #Nacos作为服务中心地址
+        ip: 192.168.0.144
       config:
-        server-addr: 10.1.4.16:8848
+        server-addr: 192.168.0.144:8848
         file-extension: properties
         namespace: 8740fef6-e5cd-4bee-aa59-1982b454323e
         group: DEFAULT_GROUP
@@ -49,10 +49,10 @@ jpa:
 
 server:
   port: 8001
-  ip: 10.1.4.16
+  ip: 192.168.0.144
 
 ribbon:
   ConnectTimeout: 30000
   ReadTimeout: 7000
-qyserver:
-  ipAdd: http://119.135.180.178:8850/api/auth/user/get
+lcserver:
+  ipAdd: http://192.168.0.144:8850/api/auth/user/get

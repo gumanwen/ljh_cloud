@@ -128,6 +128,12 @@ public class BizHiddenDangerPointEntity {
    @Column(name = "commit_by" )
 	private String commitBy;
 
+   /**
+	 * 提交
+	 */
+   @Column(name = "opration" )
+	private String opration;
+
 	/**
 	 * 提交时间
 	 */
@@ -230,6 +236,14 @@ public class BizHiddenDangerPointEntity {
 		this.commitBy = commitBy;
 		this.commitDate = commitDate;
 		this.enabled = enabled;
+	}
+
+	public String getOpration() {
+		return opration;
+	}
+
+	public void setOpration(String opration) {
+		this.opration = opration;
 	}
 
 	public HashMap<String, Object> getHiddenDangerPointStatusEnum() {

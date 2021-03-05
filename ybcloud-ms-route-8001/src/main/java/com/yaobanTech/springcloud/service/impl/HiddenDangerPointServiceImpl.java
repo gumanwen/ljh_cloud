@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -215,6 +216,8 @@ public class HiddenDangerPointServiceImpl {
 
     @Transactional(propagation= Propagation.NOT_SUPPORTED)
     public RespBean findCondition(HiddenDangerPointQuery hiddenDangerPointQuery, HttpServletRequest request) throws UnsupportedEncodingException {
+        HashMap<String,Object> hashMap = new HashMap<>();
+        List<String> codeList = new ArrayList<>();
         List<BizHiddenDangerPointEntity> list = null;
         if(hiddenDangerPointQuery != null){
             LoginUser u = urlUtils.getAll(request);
@@ -233,7 +236,7 @@ public class HiddenDangerPointServiceImpl {
                     hiddenDangerPointEntity.setRiskLevelEnum(riskLevelEnum);
                     hiddenDangerPointEntity.setConstructionTypeEnum(constructionTypeEnum);
                     hiddenDangerPointEntity.setCommitByCN(chineseName);
-
+                    codeList.add(hiddenDangerPointEntity.getHiddenDangerPointCode());
 //                if(points.size()>0){
 //                    for(int j =0; j<points.size();j++){
 //                        //获取报建文件列表
@@ -253,11 +256,13 @@ public class HiddenDangerPointServiceImpl {
 //                    }
 //                }
                 }
+                hashMap.put("HiddenDangerPointList",list);
+                hashMap.put("CodeList",codeList);
             }
         }else {
             return RespBean.error("查询条件为空！");
         }
-        return RespBean.ok("查询成功！",list);
+        return RespBean.ok("查询成功！",hashMap);
     }
 
 }
