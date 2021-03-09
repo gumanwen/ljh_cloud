@@ -186,6 +186,13 @@ public class InspectController {
         return iInspectService.digui(gid);
     }
 
+    @ApiOperation("gis：生成网络")
+    @GetMapping("/create")
+    /*@Cacheable("cache1")*/
+    public RespBean create(){
+        return iInspectService.create();
+    }
+
     @ApiOperation("opnefeign:根据任务开始时间过滤任务编号")
     @GetMapping("/getTaskListByTime")
     public RespBean getTaskListByTime(Date  taskStart1,Date taskEnd1,Date taskStart2,Date taskEnd2,String checkMan){

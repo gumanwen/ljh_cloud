@@ -635,11 +635,19 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
     @Override
     public RespBean getTaskListByTime(Date begin_time1, Date begin_time2, Date dead_time1, Date dead_time2,String checkMan) {
         QueryWrapper<Inspect> queryWrapper = new QueryWrapper<>();
-        queryWrapper.apply(FieldUtils.isStringNotEmpty(dateFormat.format(begin_time1)),"convert(varchar(20),begin_time,20) >= convert(varchar(20),'"+begin_time1+"',20)");
-        queryWrapper.apply(FieldUtils.isStringNotEmpty(dateFormat.format(begin_time2)),"convert(varchar(20),begin_time,20) <= convert(varchar(20),'"+begin_time2+"',20)");
-        queryWrapper.apply(FieldUtils.isStringNotEmpty(dateFormat.format(dead_time1)),"convert(varchar(20),end_time,20) >= convert(varchar(20),'"+dead_time1+"',20)");
-        queryWrapper.apply(FieldUtils.isStringNotEmpty(dateFormat.format(dead_time2)),"convert(varchar(20),end_time,20) <= convert(varchar(20),'"+dead_time2+"',20)");
-        queryWrapper.eq("inspect_person",checkMan);
+        if(FieldUtils.isObjectNotEmpty(begin_time1)){
+            queryWrapper.apply(FieldUtils.isStringNotEmpty(dateFormat.format(begin_time1)),"convert(varchar(20),begin_time,20) >= convert(varchar(20),'"+begin_time1+"',20)");
+        }
+        if(FieldUtils.isObjectNotEmpty(begin_time2)){
+            queryWrapper.apply(FieldUtils.isStringNotEmpty(dateFormat.format(begin_time2)),"convert(varchar(20),begin_time,20) <= convert(varchar(20),'"+begin_time2+"',20)");
+        }
+        if(FieldUtils.isObjectNotEmpty(dead_time1)){
+            queryWrapper.apply(FieldUtils.isStringNotEmpty(dateFormat.format(dead_time1)),"convert(varchar(20),end_time,20) >= convert(varchar(20),'"+dead_time1+"',20)");
+        }
+        if(FieldUtils.isObjectNotEmpty(dead_time2)){
+            queryWrapper.apply(FieldUtils.isStringNotEmpty(dateFormat.format(dead_time2)),"convert(varchar(20),end_time,20) <= convert(varchar(20),'"+dead_time2+"',20)");
+        }
+         queryWrapper.eq("inspect_person",checkMan);
         List<Inspect> list = inspectMapper.selectList(queryWrapper);
         List<HashMap<String,Object>> result = new ArrayList<>();
         Iterator <Inspect> t = list.iterator();
@@ -658,30 +666,13 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         List<Test> result1 = new ArrayList<>();
         List<Test> result2 = new ArrayList<>();
         List<Test> result3 = new ArrayList<>();
-        /*result1 = digui(1562);
-        result3 =digui(1562);
-        result2 = digui(390);
-
-        for (int i = 0; i < result1.size(); i++) {
-            boolean flag = false;
-            for (int j = 0; j < result2.size(); j++) {
-                if(result1.get(i).getGid().equals(result2.get(j).getGid())){
-                    result3.remove(result1.get(i));
-                    flag = true;
-                }else{
-                }
-            }
-            if(!flag){
-                //System.out.println(result1.get(i).getGid());
-            }
-        }*/
         return RespBean.ok("").setObj(result3);
     }
 
     @Override
     public RespBean digui(Integer gid) {
         //1:查询出该gid对应的s/t
-        HashMap<String,Object> map = new HashMap<>();
+       /* HashMap<String,Object> map = new HashMap<>();
         List<Test> alllist = new ArrayList<>();
         HashSet<Test> oalllist = new HashSet<>();
         HashSet<Test> allnewlist = new HashSet<>();
@@ -702,8 +693,74 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         oalllist.removeAll(result);
         map.put("length",oalllist.size());
         map.put("list",oalllist);
-        System.out.println(oalllist.size());
-        return RespBean.ok("").setObj(map);
+        System.out.println(oalllist.size());*/
+        List<Test> alllist = new ArrayList<>();
+        //HashMap<String,Object> map = new HashMap<>();
+        alllist = testMapper.selectAllList(gid);
+        /*map.put("total",alllist.size());
+        map.put("list",alllist);*/
+        return RespBean.ok("").setObj(alllist);
+    }
+    //生成地图网络块
+    public RespBean create(){
+        List<Test> alllist = new ArrayList<>();
+        //排序查出表中的第一条数据
+        QueryWrapper<Test> queryWrapper = new QueryWrapper<>();
+        HashSet<Test> oalllist = new HashSet<>();
+        alllist = testMapper.selectList(queryWrapper);
+        for (int i = 0; i < alllist.size(); i++) {
+            oalllist.add(alllist.get(i));
+        }
+        return RespBean.ok("分析成功，一共生成"+createGeo(oalllist,0)+"条");
+    }
+    //传入alllist,然后递归算出一共生成几段网络
+    public Integer createGeo(HashSet<Test> alllist,int n){
+        HashSet<Test> oalllist = new HashSet<>();
+        List<Test> newlist = new ArrayList<>();
+        boolean flag = false;
+        if(!alllist.isEmpty()){
+            n+=1;
+            HashSet<Test> allnewlist = new HashSet<>();
+            HashSet<Test> list = new HashSet<>();
+            HashSet<Test> result = new HashSet<>();
+            Iterator <Test> t = alllist.iterator();
+            Test test = (Test) alllist.toArray()[0];
+            while(t.hasNext()){
+                Test tests = t.next();
+                if(!test.getGid().equals(tests.getGid())){
+                    allnewlist.add(tests);
+                }
+                oalllist.add(tests);
+            }
+            allnewlist.remove(test);
+            list.add(test);
+            result = func(allnewlist,list,list);
+            //更新数据库 update
+            Iterator <Test> te = result.iterator();
+            while(te.hasNext()){
+                Test tt = te.next();
+                tt.setSid(n);
+                newlist.add(tt);
+            }
+            if(newlist.size()<=1000){
+                testMapper.updateAll(newlist,n);
+            }else{
+                int m= (int) Math.floor(newlist.size()/1000);
+                for (int j = 0; j < m+1; j++) {
+                    List<Test>  temp = new ArrayList<>();
+                    for(int i =j*1000;i<(j+1)*1000 && i<newlist.size();i++ ){
+                        temp.add(newlist.get(i));
+                    }
+                    testMapper.updateAll(temp,n);
+                }
+            }
+            oalllist.removeAll(result);
+            flag =true;
+        }
+        if(flag){
+            createGeo(oalllist,n);
+        }
+        return 1;
     }
 
     //数组递归方法
@@ -711,11 +768,13 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         HashSet<Test> newlist = new HashSet<>();
         boolean flag = false;
         Iterator <Test> s = list.iterator();
+        Test tests = new Test();
+        Test test = new Test();
         while(s.hasNext()){
-            Test tests = s.next();
+            tests = s.next();
             Iterator <Test> t = alllist.iterator();
             while(t.hasNext()){
-                Test test = t.next();
+                test = t.next();
                 if(tests.getSource().equals(test.getTarget()) || tests.getTarget().equals(test.getSource())
                         ||tests.getTarget().equals(test.getTarget()) || tests.getSource().equals(test.getSource())){
                     flag = true;
@@ -724,24 +783,11 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                 }
             }
             alllist.removeAll(newlist);
-            //newlist.removeAll(olist);
         }
         if(flag){
             func(alllist,newlist,olist);
         }
         return olist;
-        //for (   i = 0; i < list.size(); i++) {
-        //第一次 ： list s:154 t:367
-            /*for (int j = 0; j < alllist.size(); j++) {
-                if(list.get(i).getTarget().equals(alllist.get(j).getTarget())||
-                        list.get(i).getSource().equals(alllist.get(j).getSource())||
-                        list.get(i).getSource().equals(alllist.get(j).getTarget())||
-                        list.get(i).getTarget().equals(alllist.get(j).getSource())){
-                    olist.add(alllist.get(j));
-                    newlist.add(alllist.get(j));
-                    flag = true;
-                }
-            }*/
     }
 
     //数据库递归方法
@@ -760,11 +806,5 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         }
         return olist;
     }
-    //生成地图网络块
-    public RespBean create(){
-        //排序查出表中的第一条数据
-        QueryWrapper<Test> queryWrapper = new QueryWrapper<>();
-        testMapper.selectList(queryWrapper);
-        return RespBean.ok("分析成功，一共生成"+"条");
-    }
+
 }

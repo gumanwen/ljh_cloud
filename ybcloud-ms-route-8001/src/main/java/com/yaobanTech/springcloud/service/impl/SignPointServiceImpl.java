@@ -250,6 +250,7 @@ public class SignPointServiceImpl {
     public RespBean findCondition(HashMap<String,Object> map) {
         SignPointQuery signPointQuery = null;
         List<HashMap<String, Object>> maps = null;
+        List<String> taskids = new ArrayList<>();
         List<HashMap<String, Object>> list = new ArrayList<>();
         if(map != null){
             signPointQuery = JSONObject.parseObject(JSONObject.toJSONString(map.get("form")), SignPointQuery.class);
@@ -257,9 +258,22 @@ public class SignPointServiceImpl {
                     signPointQuery.getTaskStart2() != null || signPointQuery.getTaskEnd2() != null || signPointQuery.getCheckMan() != null){
                 RespBean respBean = inspectService.getTaskIds(signPointQuery.getTaskStart1(), signPointQuery.getTaskEnd1(), signPointQuery.getTaskStart2(), signPointQuery.getTaskEnd2(),signPointQuery.getCheckMan());
                 list = (List<HashMap<String, Object>>) respBean.getObj();
-                for (int i = 0; i < list.size(); i++) {
-                    HashMap<String, Object> hashMap = list.get(i);
-
+                if(list.size()>0){
+                    for (int i = 0; i < list.size(); i++) {
+                        taskids.add((String) list.get(i).get("inspect_task_id"));
+                    }
+                }
+                signPointQuery.setTaskidList(taskids);
+                maps = bizSignPointMapper.findConditionElse(signPointQuery);
+                //根据查询结果查出巡查人
+                if(maps.size()>0){
+                    for (int i = 0; i < maps.size(); i++) {
+                        for (int j = 0; j < list.size(); j++) {
+                            if(maps.get(i).get("inspect_task_id").equals(list.get(j).get("inspect_task_id"))){
+                                maps.get(i).put("inspect_person",list.get(j).get("inspect_person"));
+                            }
+                        }
+                    }
                 }
             }else{
                  maps = bizSignPointMapper.findCondition(signPointQuery);
