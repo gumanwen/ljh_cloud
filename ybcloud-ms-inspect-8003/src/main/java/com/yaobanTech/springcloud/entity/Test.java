@@ -16,14 +16,15 @@ public class Test implements Serializable {
     private Integer gid;
     private Integer source;
     private Integer target;
-
+    private Integer sid;
     public Test() {
     }
 
-    public Test(Integer gid, Integer source, Integer target) {
+    public Test(Integer gid, Integer source, Integer target, Integer sid) {
         this.gid = gid;
         this.source = source;
         this.target = target;
+        this.sid = sid;
     }
 
     public Integer getGid() {
@@ -50,12 +51,11 @@ public class Test implements Serializable {
         this.target = target;
     }
 
-    @Override
-    public String toString() {
-        return "Test{" +
-                "gid=" + gid +
-                ", source=" + source +
-                ", target=" + target +
-                '}';
+    public Integer getSid() {
+        return sid;
+    }
+
+    public void setSid(Integer sid) {
+        this.sid = sid;
     }
 }

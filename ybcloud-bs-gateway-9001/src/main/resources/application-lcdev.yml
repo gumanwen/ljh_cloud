@@ -2,9 +2,9 @@ spring:
     autoconfigure:
         exclude: org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationAutoConfiguration
     datasource:
-        url: jdbc:sqlserver://192.168.50.169:1433;DatabaseName=kmtysw
+        url: jdbc:sqlserver://192.168.0.144:1433;DatabaseName=kmtysw
         username: sa
-        password: yaobanTech3131 #yaobanTech3131
+        password: yaoban #yaobanTech3131
         driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
         type: com.zaxxer.hikari.HikariDataSource
         hikari:
@@ -24,48 +24,45 @@ spring:
     cloud:
         nacos:
             discovery:
-                server-addr: 192.168.50.91:8848
-                ip: 192.168.50.169
+                server-addr: 192.168.0.144:8848
+                ip: 192.168.0.144
             config:
-                server-addr: 192.168.50.91:8848
+                server-addr: 192.168.0.144:8848
                 file-extension: properties
                 namespace: 8740fef6-e5cd-4bee-aa59-1982b454323e
                 group: DEFAULT_GROUP
         gateway:
-            discovery:
-                locator:
-                    enabled: true #动态路由
             routes:
                 - id: cs-auth
-                  uri: http://192.168.50.169:6003 #负载均衡 动态路由
+                  uri: http://192.168.0.144:6003 #负载均衡 动态路由
                   predicates:
                       - Path=/user/**
                 - id: cs-auth
-                  uri: http://192.168.50.169:6003 #负载均衡 动态路由
+                  uri: http://192.168.0.144:6003 #负载均衡 动态路由
                   predicates:
                       - Path=/oauth/**
                 - id: cs-activiti
-                  uri: http://192.168.50.169:6001 #负载均衡 动态路由
+                  uri: http://192.168.0.144:6001 #负载均衡 动态路由
                   predicates:
                       - Path=/api/activiti/**
                 - id: cs-file
-                  uri: http://192.168.50.169:6005 #负载均衡 动态路由
+                  uri: http://192.168.0.144:6005 #负载均衡 动态路由
                   predicates:
                       - Path=/api/file/**
                 - id: cs-file1
-                  uri: http://192.168.50.169:6005 #负载均衡 动态路由
+                  uri: http://192.168.0.144:6005 #负载均衡 动态路由
                   predicates:
                       - Path=/file/**
                 - id: ms-route
-                  uri: http://192.168.50.91:8001 #负载均衡 动态路由
+                  uri: http://192.168.0.144:8001 #负载均衡 动态路由
                   predicates:
                       - Path=/api/route/**
                 - id: ms-plan
-                  uri: http://192.168.50.91:8002 #负载均衡 动态路由
+                  uri: http://192.168.0.144:8002 #负载均衡 动态路由
                   predicates:
                       - Path=/api/plan/**
                 - id: ms-inspect
-                  uri: http://192.168.50.169:8003 #负载均衡 动态路由
+                  uri: http://192.168.0.144:8003 #负载均衡 动态路由
                   predicates:
                       - Path=/api/inspect/**
 mybatis:
@@ -75,32 +72,23 @@ mybatis:
         call-setters-on-nulls: true
 server:
     port: 8888
+ribbon:
+    ConnectTimeout: 30000
+    ReadTimeout: 7000
+    eureka:
+        enabled: true
 ########资源服务器oauth2配置 - 此配置暂时不使用,在代码和数据库中已经存在########################################
 security:
     oauth2:
         client:
             client-id: demo-client
             client-secret: demo-secret
-            user-authorization-uri: http://192.168.50.91:6003/oauth/authorize
-            access-token-uri: http://192.168.50.91:6003/oauth/token
+            user-authorization-uri: http://192.168.0.144:6003/oauth/authorize
+            access-token-uri: http://192.168.0.144:6003/oauth/token
             resource:
             jwt:
-                key-uri: http://192.168.50.91:6003/oauth/token_key
+                key-uri: http://192.168.0.144:6003/oauth/token_key
                 key-value: demo
             authorization:
-            check-token-access: http://192.168.50.91:6003/oauth/check_token
+            check-token-access: http://192.168.0.144:6003/oauth/check_token
 ########资源服务器oauth2配置 - 此配置暂时不使用,在代码和数据库中已经存在########################################
-ribbon:
-    ConnectTimeout: 30000
-    ReadTimeout: 7000
-eureka:
-    client:
-        fetch-registry: true
-        register-with-eureka: true
-        service-url:
-            defaultZone: http://user:password@218.17.45.99:18861/eureka
-    instance:
-        hostname: 47.92.144.224
-        prefer-ip-address: true
-        instance-id: 47.92.144.224:9000
-        ip-address: 47.92.144.224

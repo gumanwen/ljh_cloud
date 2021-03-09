@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yaobanTech.springcloud.mapper.TestMapper">
+
+    <update id="updateAll" parameterType="java.util.HashMap">
+        update biz_test set sid = #{n}
+        where gid in
+        <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+           #{item.gid}
+        </foreach>
+    </update>
+    <select id="selectAllList" resultType="java.util.HashMap">
+        select gid,sid from biz_test where sid = (select sid from biz_test where gid =#{gid})
+    </select>
+</mapper>

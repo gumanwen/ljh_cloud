@@ -64,4 +64,5 @@ public interface IInspectService extends IService<Inspect> {
 
     RespBean bijiao(Integer gid);
 
+    RespBean create();
 }
