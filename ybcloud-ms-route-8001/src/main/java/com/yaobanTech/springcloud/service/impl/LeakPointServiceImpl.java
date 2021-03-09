@@ -18,10 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class LeakPointServiceImpl {
@@ -92,8 +89,8 @@ public class LeakPointServiceImpl {
     @Transactional
     public RespBean updateBizLeakPointEntity(HashMap<String,Object> param) {
         BizLeakPointEntity bizLeakPointEntity = null;
-        if(!param.isEmpty() && param.get("form") != null) {
-            bizLeakPointEntity = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizLeakPointEntity.class);
+        if(!param.isEmpty()) {
+            bizLeakPointEntity = JSONObject.parseObject(JSONObject.toJSONString(param), BizLeakPointEntity.class);
             if(bizLeakPointEntity.getId() != null){
             try {
                 leakPointRepository.save(bizLeakPointEntity);
@@ -196,7 +193,9 @@ public class LeakPointServiceImpl {
 
     @Transactional(propagation= Propagation.NOT_SUPPORTED)
      public RespBean findCondition(LeakPointQuery leakPointQuery,HttpServletRequest request) throws UnsupportedEncodingException {
-        List<BizLeakPointEntity> list = null;
+        HashMap<String,Object> hashMap = new HashMap<>();
+        List<String> codeList = new ArrayList<>();
+        List<BizLeakPointEntity> list = new ArrayList<>();
         if(leakPointQuery != null){
             LoginUser u = urlUtils.getAll(request);
             String user = u.getLoginname();
@@ -210,6 +209,7 @@ public class LeakPointServiceImpl {
                     bizLeakPointEntity.setCommitByCN(chineseName);
                     bizLeakPointEntity.setLeakPointStatusEnum(leakPointStatusEnum);
                     bizLeakPointEntity.setAbnormalPhenomenaEnum(abnormalPhenomenaEnum);
+                    codeList.add(bizLeakPointEntity.getLeakPointCode());
 //                if(points.size()>0){
 //                    for(int j =0; j<points.size();j++){
 //                        //获取报建文件列表
@@ -229,11 +229,13 @@ public class LeakPointServiceImpl {
 //                    }
 //                }
                 }
+                hashMap.put("LeakPointList",list);
+                hashMap.put("CodeList",codeList);
             }
        }else {
             return RespBean.error("查询条件为空！");
         }
-        return RespBean.ok("查询成功！",list);
+        return RespBean.ok("查询成功！",hashMap);
     }
 
 }

@@ -250,13 +250,17 @@ public class SignPointServiceImpl {
     public RespBean findCondition(HashMap<String,Object> map) {
         SignPointQuery signPointQuery = null;
         List<HashMap<String, Object>> maps = null;
+        List<HashMap<String, Object>> list = new ArrayList<>();
         if(map != null){
             signPointQuery = JSONObject.parseObject(JSONObject.toJSONString(map.get("form")), SignPointQuery.class);
             if(signPointQuery.getTaskStart1() != null || signPointQuery.getTaskEnd1() != null||
                     signPointQuery.getTaskStart2() != null || signPointQuery.getTaskEnd2() != null || signPointQuery.getCheckMan() != null){
                 RespBean respBean = inspectService.getTaskIds(signPointQuery.getTaskStart1(), signPointQuery.getTaskEnd1(), signPointQuery.getTaskStart2(), signPointQuery.getTaskEnd2(),signPointQuery.getCheckMan());
-                List<HashMap<String,Object>> list = (List)respBean.getObj();
+                list = (List<HashMap<String, Object>>) respBean.getObj();
+                for (int i = 0; i < list.size(); i++) {
+                    HashMap<String, Object> hashMap = list.get(i);
 
+                }
             }else{
                  maps = bizSignPointMapper.findCondition(signPointQuery);
             }

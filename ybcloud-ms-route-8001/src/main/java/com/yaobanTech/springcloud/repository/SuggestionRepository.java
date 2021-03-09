@@ -15,7 +15,7 @@ public interface SuggestionRepository extends JpaRepository<BizSuggestionEntity,
     void deleteBizSuggestionEntity(Integer id);
 
     @Query(value = " from BizSuggestionEntity t where t.enabled = 1 and t.id = ?1")
-    BizSuggestionEntity findBizSuggestionEntity(Integer id);
+    List<BizSuggestionEntity> findBizSuggestionEntity(Integer id);
 
     @Query(value = " from BizSuggestionEntity t where t.enabled = 1 and t.fCode = ?1")
     List<BizSuggestionEntity> findList(String fCode);

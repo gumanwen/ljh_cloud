@@ -81,7 +81,7 @@ public class SignPointController {
 
     @ApiOperation("条件查询签到点")
     @PostMapping("findCondition")
-    public RespBean findCondition(@RequestParam HashMap<String,Object> map){
+    public RespBean findCondition(@RequestBody HashMap<String,Object> map){
         return signPointService.findCondition(map);
     }
 }

@@ -40,7 +40,7 @@ public class SuggestServiceImpl {
     @Lazy
     private UrlUtils urlUtils;
 
-    @GlobalTransactional
+    @Transactional
     public RespBean saveSuggestion(HashMap<String,Object> param,HttpServletRequest request) {
         BizSuggestionEntity bizSuggestionEntity = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizSuggestionEntity.class);
         if(bizSuggestionEntity != null && bizSuggestionEntity.getFCode() != null) {
@@ -104,14 +104,17 @@ public class SuggestServiceImpl {
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public RespBean findDetail(Integer id,HttpServletRequest request) {
-        BizSuggestionEntity bse = null;
+        List<BizSuggestionEntity> list = null;
         if(id != null) {
             try {
-                bse = suggestionRepository.findBizSuggestionEntity(id);
-                if(bse != null){
-                    LoginUser u = urlUtils.getAll(request);
-                    String chineseName = u.getName();
-                    bse.setCommitBy(chineseName);
+                list = suggestionRepository.findBizSuggestionEntity(id);
+                LoginUser u = urlUtils.getAll(request);
+                String chineseName = u.getName();
+                if(!list.isEmpty()){
+                    for (int i = 0; i < list.size(); i++) {
+                        BizSuggestionEntity suggestionEntity = list.get(i);
+                        suggestionEntity.setCommitBy(chineseName);
+                    }
                 }
 
             } catch (Exception e) {
@@ -121,7 +124,7 @@ public class SuggestServiceImpl {
         }else{
             return RespBean.error("id为空！");
         }
-        return RespBean.ok("查询成功！",bse);
+        return RespBean.ok("查询成功！",list);
     }
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)

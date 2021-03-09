@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Date;
 
-@FeignClient(value ="InspectService")
+@FeignClient(value ="inspectService")
 public interface InspectService {
 
     @GetMapping("/api/inspect/getTaskListByTime")

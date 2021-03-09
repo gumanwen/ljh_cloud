@@ -1,23 +1,8 @@
 #druid监控台配置信息，主要用作sql监控，还能用来监控url等
-#druid:
-#  allow:
-#    ip: 127.0.0.1
-#  login:
-#    user_name: root
-#    password: root
 spring:
-  cloud:
-    nacos:
-      config:
-        server-addr: 192.168.99.1:8848
-        file-extension: yml
-        namespace: 8740fef6-e5cd-4bee-aa59-1982b454323e
-        group: DEFAULT_GROUP
-  main:
-    allow-bean-definition-overriding: true
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.50.91:3306/ybcloud-ms-route-8001?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://192.168.0.144:3306/ybcloud-ms-route-8001?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
     username: root
     password: 123456
     type: com.alibaba.druid.pool.DruidDataSource
@@ -38,18 +23,36 @@ spring:
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
   application:
     name: routeService
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.0.144:8848 #Nacos作为服务中心地址
+        ip: 192.168.0.144
+      config:
+        server-addr: 192.168.0.144:8848
+        file-extension: properties
+        namespace: 8740fef6-e5cd-4bee-aa59-1982b454323e
+        group: DEFAULT_GROUP
 mybatis:
   #mapper-locations: classpath:mapping/*Mapper.xml
   #type-aliases-package: com.yaoban.kmsw.pojos
   configuration:
     call-setters-on-nulls: true
     map-underscore-to-camel-case: true
+jpa:
+  show-sql: true
+  database-platform: org.hibernate.dialect.SQLServerDialect
+  hibernate:
+    ddl-auto: none
+    naming:
+      physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 
 server:
   port: 8001
+  ip: 192.168.0.144
 
 ribbon:
   ConnectTimeout: 30000
   ReadTimeout: 7000
-qyserver:
-  ipAdd: http://218.17.45.99:8850/api/auth/user/get
+lcserver:
+  ipAdd: http://192.168.0.144:8850/api/auth/user/get

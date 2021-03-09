@@ -16,7 +16,7 @@ public interface BizLeakPointRepository extends JpaRepository<BizLeakPointEntity
     void deleteBizLeakPointEntity(Integer id);
 
     @Modifying
-    @Query("update BizLeakPointEntity t set t.leakPointStatus = '已跟进' where t.leakPointCode = ?1")
+    @Query("update BizLeakPointEntity t set t.leakPointStatus = 54 where t.leakPointCode = ?1")
     void updateBizLeakPoint(String leakPointCode);
 
     @Modifying

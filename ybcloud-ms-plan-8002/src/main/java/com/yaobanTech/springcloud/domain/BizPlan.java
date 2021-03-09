@@ -171,6 +171,12 @@ public class BizPlan  implements Serializable {
     @Transient
 	private Map<String,Object> planStatusMenu;
 
+	/**
+	 * 附件
+	 */
+	@Transient
+	private Map<String,Object> attachment;
+
     /**
 	 * 计划制定人
 	 */
@@ -199,6 +205,14 @@ public class BizPlan  implements Serializable {
 		this.routeId = routeId;
 		this.mainKey = mainKey;
 		this.troubleCode = troubleCode;
+	}
+
+	public Map<String, Object> getAttachment() {
+		return attachment;
+	}
+
+	public void setAttachment(Map<String, Object> attachment) {
+		this.attachment = attachment;
 	}
 
 	public String getPlanCreatedByCN() {

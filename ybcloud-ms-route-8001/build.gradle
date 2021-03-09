@@ -28,8 +28,6 @@ dependencies {
     compile group: 'io.seata', name: 'seata-server', version: '0.7.1'
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: '2.3.5.RELEASE'
-    // https://mvnrepository.com/artifact/com.bstek.ureport/ureport2-console
-    implementation group: 'com.bstek.ureport', name: 'ureport2-console', version: '2.2'
 
 
     testImplementation('org.springframework.boot:spring-boot-starter-test') {

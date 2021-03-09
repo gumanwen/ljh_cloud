@@ -38,6 +38,7 @@ mybatis:
   #type-aliases-package: com.yaoban.kmsw.pojos
   configuration:
     call-setters-on-nulls: true
+    map-underscore-to-camel-case: true
 jpa:
   show-sql: true
   database-platform: org.hibernate.dialect.SQLServerDialect
