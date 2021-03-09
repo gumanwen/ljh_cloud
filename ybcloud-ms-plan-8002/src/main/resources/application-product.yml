@@ -43,6 +43,7 @@ mybatis:
   #type-aliases-package: com.yaoban.kmsw.pojos
   configuration:
     call-setters-on-nulls: true
+    map-underscore-to-camel-case: true
 
 server:
   port: 8002
