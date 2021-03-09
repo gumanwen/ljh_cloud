@@ -6,6 +6,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -175,7 +177,7 @@ public class BizPlan  implements Serializable {
 	 * 附件
 	 */
 	@Transient
-	private Map<String,Object> attachment;
+	private List<HashMap<String,Object>> attachment;
 
     /**
 	 * 计划制定人
@@ -207,11 +209,11 @@ public class BizPlan  implements Serializable {
 		this.troubleCode = troubleCode;
 	}
 
-	public Map<String, Object> getAttachment() {
+	public List<HashMap<String, Object>> getAttachment() {
 		return attachment;
 	}
 
-	public void setAttachment(Map<String, Object> attachment) {
+	public void setAttachment(List<HashMap<String, Object>> attachment) {
 		this.attachment = attachment;
 	}
 

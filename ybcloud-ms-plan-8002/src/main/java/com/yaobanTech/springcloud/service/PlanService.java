@@ -9,6 +9,7 @@ import com.yaobanTech.springcloud.domain.enumDef.EnumMenu;
 import com.yaobanTech.springcloud.repository.BizPlanMapper;
 import com.yaobanTech.springcloud.repository.BizPlanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -33,6 +34,10 @@ public class PlanService {
     @Autowired
     @Lazy
     private RouteService routeService;
+
+    @Autowired
+    @Lazy
+    private FileService fileService;
 
     @Autowired
     @Lazy
@@ -220,6 +225,14 @@ public class PlanService {
                 throw new RuntimeException("Feign调用路线服务失败！");
             }
             bp.setRouteObj(o);
+
+            //获取报建文件列表
+                respBean = fileService.selectOneByPid(String.valueOf((Integer) bp.getRouteId()), "qddfj");
+                List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) respBean.getObj();
+                if(respBean.getStatus() == 500){
+                    throw new RuntimeException("Feign调用文件服务失败");
+                }
+                bp.setAttachment(fileList);
             return RespBean.ok("查询成功！", bp);
         }
         return RespBean.ok("查询成功！", bp);
