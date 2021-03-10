@@ -1,6 +1,7 @@
 package com.yaobanTech.springcloud.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.yaobanTech.springcloud.ToolUtils.DateFormatUtils;
 import com.yaobanTech.springcloud.ToolUtils.UrlUtils;
 import com.yaobanTech.springcloud.domain.*;
 import com.yaobanTech.springcloud.repository.BizHiddenDangerPointRepository;
@@ -77,9 +78,9 @@ public class HiddenDangerPointServiceImpl {
                 /*if(oauthService.getCurrentUser(token).getStatus() == 500){
                     throw new RuntimeException("Feign调用权限服务失败");
                 }*/
-                bizHiddenDangerPointEntity.setCommitDate(new Date());
+                bizHiddenDangerPointEntity.setCommitDate(DateFormatUtils.DateToStr(new Date()));
                 bizHiddenDangerPointEntity.setEnabled(1);
-                bizHiddenDangerPointEntity.setHiddenDangerStatus("未跟进");
+                bizHiddenDangerPointEntity.setHiddenDangerStatus("53");
                 bizHiddenDangerPointEntity.setCommitBy(user);
                 bizHiddenDangerPointEntity.setHiddenDangerPointCode(hiddenDangerPointCode);
                hiddenDangerPointRepository.save(bizHiddenDangerPointEntity);

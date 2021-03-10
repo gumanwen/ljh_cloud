@@ -128,10 +128,10 @@ public class RedisService {
 
         // 拼接的字符串
         StringBuffer sb = new StringBuffer();
-//        // 当前日期
-//        Date date = new Date();
-//        // 自定义前缀
-//        sb.append(prefix);
+        // 当前日期
+        Date date = new Date();
+        // 自定义前缀
+        sb.append(prefix);
 //        if (date != null) {
 //            DateFormat df = new SimpleDateFormat("yyyyMMdd");
 //            sb.append(df.format(date));

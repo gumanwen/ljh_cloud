@@ -106,4 +106,10 @@ public class PlanController {
         return planService.findCondition(routeName,waterManagementOffice,planPorid,planType,startTimeOfPCT,endTimeOfPCT,startTimeOfPST,endTimeOfPST,startTimeOfPET,endTimeOfPET,request);
     }
 
+    @ApiOperation("计划审核")
+    @GetMapping("examine")
+    public RespBean examinePlan(@RequestParam Integer id,@RequestParam String status) {
+        return planService.examinePlan(id,status);
+    }
+
 }

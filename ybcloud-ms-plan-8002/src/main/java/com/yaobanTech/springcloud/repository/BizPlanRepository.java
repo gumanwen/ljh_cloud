@@ -17,6 +17,10 @@ public interface BizPlanRepository extends JpaRepository<BizPlan,Integer>, JpaSp
     @Query("update BizPlan t set t.enabled = 0 where t.id = ?1")
     void deletePlan(Integer id);
 
+    @Modifying
+    @Query("update BizPlan t set t.planStatus = ?2 where t.id = ?1")
+    void examinePlan(Integer id,String status);
+
     @Query("select t.routeId from  BizPlan t where t.id = ?1")
     Integer findRouteId(Integer planId);
 

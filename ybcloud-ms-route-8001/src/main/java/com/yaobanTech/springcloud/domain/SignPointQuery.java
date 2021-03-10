@@ -21,12 +21,12 @@ public class SignPointQuery {
     private String signStatus;
     private String mainKey;
     private String hiddenCode;
-    private List<String> taskidList;
+    private String taskidList;
 
     public SignPointQuery() {
     }
 
-    public SignPointQuery(String waterUserOffice, String routeName, String routeType, String pointInspectionType, String planName, String checkMan, Date taskStart1, Date taskEnd1, Date taskStart2, Date taskEnd2, Date signDateStart, Date signDateEnd, String signPointType, String pipeDiameter, String signStatus, String mainKey, String hiddenCode, List<String> taskidList) {
+    public SignPointQuery(String waterUserOffice, String routeName, String routeType, String pointInspectionType, String planName, String checkMan, Date taskStart1, Date taskEnd1, Date taskStart2, Date taskEnd2, Date signDateStart, Date signDateEnd, String signPointType, String pipeDiameter, String signStatus, String mainKey, String hiddenCode, String taskidList) {
         this.waterUserOffice = waterUserOffice;
         this.routeName = routeName;
         this.routeType = routeType;
@@ -47,11 +47,11 @@ public class SignPointQuery {
         this.taskidList = taskidList;
     }
 
-    public List<String> getTaskidList() {
+    public String getTaskidList() {
         return taskidList;
     }
 
-    public void setTaskidList(List<String> taskidList) {
+    public void setTaskidList(String taskidList) {
         this.taskidList = taskidList;
     }
 

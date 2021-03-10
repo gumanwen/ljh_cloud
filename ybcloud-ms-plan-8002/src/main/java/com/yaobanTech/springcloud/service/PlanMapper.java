@@ -36,5 +36,5 @@ public interface PlanMapper {
                    @Result(column="main_key", property="mainKey", jdbcType= JdbcType.VARCHAR),
                    @Result(column="trouble_code", property="troubleCode", jdbcType= JdbcType.VARCHAR)
            })
-   List<BizPlan> findAll(String user);
+   List<BizPlan>  findAll(String user);
 }

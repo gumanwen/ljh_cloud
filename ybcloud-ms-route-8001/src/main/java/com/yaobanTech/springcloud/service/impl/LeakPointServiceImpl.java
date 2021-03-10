@@ -1,6 +1,7 @@
 package com.yaobanTech.springcloud.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.yaobanTech.springcloud.ToolUtils.DateFormatUtils;
 import com.yaobanTech.springcloud.ToolUtils.UrlUtils;
 import com.yaobanTech.springcloud.domain.BizLeakPointEntity;
 import com.yaobanTech.springcloud.domain.LeakPointQuery;
@@ -56,13 +57,13 @@ public class LeakPointServiceImpl {
             try {
                 String leakPointCode = null;
                 if("3".equals(bizLeakPointEntity.getWaterUseOffice())){
-                    leakPointCode =redisService.createGenerateCode("漏点","CNL",true,6);
+                    leakPointCode =redisService.createGenerateCode("漏点","CNL",true,4);
                 }
                 else if("4".equals(bizLeakPointEntity.getWaterUseOffice())){
-                    leakPointCode =redisService.createGenerateCode("漏点","CBL",true,6);
+                    leakPointCode =redisService.createGenerateCode("漏点","CBL",true,4);
                 }
                 else if("5".equals(bizLeakPointEntity.getWaterUseOffice())){
-                    leakPointCode =redisService.createGenerateCode("漏点","SJL",true,6);
+                    leakPointCode =redisService.createGenerateCode("漏点","SJL",true,4);
                 }else{
                     return RespBean.error("用水管理所参数不符合系统约定，生成编号异常！");
                 }
@@ -70,10 +71,10 @@ public class LeakPointServiceImpl {
                 String token =  StringUtils.substringAfter(header, "Bearer ");
                 LoginUser u = urlUtils.getAll(request);
                 String user = u.getLoginname();
-                bizLeakPointEntity.setCommitDate(new Date());
+                bizLeakPointEntity.setCommitDate(DateFormatUtils.DateToStr(new Date()));
                 bizLeakPointEntity.setEnabled(1);
                 bizLeakPointEntity.setCommitBy(user);
-                bizLeakPointEntity.setLeakPointStatus("未跟进");
+                bizLeakPointEntity.setLeakPointStatus("53");
                 bizLeakPointEntity.setLeakPointCode(leakPointCode);
                 leakPointRepository.save(bizLeakPointEntity);
             } catch (Exception e) {
@@ -165,27 +166,12 @@ public class LeakPointServiceImpl {
                 BizLeakPointEntity bizLeakPointEntity = list.get(i);
                 HashMap<String,Object> leakPointStatusEnum = (HashMap)routeService.findEnum(bizLeakPointEntity.getLeakPointStatus()).getObj();
                 HashMap<String,Object> abnormalPhenomenaEnum = (HashMap)routeService.findEnum(bizLeakPointEntity.getAbnormalPhenomena()).getObj();
+                HashMap<String,Object> assetTypeEnum = (HashMap)routeService.findEnum(bizLeakPointEntity.getAssetType()).getObj();
+
                 bizLeakPointEntity.setCommitByCN(chineseName);
                 bizLeakPointEntity.setLeakPointStatusEnum(leakPointStatusEnum);
                 bizLeakPointEntity.setAbnormalPhenomenaEnum(abnormalPhenomenaEnum);
-//                if(points.size()>0){
-//                    for(int j =0; j<points.size();j++){
-//                        //获取报建文件列表
-//                        if(FieldUtils.isObjectNotEmpty(points.get(j).getFileType())) {
-//                            RespBean respBean = fileService.selectOneByPid(String.valueOf((Integer) points.get(j).getId()), (String) points.get(j).getFileType());
-//                            List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) respBean.getObj();
-//                            if(respBean.getStatus() == 500){
-//                                throw new RuntimeException("Feign调用文件服务失败");
-//                            }
-//                            Map signPointTypeEnum = (Map) EnumMenu.findEnum(points.get(j).getSignPointType()).getObj();
-//                            points.get(j).setFileList(fileList);
-//                            points.get(j).setWaterUseOfficeEnum(waterManagementOfficeEnum);
-//                            points.get(j).setSignPointTypeEnum(pointInspectionTypeEnum);
-//                            points.get(j).setRouteTypeEnum(routeTypeEnum);
-//                        }
-//                        list.add(points.get(j));
-//                    }
-//                }
+                bizLeakPointEntity.setAssetTypeEnum(assetTypeEnum);
             }
         }
         return RespBean.ok("查询成功！",list);

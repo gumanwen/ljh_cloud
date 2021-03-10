@@ -5,7 +5,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(value ="auth2Service",fallback = OauthServiceFallBack.class)
+@FeignClient(value ="auth2Service")
 public interface OauthService {
 
     @GetMapping("/user/userRight/getNameByUsername")
