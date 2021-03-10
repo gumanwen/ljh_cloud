@@ -204,5 +204,18 @@ public class InspectController {
     public RespBean bijiao(Integer gid){
         return iInspectService.bijiao(gid);
     }
+
+    @ApiOperation("web：巡查统计")
+    @GetMapping("/inspectStatistics")
+    public RespBean inspectStatistics(){
+        return iInspectService.inspectStatistics();
+    }
+
+    @ApiOperation("/上传GPS坐标")
+    @PostMapping("/uploadGPS")
+    public RespBean uploadGPS(@RequestBody Map<String, Object> params){
+        return iInspectService.uploadGPS(params);
+    }
+
 }
 

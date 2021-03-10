@@ -2,7 +2,7 @@ spring:
     datasource:
         url: jdbc:sqlserver://192.168.0.144:1433;DatabaseName=ybcloud-cs-auth-6002
         username: sa
-        password: yaoban #yaobanTech3131
+        password: yaobanTech3131 #yaobanTech3131
         driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
         type: com.zaxxer.hikari.HikariDataSource
         hikari:

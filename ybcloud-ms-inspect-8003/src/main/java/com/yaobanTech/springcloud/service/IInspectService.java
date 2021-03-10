@@ -65,4 +65,8 @@ public interface IInspectService extends IService<Inspect> {
     RespBean bijiao(Integer gid);
 
     RespBean create();
+
+    RespBean inspectStatistics();
+
+    RespBean uploadGPS(Map<String, Object> params);
 }

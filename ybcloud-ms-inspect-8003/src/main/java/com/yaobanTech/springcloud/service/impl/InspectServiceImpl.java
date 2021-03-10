@@ -11,10 +11,12 @@ import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
 import com.yaobanTech.springcloud.entity.Inspect;
 import com.yaobanTech.springcloud.entity.LoginUser;
 import com.yaobanTech.springcloud.entity.Test;
+import com.yaobanTech.springcloud.entity.Track;
 import com.yaobanTech.springcloud.entity.utils.RedisGeneratorCode;
 import com.yaobanTech.springcloud.entity.utils.RespBean;
 import com.yaobanTech.springcloud.mapper.InspectMapper;
 import com.yaobanTech.springcloud.mapper.TestMapper;
+import com.yaobanTech.springcloud.mapper.TrackMapper;
 import com.yaobanTech.springcloud.service.IInspectService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yaobanTech.springcloud.service.feign.*;
@@ -56,6 +58,8 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
     @Autowired
     private InspectMapper inspectMapper;
 
+    @Autowired
+    private TrackMapper trackMapper;
 
     @Autowired
     private TestMapper testMapper;
@@ -298,7 +302,9 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
             Map<String, Object> map3 = new HashMap<String, Object>();
             //创建对象
             QueryWrapper<Inspect> queryWrapper = new QueryWrapper<>();
+            QueryWrapper<Track> query = new QueryWrapper<>();
             Inspect inspect = inspectMapper.selectOne(queryWrapper.eq("inspect_task_id",inspect_task_id));
+            query.eq("inspect_task_id",inspect_task_id);
             if(FieldUtils.isObjectNotEmpty(inspect)){
                 if(FieldUtils.isObjectNotEmpty(inspect.getRouteId())){
                     map2 = (Map<String, Object>) routeService.findDetail(inspect.getRouteId()).getObj();
@@ -318,6 +324,9 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                 if(FieldUtils.isObjectNotEmpty(map1)){
                     combineResultMap.putAll(map1);
                 }
+                //根据任务编号查出gps轨迹
+                List<Track> tracklist = trackMapper.selectList(query);
+                combineResultMap.put("tracklist",tracklist);
                 return RespBean.ok("").setObj(combineResultMap);
             }
             return RespBean.ok("数据信息有误！").setObj("");
@@ -642,10 +651,10 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
             queryWrapper.apply(FieldUtils.isStringNotEmpty(dateFormat.format(begin_time2)),"convert(varchar(20),begin_time,20) <= convert(varchar(20),'"+begin_time2+"',20)");
         }
         if(FieldUtils.isObjectNotEmpty(dead_time1)){
-            queryWrapper.apply(FieldUtils.isStringNotEmpty(dateFormat.format(dead_time1)),"convert(varchar(20),end_time,20) >= convert(varchar(20),'"+dead_time1+"',20)");
+            queryWrapper.apply(FieldUtils.isStringNotEmpty(dateFormat.format(dead_time1)),"convert(varchar(20),dead_time,20) >= convert(varchar(20),'"+dead_time1+"',20)");
         }
         if(FieldUtils.isObjectNotEmpty(dead_time2)){
-            queryWrapper.apply(FieldUtils.isStringNotEmpty(dateFormat.format(dead_time2)),"convert(varchar(20),end_time,20) <= convert(varchar(20),'"+dead_time2+"',20)");
+            queryWrapper.apply(FieldUtils.isStringNotEmpty(dateFormat.format(dead_time2)),"convert(varchar(20),dead_time,20) <= convert(varchar(20),'"+dead_time2+"',20)");
         }
          queryWrapper.eq("inspect_person",checkMan);
         List<Inspect> list = inspectMapper.selectList(queryWrapper);
@@ -713,6 +722,28 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         }
         return RespBean.ok("分析成功，一共生成"+createGeo(oalllist,0)+"条");
     }
+
+    @Override
+    public RespBean inspectStatistics() {
+        return null;
+    }
+
+    @Override
+    public RespBean uploadGPS(Map<String, Object> params) {
+        if(FieldUtils.isObjectNotEmpty(params)){
+            Track track = JSONObject.parseObject(JSONObject.toJSONString(params), Track.class);
+            //创建对象
+            if(FieldUtils.isStringNotEmpty(track.getInspectTaskId())){
+                trackMapper.insert(track);
+                return RespBean.ok("修改成功！").setObj(track);
+            }else{
+                return RespBean.error("缺少任务编号！");
+            }
+        }else{
+            return RespBean.error("map参数为空!");
+        }
+    }
+
     //传入alllist,然后递归算出一共生成几段网络
     public Integer createGeo(HashSet<Test> alllist,int n){
         HashSet<Test> oalllist = new HashSet<>();
