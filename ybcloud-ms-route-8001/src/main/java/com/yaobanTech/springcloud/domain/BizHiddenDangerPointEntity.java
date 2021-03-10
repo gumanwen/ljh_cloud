@@ -1,16 +1,13 @@
 package com.yaobanTech.springcloud.domain;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.format.annotation.DateTimeFormat;
-
 import javax.persistence.*;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 /**
  * @Description  
- * @Author  浣滆�呭悕绉癨n * @Date 2021-01-22 11:25:28 
+ * @Author  yuxy
+ * * @Date 2021-01-22 11:25:28
  */
 
 @Entity
@@ -137,13 +134,7 @@ public class BizHiddenDangerPointEntity {
 	/**
 	 * 提交时间
 	 */
-	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(
-			pattern = "yyyy-MM-dd HH:mm:ss",
-			timezone = "GMT+8"
-	)
-   @Column(name = "commit_date" )
-	private Date commitDate;
+	private String commitDate;
 
 	/**
 	 * 是否有效
@@ -160,13 +151,8 @@ public class BizHiddenDangerPointEntity {
 	/**
 	 * 结束时间
 	 */
-	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(
-			pattern = "yyyy-MM-dd HH:mm:ss",
-			timezone = "GMT+8"
-	)
 	@Column(name = "end_date" )
-	private Date endDate;
+	private String endDate;
 
 	/**
 	 * 隐患时长
@@ -215,7 +201,7 @@ public class BizHiddenDangerPointEntity {
 	public BizHiddenDangerPointEntity() {
 	}
 
-	public BizHiddenDangerPointEntity(Integer id, String hiddenDangerPointCode, Integer routeId, String waterUseOffice, String projectName, String constructionPosition, String buildCompany, String buildCompanyAgent, String buildCompanyAgentPhone, String constructionCompany, String constructionCompanyAgentPhone, String networkSize, String projectType, String constructionType, String riskLevel, String networkNotification, String memo, String commitBy, Date commitDate, Integer enabled) {
+	public BizHiddenDangerPointEntity(Integer id, String hiddenDangerPointCode, Integer routeId, String waterUseOffice, String projectName, String constructionPosition, String buildCompany, String buildCompanyAgent, String buildCompanyAgentPhone, String constructionCompany, String constructionCompanyAgentPhone, String networkSize, String projectType, String constructionType, String riskLevel, String networkNotification, String memo, String commitBy, String opration, String commitDate, Integer enabled, String hiddenDangerStatus, String endDate, String hiddenLast, List<BizSuggestionEntity> handleAdvice, String commitByCN, HashMap<String, Object> hiddenDangerPointStatusEnum, HashMap<String, Object> projectTypeEnum, HashMap<String, Object> riskLevelEnum, HashMap<String, Object> constructionTypeEnum) {
 		this.id = id;
 		this.hiddenDangerPointCode = hiddenDangerPointCode;
 		this.routeId = routeId;
@@ -234,8 +220,162 @@ public class BizHiddenDangerPointEntity {
 		this.networkNotification = networkNotification;
 		this.memo = memo;
 		this.commitBy = commitBy;
+		this.opration = opration;
 		this.commitDate = commitDate;
 		this.enabled = enabled;
+		this.hiddenDangerStatus = hiddenDangerStatus;
+		this.endDate = endDate;
+		this.hiddenLast = hiddenLast;
+		this.handleAdvice = handleAdvice;
+		this.commitByCN = commitByCN;
+		this.hiddenDangerPointStatusEnum = hiddenDangerPointStatusEnum;
+		this.projectTypeEnum = projectTypeEnum;
+		this.riskLevelEnum = riskLevelEnum;
+		this.constructionTypeEnum = constructionTypeEnum;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getHiddenDangerPointCode() {
+		return hiddenDangerPointCode;
+	}
+
+	public void setHiddenDangerPointCode(String hiddenDangerPointCode) {
+		this.hiddenDangerPointCode = hiddenDangerPointCode;
+	}
+
+	public Integer getRouteId() {
+		return routeId;
+	}
+
+	public void setRouteId(Integer routeId) {
+		this.routeId = routeId;
+	}
+
+	public String getWaterUseOffice() {
+		return waterUseOffice;
+	}
+
+	public void setWaterUseOffice(String waterUseOffice) {
+		this.waterUseOffice = waterUseOffice;
+	}
+
+	public String getProjectName() {
+		return projectName;
+	}
+
+	public void setProjectName(String projectName) {
+		this.projectName = projectName;
+	}
+
+	public String getConstructionPosition() {
+		return constructionPosition;
+	}
+
+	public void setConstructionPosition(String constructionPosition) {
+		this.constructionPosition = constructionPosition;
+	}
+
+	public String getBuildCompany() {
+		return buildCompany;
+	}
+
+	public void setBuildCompany(String buildCompany) {
+		this.buildCompany = buildCompany;
+	}
+
+	public String getBuildCompanyAgent() {
+		return buildCompanyAgent;
+	}
+
+	public void setBuildCompanyAgent(String buildCompanyAgent) {
+		this.buildCompanyAgent = buildCompanyAgent;
+	}
+
+	public String getBuildCompanyAgentPhone() {
+		return buildCompanyAgentPhone;
+	}
+
+	public void setBuildCompanyAgentPhone(String buildCompanyAgentPhone) {
+		this.buildCompanyAgentPhone = buildCompanyAgentPhone;
+	}
+
+	public String getConstructionCompany() {
+		return constructionCompany;
+	}
+
+	public void setConstructionCompany(String constructionCompany) {
+		this.constructionCompany = constructionCompany;
+	}
+
+	public String getConstructionCompanyAgentPhone() {
+		return constructionCompanyAgentPhone;
+	}
+
+	public void setConstructionCompanyAgentPhone(String constructionCompanyAgentPhone) {
+		this.constructionCompanyAgentPhone = constructionCompanyAgentPhone;
+	}
+
+	public String getNetworkSize() {
+		return networkSize;
+	}
+
+	public void setNetworkSize(String networkSize) {
+		this.networkSize = networkSize;
+	}
+
+	public String getProjectType() {
+		return projectType;
+	}
+
+	public void setProjectType(String projectType) {
+		this.projectType = projectType;
+	}
+
+	public String getConstructionType() {
+		return constructionType;
+	}
+
+	public void setConstructionType(String constructionType) {
+		this.constructionType = constructionType;
+	}
+
+	public String getRiskLevel() {
+		return riskLevel;
+	}
+
+	public void setRiskLevel(String riskLevel) {
+		this.riskLevel = riskLevel;
+	}
+
+	public String getNetworkNotification() {
+		return networkNotification;
+	}
+
+	public void setNetworkNotification(String networkNotification) {
+		this.networkNotification = networkNotification;
+	}
+
+	public String getMemo() {
+		return memo;
+	}
+
+	public void setMemo(String memo) {
+		this.memo = memo;
+	}
+
+	public String getCommitBy() {
+		return commitBy;
+	}
+
+	public void setCommitBy(String commitBy) {
+		this.commitBy = commitBy;
 	}
 
 	public String getOpration() {
@@ -244,6 +384,62 @@ public class BizHiddenDangerPointEntity {
 
 	public void setOpration(String opration) {
 		this.opration = opration;
+	}
+
+	public String getCommitDate() {
+		return commitDate;
+	}
+
+	public void setCommitDate(String commitDate) {
+		this.commitDate = commitDate;
+	}
+
+	public Integer getEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(Integer enabled) {
+		this.enabled = enabled;
+	}
+
+	public String getHiddenDangerStatus() {
+		return hiddenDangerStatus;
+	}
+
+	public void setHiddenDangerStatus(String hiddenDangerStatus) {
+		this.hiddenDangerStatus = hiddenDangerStatus;
+	}
+
+	public String getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(String endDate) {
+		this.endDate = endDate;
+	}
+
+	public String getHiddenLast() {
+		return hiddenLast;
+	}
+
+	public void setHiddenLast(String hiddenLast) {
+		this.hiddenLast = hiddenLast;
+	}
+
+	public List<BizSuggestionEntity> getHandleAdvice() {
+		return handleAdvice;
+	}
+
+	public void setHandleAdvice(List<BizSuggestionEntity> handleAdvice) {
+		this.handleAdvice = handleAdvice;
+	}
+
+	public String getCommitByCN() {
+		return commitByCN;
+	}
+
+	public void setCommitByCN(String commitByCN) {
+		this.commitByCN = commitByCN;
 	}
 
 	public HashMap<String, Object> getHiddenDangerPointStatusEnum() {
@@ -278,206 +474,6 @@ public class BizHiddenDangerPointEntity {
 		this.constructionTypeEnum = constructionTypeEnum;
 	}
 
-	public String getCommitByCN() {
-		return commitByCN;
-	}
-
-	public void setCommitByCN(String commitByCN) {
-		this.commitByCN = commitByCN;
-	}
-
-	public List<BizSuggestionEntity> getHandleAdvice() {
-		return handleAdvice;
-	}
-
-	public void setHandleAdvice(List<BizSuggestionEntity> handleAdvice) {
-		this.handleAdvice = handleAdvice;
-	}
-
-	public String getHiddenDangerStatus() {
-		return hiddenDangerStatus;
-	}
-
-	public void setHiddenDangerStatus(String hiddenDangerStatus) {
-		this.hiddenDangerStatus = hiddenDangerStatus;
-	}
-
-	public Date getEndDate() {
-		return endDate;
-	}
-
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}
-
-	public String getHiddenLast() {
-		return hiddenLast;
-	}
-
-	public void setHiddenLast(String hiddenLast) {
-		this.hiddenLast = hiddenLast;
-	}
-
-	public Integer getId() {
-		return this.id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public String getHiddenDangerPointCode() {
-		return this.hiddenDangerPointCode;
-	}
-
-	public void setHiddenDangerPointCode(String hiddenDangerPointCode) {
-		this.hiddenDangerPointCode = hiddenDangerPointCode;
-	}
-
-	public Integer getRouteId() {
-		return this.routeId;
-	}
-
-	public void setRouteId(Integer routeId) {
-		this.routeId = routeId;
-	}
-
-	public String getWaterUseOffice() {
-		return this.waterUseOffice;
-	}
-
-	public void setWaterUseOffice(String waterUseOffice) {
-		this.waterUseOffice = waterUseOffice;
-	}
-
-	public String getProjectName() {
-		return this.projectName;
-	}
-
-	public void setProjectName(String projectName) {
-		this.projectName = projectName;
-	}
-
-	public String getConstructionPosition() {
-		return this.constructionPosition;
-	}
-
-	public void setConstructionPosition(String constructionPosition) {
-		this.constructionPosition = constructionPosition;
-	}
-
-	public String getBuildCompany() {
-		return this.buildCompany;
-	}
-
-	public void setBuildCompany(String buildCompany) {
-		this.buildCompany = buildCompany;
-	}
-
-	public String getBuildCompanyAgent() {
-		return this.buildCompanyAgent;
-	}
-
-	public void setBuildCompanyAgent(String buildCompanyAgent) {
-		this.buildCompanyAgent = buildCompanyAgent;
-	}
-
-	public String getBuildCompanyAgentPhone() {
-		return this.buildCompanyAgentPhone;
-	}
-
-	public void setBuildCompanyAgentPhone(String buildCompanyAgentPhone) {
-		this.buildCompanyAgentPhone = buildCompanyAgentPhone;
-	}
-
-	public String getConstructionCompany() {
-		return this.constructionCompany;
-	}
-
-	public void setConstructionCompany(String constructionCompany) {
-		this.constructionCompany = constructionCompany;
-	}
-
-	public String getConstructionCompanyAgentPhone() {
-		return this.constructionCompanyAgentPhone;
-	}
-
-	public void setConstructionCompanyAgentPhone(String constructionCompanyAgentPhone) {
-		this.constructionCompanyAgentPhone = constructionCompanyAgentPhone;
-	}
-
-	public String getNetworkSize() {
-		return this.networkSize;
-	}
-
-	public void setNetworkSize(String networkSize) {
-		this.networkSize = networkSize;
-	}
-
-	public String getProjectType() {
-		return this.projectType;
-	}
-
-	public void setProjectType(String projectType) {
-		this.projectType = projectType;
-	}
-
-	public String getConstructionType() {
-		return this.constructionType;
-	}
-
-	public void setConstructionType(String constructionType) {
-		this.constructionType = constructionType;
-	}
-
-	public String getRiskLevel() {
-		return this.riskLevel;
-	}
-
-	public void setRiskLevel(String riskLevel) {
-		this.riskLevel = riskLevel;
-	}
-
-	public String getNetworkNotification() {
-		return this.networkNotification;
-	}
-
-	public void setNetworkNotification(String networkNotification) {
-		this.networkNotification = networkNotification;
-	}
-
-	public String getMemo() {
-		return this.memo;
-	}
-
-	public void setMemo(String memo) {
-		this.memo = memo;
-	}
-
-	public String getCommitBy() {
-		return this.commitBy;
-	}
-
-	public void setCommitBy(String commitBy) {
-		this.commitBy = commitBy;
-	}
-
-	public Date getCommitDate() {
-		return this.commitDate;
-	}
-
-	public void setCommitDate(Date commitDate) {
-		this.commitDate = commitDate;
-	}
-
-	public Integer getEnabled() {
-		return this.enabled;
-	}
-
-	public void setEnabled(Integer enabled) {
-		this.enabled = enabled;
-	}
-
 	@Override
 	public String toString() {
 		return "BizHiddenDangerPointEntity{" +
@@ -499,8 +495,18 @@ public class BizHiddenDangerPointEntity {
 				", networkNotification='" + networkNotification + '\'' +
 				", memo='" + memo + '\'' +
 				", commitBy='" + commitBy + '\'' +
-				", commitDate=" + commitDate +
+				", opration='" + opration + '\'' +
+				", commitDate='" + commitDate + '\'' +
 				", enabled=" + enabled +
+				", hiddenDangerStatus='" + hiddenDangerStatus + '\'' +
+				", endDate='" + endDate + '\'' +
+				", hiddenLast='" + hiddenLast + '\'' +
+				", handleAdvice=" + handleAdvice +
+				", commitByCN='" + commitByCN + '\'' +
+				", hiddenDangerPointStatusEnum=" + hiddenDangerPointStatusEnum +
+				", projectTypeEnum=" + projectTypeEnum +
+				", riskLevelEnum=" + riskLevelEnum +
+				", constructionTypeEnum=" + constructionTypeEnum +
 				'}';
 	}
 }

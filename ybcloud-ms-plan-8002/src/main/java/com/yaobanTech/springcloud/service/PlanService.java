@@ -178,26 +178,32 @@ public class PlanService {
     public RespBean findAll(HttpServletRequest request) throws UnsupportedEncodingException {
         LoginUser u = urlUtils.getAll(request);
         String user = u.getLoginname();
-        List<BizPlan> list = planMapper.findAll(user);
         String chineseName = (String)oauthService.getChineseName(u.getLoginname()).getObj();
-        if(!list.isEmpty()){
-            for (int i = 0; i < list.size(); i++) {
-                BizPlan plan = list.get(i);
-                Map map = (Map) findEnum(plan.getPlanType()).getObj();
-                Map ps = (Map) findEnum(plan.getPlanStatus()).getObj();
-                Map pp = (Map) findEnum(plan.getPlanPorid()).getObj();
-                plan.setPlanTypeMenu(map);
-                plan.setPlanStatusMenu(ps);
-                plan.setPlanPoridMenu(pp);
-                plan.setPlanCreatedByCN(chineseName);
-                RespBean respBean = routeService.findDetail(plan.getRouteId());
-                Object o = respBean.getObj();
-                if(respBean.getStatus() == 500){
-                    throw new RuntimeException("Feign调用路线服务失败！");
+        List<BizPlan> list = null;
+        if("bzy".equals(user)){
+             list = planMapper.findAll(user);
+            if(!list.isEmpty()){
+                for (int i = 0; i < list.size(); i++) {
+                    BizPlan plan = list.get(i);
+                    Map map = (Map) findEnum(plan.getPlanType()).getObj();
+                    Map ps = (Map) findEnum(plan.getPlanStatus()).getObj();
+                    Map pp = (Map) findEnum(plan.getPlanPorid()).getObj();
+                    plan.setPlanTypeMenu(map);
+                    plan.setPlanStatusMenu(ps);
+                    plan.setPlanPoridMenu(pp);
+                    plan.setPlanCreatedByCN(chineseName);
+                    RespBean respBean = routeService.findDetail(plan.getRouteId());
+                    Object o = respBean.getObj();
+                    if(respBean.getStatus() == 500){
+                        throw new RuntimeException("Feign调用路线服务失败！");
+                    }
+                    plan.setRouteObj(o);
                 }
-                plan.setRouteObj(o);
             }
+        }else{
+            list = bizPlanRepository.findAll();
         }
+
         return RespBean.ok("查询成功！",list);
     }
 
@@ -344,6 +350,21 @@ public class PlanService {
             }
         }
         return RespBean.ok("查询成功！", list);
+    }
+
+    @Transactional
+    public RespBean examinePlan(Integer id,String status) {
+        if(id != null && status != null) {
+            try {
+                bizPlanRepository.examinePlan(id,status);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return RespBean.error("审批失败！");
+            }
+        }else{
+            return RespBean.error("id或审核状态为空！");
+        }
+        return RespBean.ok("审批成功！");
     }
 
 }

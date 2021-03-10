@@ -1,7 +1,6 @@
 package com.yaobanTech.springcloud.domain;
 
 import javax.persistence.*;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -106,7 +105,7 @@ public class BizLeakPointEntity {
 	 * 提交时间
 	 */
    @Column(name = "commit_Date" )
-	private Date commitDate;
+	private String commitDate;
 
 	/**
 	 * 是否有效
@@ -124,7 +123,7 @@ public class BizLeakPointEntity {
 	 * 结束时间
 	 */
    @Column(name = "end_date" )
-	private Date endDate;
+	private String endDate;
 
 	/**
 	 * 详细地址
@@ -195,7 +194,7 @@ public class BizLeakPointEntity {
 	public BizLeakPointEntity() {
 	}
 
-	public BizLeakPointEntity(Integer id, String leakPointCode, Integer routeId, String waterUseOffice, String equipmentName, String equipmentSize, String abnormalPhenomena, String abnormalReason, String currentPosition, String autoGetPositon, String memo, String assetType, String commitBy, String commitByCN, Date commitDate, Integer enabled, String leakPointStatus, Date endDate, String address, String x, String y, String dept, String opration, List<HashMap<String, Object>> attachment, List<HashMap<String, Object>> checkRecord, List<HashMap<String, Object>> handleRecord, HashMap<String, Object> leakPointStatusEnum, HashMap<String, Object> abnormalPhenomenaEnum) {
+	public BizLeakPointEntity(Integer id, String leakPointCode, Integer routeId, String waterUseOffice, String equipmentName, String equipmentSize, String abnormalPhenomena, String abnormalReason, String currentPosition, String autoGetPositon, String memo, String assetType, String commitBy, String commitByCN, String commitDate, Integer enabled, String leakPointStatus, String endDate, String address, String x, String y, String dept, String opration, List<HashMap<String, Object>> attachment, List<HashMap<String, Object>> checkRecord, List<HashMap<String, Object>> handleRecord, HashMap<String, Object> leakPointStatusEnum, HashMap<String, Object> abnormalPhenomenaEnum, HashMap<String, Object> assetTypeEnum) {
 		this.id = id;
 		this.leakPointCode = leakPointCode;
 		this.routeId = routeId;
@@ -224,13 +223,6 @@ public class BizLeakPointEntity {
 		this.handleRecord = handleRecord;
 		this.leakPointStatusEnum = leakPointStatusEnum;
 		this.abnormalPhenomenaEnum = abnormalPhenomenaEnum;
-	}
-
-	public HashMap<String, Object> getAssetTypeEnum() {
-		return assetTypeEnum;
-	}
-
-	public void setAssetTypeEnum(HashMap<String, Object> assetTypeEnum) {
 		this.assetTypeEnum = assetTypeEnum;
 	}
 
@@ -346,11 +338,11 @@ public class BizLeakPointEntity {
 		this.commitByCN = commitByCN;
 	}
 
-	public Date getCommitDate() {
+	public String getCommitDate() {
 		return commitDate;
 	}
 
-	public void setCommitDate(Date commitDate) {
+	public void setCommitDate(String commitDate) {
 		this.commitDate = commitDate;
 	}
 
@@ -370,11 +362,11 @@ public class BizLeakPointEntity {
 		this.leakPointStatus = leakPointStatus;
 	}
 
-	public Date getEndDate() {
+	public String getEndDate() {
 		return endDate;
 	}
 
-	public void setEndDate(Date endDate) {
+	public void setEndDate(String endDate) {
 		this.endDate = endDate;
 	}
 
@@ -458,6 +450,14 @@ public class BizLeakPointEntity {
 		this.abnormalPhenomenaEnum = abnormalPhenomenaEnum;
 	}
 
+	public HashMap<String, Object> getAssetTypeEnum() {
+		return assetTypeEnum;
+	}
+
+	public void setAssetTypeEnum(HashMap<String, Object> assetTypeEnum) {
+		this.assetTypeEnum = assetTypeEnum;
+	}
+
 	@Override
 	public String toString() {
 		return "BizLeakPointEntity{" +
@@ -475,10 +475,10 @@ public class BizLeakPointEntity {
 				", assetType='" + assetType + '\'' +
 				", commitBy='" + commitBy + '\'' +
 				", commitByCN='" + commitByCN + '\'' +
-				", commitDate=" + commitDate +
+				", commitDate='" + commitDate + '\'' +
 				", enabled=" + enabled +
 				", leakPointStatus='" + leakPointStatus + '\'' +
-				", endDate=" + endDate +
+				", endDate='" + endDate + '\'' +
 				", address='" + address + '\'' +
 				", X='" + X + '\'' +
 				", Y='" + Y + '\'' +
@@ -489,6 +489,7 @@ public class BizLeakPointEntity {
 				", handleRecord=" + handleRecord +
 				", leakPointStatusEnum=" + leakPointStatusEnum +
 				", abnormalPhenomenaEnum=" + abnormalPhenomenaEnum +
+				", assetTypeEnum=" + assetTypeEnum +
 				'}';
 	}
 }

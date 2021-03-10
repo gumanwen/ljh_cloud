@@ -1,6 +1,7 @@
 package com.yaobanTech.springcloud.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.yaobanTech.springcloud.ToolUtils.DateFormatUtils;
 import com.yaobanTech.springcloud.ToolUtils.UrlUtils;
 import com.yaobanTech.springcloud.domain.BizLeakPointEntity;
 import com.yaobanTech.springcloud.domain.LeakPointQuery;
@@ -56,13 +57,13 @@ public class LeakPointServiceImpl {
             try {
                 String leakPointCode = null;
                 if("3".equals(bizLeakPointEntity.getWaterUseOffice())){
-                    leakPointCode =redisService.createGenerateCode("漏点","CNL",true,6);
+                    leakPointCode =redisService.createGenerateCode("漏点","CNL",true,4);
                 }
                 else if("4".equals(bizLeakPointEntity.getWaterUseOffice())){
-                    leakPointCode =redisService.createGenerateCode("漏点","CBL",true,6);
+                    leakPointCode =redisService.createGenerateCode("漏点","CBL",true,4);
                 }
                 else if("5".equals(bizLeakPointEntity.getWaterUseOffice())){
-                    leakPointCode =redisService.createGenerateCode("漏点","SJL",true,6);
+                    leakPointCode =redisService.createGenerateCode("漏点","SJL",true,4);
                 }else{
                     return RespBean.error("用水管理所参数不符合系统约定，生成编号异常！");
                 }
@@ -70,10 +71,10 @@ public class LeakPointServiceImpl {
                 String token =  StringUtils.substringAfter(header, "Bearer ");
                 LoginUser u = urlUtils.getAll(request);
                 String user = u.getLoginname();
-                bizLeakPointEntity.setCommitDate(new Date());
+                bizLeakPointEntity.setCommitDate(DateFormatUtils.DateToStr(new Date()));
                 bizLeakPointEntity.setEnabled(1);
                 bizLeakPointEntity.setCommitBy(user);
-                bizLeakPointEntity.setLeakPointStatus("未跟进");
+                bizLeakPointEntity.setLeakPointStatus("53");
                 bizLeakPointEntity.setLeakPointCode(leakPointCode);
                 leakPointRepository.save(bizLeakPointEntity);
             } catch (Exception e) {
