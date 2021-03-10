@@ -160,6 +160,7 @@ public interface BizSignPointMapper {
             "AND IF(#{pipeDiameter} is not null, c.pipe_diameter = #{pipeDiameter},1=1 ) " +
             "AND IF(#{signStatus} is not null, c.sign_point_status = #{signStatus},1=1 ) " +
             "AND IF(#{hiddenCode} is not null, c.trouble_code = #{hiddenCode},1=1 ) " +
+            "AND FIND_IN_SET(c.task_id, #{taskidList}) <> 0 " +
             "ORDER BY c.modify_time DESC")
     List<HashMap<String,Object>> findConditionElse(SignPointQuery signPointQuery);
 }

@@ -263,13 +263,13 @@ public class SignPointServiceImpl {
                         taskids.add((String) list.get(i).get("inspect_task_id"));
                     }
                 }
-                signPointQuery.setTaskidList(taskids);
+                signPointQuery.setTaskidList(StringUtils.strip(taskids.toString(),"[]"));
                 maps = bizSignPointMapper.findConditionElse(signPointQuery);
                 //根据查询结果查出巡查人
                 if(maps.size()>0){
                     for (int i = 0; i < maps.size(); i++) {
                         for (int j = 0; j < list.size(); j++) {
-                            if(maps.get(i).get("inspect_task_id").equals(list.get(j).get("inspect_task_id"))){
+                            if(maps.get(i).get("task_id").equals(list.get(j).get("inspect_task_id"))){
                                 maps.get(i).put("inspect_person",list.get(j).get("inspect_person"));
                             }
                         }

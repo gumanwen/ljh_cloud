@@ -186,6 +186,12 @@ public class BizLeakPointEntity {
 	@Transient
 	private HashMap<String,Object> abnormalPhenomenaEnum;
 
+	/**
+	 * 资产类别枚举
+	 */
+	@Transient
+	private HashMap<String,Object> assetTypeEnum;
+
 	public BizLeakPointEntity() {
 	}
 
@@ -218,6 +224,14 @@ public class BizLeakPointEntity {
 		this.handleRecord = handleRecord;
 		this.leakPointStatusEnum = leakPointStatusEnum;
 		this.abnormalPhenomenaEnum = abnormalPhenomenaEnum;
+	}
+
+	public HashMap<String, Object> getAssetTypeEnum() {
+		return assetTypeEnum;
+	}
+
+	public void setAssetTypeEnum(HashMap<String, Object> assetTypeEnum) {
+		this.assetTypeEnum = assetTypeEnum;
 	}
 
 	public Integer getId() {

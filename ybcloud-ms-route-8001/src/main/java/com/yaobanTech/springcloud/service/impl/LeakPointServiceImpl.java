@@ -165,27 +165,12 @@ public class LeakPointServiceImpl {
                 BizLeakPointEntity bizLeakPointEntity = list.get(i);
                 HashMap<String,Object> leakPointStatusEnum = (HashMap)routeService.findEnum(bizLeakPointEntity.getLeakPointStatus()).getObj();
                 HashMap<String,Object> abnormalPhenomenaEnum = (HashMap)routeService.findEnum(bizLeakPointEntity.getAbnormalPhenomena()).getObj();
+                HashMap<String,Object> assetTypeEnum = (HashMap)routeService.findEnum(bizLeakPointEntity.getAssetType()).getObj();
+
                 bizLeakPointEntity.setCommitByCN(chineseName);
                 bizLeakPointEntity.setLeakPointStatusEnum(leakPointStatusEnum);
                 bizLeakPointEntity.setAbnormalPhenomenaEnum(abnormalPhenomenaEnum);
-//                if(points.size()>0){
-//                    for(int j =0; j<points.size();j++){
-//                        //获取报建文件列表
-//                        if(FieldUtils.isObjectNotEmpty(points.get(j).getFileType())) {
-//                            RespBean respBean = fileService.selectOneByPid(String.valueOf((Integer) points.get(j).getId()), (String) points.get(j).getFileType());
-//                            List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) respBean.getObj();
-//                            if(respBean.getStatus() == 500){
-//                                throw new RuntimeException("Feign调用文件服务失败");
-//                            }
-//                            Map signPointTypeEnum = (Map) EnumMenu.findEnum(points.get(j).getSignPointType()).getObj();
-//                            points.get(j).setFileList(fileList);
-//                            points.get(j).setWaterUseOfficeEnum(waterManagementOfficeEnum);
-//                            points.get(j).setSignPointTypeEnum(pointInspectionTypeEnum);
-//                            points.get(j).setRouteTypeEnum(routeTypeEnum);
-//                        }
-//                        list.add(points.get(j));
-//                    }
-//                }
+                bizLeakPointEntity.setAssetTypeEnum(assetTypeEnum);
             }
         }
         return RespBean.ok("查询成功！",list);
