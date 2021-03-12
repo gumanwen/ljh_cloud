@@ -28,6 +28,9 @@ dependencies {
     compile group: 'io.seata', name: 'seata-server', version: '0.7.1'
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: '2.3.5.RELEASE'
+    //mybatis-plus
+    compile group: 'com.baomidou', name: 'mybatis-plus-boot-starter', version: '3.4.2'
+    compile group: 'com.baomidou', name: 'mybatis-plus', version: '3.4.2'
 
 
     testImplementation('org.springframework.boot:spring-boot-starter-test') {

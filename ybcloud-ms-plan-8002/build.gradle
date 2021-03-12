@@ -8,7 +8,6 @@ bootJar {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation group: 'org.mybatis.spring.boot', name: 'mybatis-spring-boot-starter', version: '2.1.2'
     implementation group: 'org.springframework.boot', name: 'spring-boot-devtools', version: '2.3.5.RELEASE'
     implementation group: 'com.microsoft.sqlserver', name: 'mssql-jdbc', version: '7.4.1.jre8'
     compile group: 'com.alibaba.cloud', name: 'spring-cloud-starter-alibaba-nacos-discovery', version: '2.2.1.RELEASE'
@@ -26,6 +25,9 @@ dependencies {
     compile group: 'com.alibaba.cloud', name: 'spring-cloud-alibaba-seata', version: '2.1.0.RELEASE'
     // https://mvnrepository.com/artifact/io.seata/seata-server
     compile group: 'io.seata', name: 'seata-server', version: '0.7.1'
+    //mybatis-plus
+    compile group: 'com.baomidou', name: 'mybatis-plus-boot-starter', version: '3.4.2'
+    compile group: 'com.baomidou', name: 'mybatis-plus', version: '3.4.2'
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }

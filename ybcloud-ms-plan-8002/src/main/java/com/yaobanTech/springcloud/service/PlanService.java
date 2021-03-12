@@ -8,6 +8,7 @@ import com.yaobanTech.springcloud.domain.RespBean;
 import com.yaobanTech.springcloud.domain.enumDef.EnumMenu;
 import com.yaobanTech.springcloud.repository.BizPlanMapper;
 import com.yaobanTech.springcloud.repository.BizPlanRepository;
+import io.seata.spring.annotation.GlobalTransactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
@@ -57,6 +58,7 @@ public class PlanService {
     SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 
+    @GlobalTransactional
     public RespBean savePlan(HashMap<String,Object> param, HttpServletRequest request) {
         BizPlan bizPlan = null;
         Boolean flag = false;
