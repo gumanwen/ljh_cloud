@@ -377,7 +377,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
 
     @Override
     @Transactional
-    public RespBean addPlanTask(Integer routeId,String  routeName ,Integer planId,String planName) throws ParseException {
+    public RespBean addPlanTask(String waterManagementOffice,Integer routeId,String  routeName ,Integer planId,String planName) throws ParseException {
         if(FieldUtils.isObjectNotEmpty(planId) && FieldUtils.isObjectNotEmpty(routeId) ){
             RespBean re = planService.findById(planId);
             List<String> list = new ArrayList<>();
@@ -394,7 +394,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                         cycleStr = (String) enumMap.get("desc");
                     }
                 }
-                int days = DateUtils.daysBetween(start,end);
+                int days = DateUtils.daysBetween(start,end)+1;
                 Integer cycle = Integer.valueOf(cycleStr.substring(0,1));
                 int nums = (int) Math.floor(days/cycle);
                 if(nums>0){
@@ -405,7 +405,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                         logger.info("生成的任务编号："+inspect_task_id +"           ------------------------");
                         inspect.setInspectTaskId(inspect_task_id);
                         inspect.setBeginTime(daydateFormat.format(DateUtils.daysAdd(start,cycle*i)));
-                        inspect.setDeadTime(daydateFormat.format(DateUtils.daysAdd(start,cycle*(i+1))));
+                        inspect.setDeadTime(daydateFormat.format(DateUtils.daysAdd(start,cycle*(i+1)-1)));
                         inspect.setPlanId(planId);
                         inspect.setRouteId(routeId);
                         inspect.setTaskType("计划任务");

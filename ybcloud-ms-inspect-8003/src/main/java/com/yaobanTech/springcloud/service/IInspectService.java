@@ -34,7 +34,7 @@ public interface IInspectService extends IService<Inspect> {
 
     RespBean addTempTask(Integer routeId,String  routeName ,String inspector,String beginTime,String endTime) throws ParseException;
 
-    RespBean addPlanTask(Integer routeId,String  routeName ,Integer planId,String planName) throws ParseException;
+    RespBean addPlanTask(String waterManagementOffice,Integer routeId,String  routeName ,Integer planId,String planName) throws ParseException;
 
     RespBean getCheckInPoints(Integer routeId,String inspectTaskId);
 

@@ -38,9 +38,9 @@ spring:
         nacos:
             discovery:
                 server-addr: 192.168.50.91:8848 #Nacos作为服务中心地址
-                ip: 192.168.50.169
+                ip: 192.168.50.168
             config:
-                server-addr: 192.168.50.169:8848
+                server-addr: 192.168.50.168:8848
                 #file-extension: properties
                 #namespace: 8740fef6-e5cd-4bee-aa59-1982b454323e
                 #group: DEFAULT_GROUP
@@ -54,7 +54,7 @@ mybatis-plus:
         call-setters-on-nulls: true
 server:
     port: 8003
-    ip: 192.168.50.169
+    ip: 192.168.50.168
 ribbon:
     ConnectTimeout: 30000
     ReadTimeout: 7000

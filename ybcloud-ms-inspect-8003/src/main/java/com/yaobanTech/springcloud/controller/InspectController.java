@@ -71,8 +71,8 @@ public class InspectController {
 
     @ApiOperation("web：新增计划任务")
     @PostMapping("/temp/addPlanTask")
-    public RespBean addPlanTask(Integer routeId,String  routeName ,Integer planId,String planName) throws ParseException {
-        return iInspectService.addPlanTask(routeId,routeName,planId,planName);
+    public RespBean addPlanTask(String waterManagementOffice,Integer routeId,String  routeName ,Integer planId,String planName) throws ParseException {
+        return iInspectService.addPlanTask(waterManagementOffice,routeId,routeName,planId,planName);
     }
 
     @ApiOperation("app & web：获取计划任务详情")
