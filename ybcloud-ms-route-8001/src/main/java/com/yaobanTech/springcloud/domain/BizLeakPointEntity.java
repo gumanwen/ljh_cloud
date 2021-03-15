@@ -191,6 +191,12 @@ public class BizLeakPointEntity {
 	@Transient
 	private HashMap<String,Object> assetTypeEnum;
 
+	/**
+	 * app附件上传
+	 */
+	@Transient
+	private List<HashMap<String,Object>> fileList;
+
 	public BizLeakPointEntity() {
 	}
 
@@ -224,6 +230,14 @@ public class BizLeakPointEntity {
 		this.leakPointStatusEnum = leakPointStatusEnum;
 		this.abnormalPhenomenaEnum = abnormalPhenomenaEnum;
 		this.assetTypeEnum = assetTypeEnum;
+	}
+
+	public List<HashMap<String, Object>> getFileList() {
+		return fileList;
+	}
+
+	public void setFileList(List<HashMap<String, Object>> fileList) {
+		this.fileList = fileList;
 	}
 
 	public Integer getId() {

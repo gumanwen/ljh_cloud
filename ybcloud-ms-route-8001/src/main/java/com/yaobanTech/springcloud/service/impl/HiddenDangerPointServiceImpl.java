@@ -59,6 +59,7 @@ public class HiddenDangerPointServiceImpl {
     @GlobalTransactional
     public RespBean saveHiddenDangerPoint(HashMap<String,Object> param,HttpServletRequest request) {
         BizHiddenDangerPointEntity bizHiddenDangerPointEntity = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizHiddenDangerPointEntity.class);
+        String type = null;
         if(bizHiddenDangerPointEntity != null) {
             try {
                 String hiddenDangerPointCode = null;
@@ -84,6 +85,7 @@ public class HiddenDangerPointServiceImpl {
                 bizHiddenDangerPointEntity.setCommitBy(user);
                 bizHiddenDangerPointEntity.setHiddenDangerPointCode(hiddenDangerPointCode);
                hiddenDangerPointRepository.save(bizHiddenDangerPointEntity);
+               fileService.saveByPid(bizHiddenDangerPointEntity.getHiddenDangerPointCode(), bizHiddenDangerPointEntity.getFileList(),type) ;
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("保存失败！");

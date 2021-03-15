@@ -53,6 +53,7 @@ public class LeakPointServiceImpl {
     @GlobalTransactional
     public RespBean saveLeakPoint(HashMap<String,Object> param,HttpServletRequest request) {
         BizLeakPointEntity bizLeakPointEntity = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizLeakPointEntity.class);
+        String type = null;
         if(bizLeakPointEntity != null) {
             try {
                 String leakPointCode = null;
@@ -77,6 +78,7 @@ public class LeakPointServiceImpl {
                 bizLeakPointEntity.setLeakPointStatus("53");
                 bizLeakPointEntity.setLeakPointCode(leakPointCode);
                 leakPointRepository.save(bizLeakPointEntity);
+                fileService.saveByPid(bizLeakPointEntity.getLeakPointCode(), bizLeakPointEntity.getFileList(),type) ;
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("保存失败！");
