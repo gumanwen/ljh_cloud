@@ -59,6 +59,7 @@ public class RouteServiceImpl {
 
     @Transactional
     public RespBean saveRoute(HashMap<String,Object> param,HttpServletRequest request) throws UnsupportedEncodingException {
+        HashMap<String,Object> hashMap = new HashMap<>();
         String header = request.getHeader("Authorization");
         String token =  StringUtils.substringAfter(header, "Bearer ");
         LoginUser u = urlUtils.getAll(request);
@@ -92,10 +93,13 @@ public class RouteServiceImpl {
                 e.printStackTrace();
                 return RespBean.error("保存失败！");
             }
+            hashMap.put("signPointList",bizRoute.getBizSignPoints());
+            hashMap.put("routeName",bizRoute.getRouteName());
+            hashMap.put("routeId",bizRoute.getId());
         }else{
             return RespBean.error("数据为空！");
         }
-        return RespBean.ok("保存成功！",bizRoute.getBizSignPoints());
+        return RespBean.ok("保存成功！",hashMap);
     }
 
     @Transactional
@@ -230,7 +234,13 @@ public class RouteServiceImpl {
         LoginUser u = urlUtils.getAll(request);
         String user = u.getLoginname();
         String chineseName = (String)oauthService.getChineseName(u.getLoginname()).getObj();
-        List<BizRoute> list = bizRouteRepository.findList(user);
+        String role = u.getRoleLists();
+        List<BizRoute> list = null;
+        if(role.contains("BZZ")){
+            list = bizRouteRepository.findAll();
+        }else{
+            list = bizRouteRepository.findList(user);
+        }
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
                 BizRoute route = list.get(i);

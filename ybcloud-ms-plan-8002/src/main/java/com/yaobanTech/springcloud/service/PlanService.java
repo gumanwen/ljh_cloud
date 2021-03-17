@@ -60,6 +60,10 @@ public class PlanService {
 
     @GlobalTransactional
     public RespBean savePlan(HashMap<String,Object> param, HttpServletRequest request) {
+        HashMap<String,Object> hashMap = new HashMap<>();
+        String routeName = null;
+        Map<String, Object> waterUseOfficeEnum = null;
+        String waterUseOffice = null;
         BizPlan bizPlan = null;
         Boolean flag = false;
         if(param != null){
@@ -94,6 +98,11 @@ public class PlanService {
                         map.put("endTime",dateFormat.format(bizPlan.getEndTime()));
                         map.put("period",period);
                         inspectService.sendInspectInfo(map);
+                        RespBean detail = routeService.findDetail(bizPlan.getRouteId());
+                        HashMap<String, Object> routeMap = (HashMap<String, Object>) detail.getObj();
+                        routeName = (String) routeMap.get("routeName");
+                        waterUseOffice = (String) routeMap.get("waterManagementOffice");
+                        waterUseOfficeEnum = (Map) findEnum(waterUseOffice).getObj();
                     } catch (Exception
                             e) {
                         e.printStackTrace();
@@ -102,11 +111,16 @@ public class PlanService {
                 }else{
                     return RespBean.error("数据为空！");
                 }
+                hashMap.put("routeId",bizPlan.getRouteId());
+                hashMap.put("routeName",routeName);
+                hashMap.put("planName",bizPlan.getPlanName());
+                hashMap.put("planId",bizPlan.getId());
+                hashMap.put("waterUserOffice",waterUseOfficeEnum);
             }else{
                 return RespBean.error("该路线下已有重名计划,请修改计划名重试!");
             }
         }
-        return RespBean.ok("保存成功！");
+        return RespBean.ok("保存成功！",hashMap);
     }
 
     public RespBean updatePlan(HashMap<String,Object> param) {
@@ -204,6 +218,24 @@ public class PlanService {
             }
         }else{
             list = bizPlanRepository.findAll();
+            if(!list.isEmpty()){
+                for (int i = 0; i < list.size(); i++) {
+                    BizPlan plan = list.get(i);
+                    Map map = (Map) findEnum(plan.getPlanType()).getObj();
+                    Map ps = (Map) findEnum(plan.getPlanStatus()).getObj();
+                    Map pp = (Map) findEnum(plan.getPlanPorid()).getObj();
+                    plan.setPlanTypeMenu(map);
+                    plan.setPlanStatusMenu(ps);
+                    plan.setPlanPoridMenu(pp);
+                    plan.setPlanCreatedByCN(chineseName);
+                    RespBean respBean = routeService.findDetail(plan.getRouteId());
+                    Object o = respBean.getObj();
+                    if(respBean.getStatus() == 500){
+                        throw new RuntimeException("Feign调用路线服务失败！");
+                    }
+                    plan.setRouteObj(o);
+                }
+            }
         }
 
         return RespBean.ok("查询成功！",list);

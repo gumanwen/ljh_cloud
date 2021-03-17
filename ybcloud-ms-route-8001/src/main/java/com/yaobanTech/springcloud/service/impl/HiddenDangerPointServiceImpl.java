@@ -59,7 +59,7 @@ public class HiddenDangerPointServiceImpl {
     @GlobalTransactional
     public RespBean saveHiddenDangerPoint(HashMap<String,Object> param,HttpServletRequest request) {
         BizHiddenDangerPointEntity bizHiddenDangerPointEntity = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizHiddenDangerPointEntity.class);
-        String type = null;
+        String type = "yhdfj";
         if(bizHiddenDangerPointEntity != null) {
             try {
                 String hiddenDangerPointCode = null;
@@ -133,6 +133,7 @@ public class HiddenDangerPointServiceImpl {
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public RespBean findDetail(Integer id,HttpServletRequest request) {
         BizHiddenDangerPointEntity bdpe = null;
+        String type = "yhdfj";
         if(id != null) {
             try {
                 bdpe = hiddenDangerPointRepository.findHiddenDangerPoint(id);
@@ -149,9 +150,9 @@ public class HiddenDangerPointServiceImpl {
                 bdpe.setConstructionTypeEnum(constructionTypeEnum);
                 bdpe.setCommitByCN(chineseName);
                 bdpe.setHandleAdvice(suggestionEntityList);
-                /*if(oauthService.getChineseName(bdpe.getCommitBy()).getStatus() == 500){
-                    throw new RuntimeException("Feign调用权限服务失败");
-                }*/
+                RespBean bean = fileService.selectOneByPid(bdpe.getHiddenDangerPointCode(), type);
+                List<HashMap<String, Object>> maps = (List<HashMap<String, Object>>) bean.getObj();
+                bdpe.setFileList(maps);
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("查询失败！");
@@ -167,8 +168,13 @@ public class HiddenDangerPointServiceImpl {
         LoginUser u = urlUtils.getAll(request);
         String chineseName = u.getName();
         String user = u.getLoginname();
-
-        List<BizHiddenDangerPointEntity> list = hiddenDangerPointRepository.findList(user);
+        String role = u.getRoleLists();
+        List<BizHiddenDangerPointEntity> list = null;
+        if(role.contains("BZZ")){
+            list = hiddenDangerPointRepository.findAll();
+        }else{
+            list = hiddenDangerPointRepository.findList(user);
+        }
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
                 BizHiddenDangerPointEntity bizHiddenDangerPointEntity = list.get(i);
