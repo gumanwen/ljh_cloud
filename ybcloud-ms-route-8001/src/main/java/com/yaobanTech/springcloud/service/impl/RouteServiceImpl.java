@@ -23,6 +23,7 @@ import javax.persistence.criteria.Root;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class RouteServiceImpl {
@@ -222,7 +223,7 @@ public class RouteServiceImpl {
                 route.setRouteTypeMenu(routeTypeMenu);
                 route.setWaterOfficeMenu(waterOfficeMenu);
                 route.setPointInspectionTypeMenu(pointInspectionTypeMenu);
-                route.setRouteCreatorCN(chineseName);
+//                route.setRouteCreatorCN(chineseName);
             }
         }
        return RespBean.ok("查询成功！",list);
@@ -264,10 +265,13 @@ public class RouteServiceImpl {
                 route.setRouteTypeMenu(routeTypeMenu);
                 route.setWaterOfficeMenu(waterOfficeMenu);
                 route.setPointInspectionTypeMenu(pointInspectionTypeMenu);
-                route.setRouteCreatorCN(chineseName);
+//                route.setRouteCreatorCN(chineseName);
             }
         }
-        return RespBean.ok("查询成功！",list);
+        List<BizRoute> routes = list.stream().
+                sorted(Comparator.comparing(BizRoute::getCreatedTime).reversed().thenComparing(BizRoute::getEnabled)).
+                collect(Collectors.toList());
+        return RespBean.ok("查询成功！",routes);
     }
 
     @Transactional(propagation= Propagation.NOT_SUPPORTED)
@@ -300,7 +304,7 @@ public class RouteServiceImpl {
                 route.setWaterOfficeMenu(waterOfficeMenu);
                 route.setPointInspectionTypeMenu(pointInspectionTypeMenu);
                 route.setRouteCreator(user);
-                route.setRouteCreatorCN(chineseName);
+//                route.setRouteCreatorCN(chineseName);
             }
         }
         return RespBean.ok("查询成功！",list);
@@ -340,7 +344,7 @@ public class RouteServiceImpl {
             br.setWaterOfficeMenu(waterOfficeMenu);
             br.setBizSignPoints(pointList);
             br.setPointInspectionTypeMenu(pointInspectionTypeMenu);
-            br.setRouteCreatorCN(chineseName);
+//            br.setRouteCreatorCN(chineseName);
         }
         return RespBean.ok("查询成功！",br);
     }

@@ -1,5 +1,7 @@
 package com.yaobanTech.springcloud.domain;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import javax.persistence.*;
 import java.util.HashMap;
 import java.util.List;
@@ -195,7 +197,7 @@ public class BizLeakPointEntity {
 	 * app附件上传
 	 */
 	@Transient
-	private List<HashMap<String,Object>> fileList;
+	private MultipartFile[] fileList;
 
 	public BizLeakPointEntity() {
 	}
@@ -232,11 +234,11 @@ public class BizLeakPointEntity {
 		this.assetTypeEnum = assetTypeEnum;
 	}
 
-	public List<HashMap<String, Object>> getFileList() {
+	public MultipartFile[] getFileList() {
 		return fileList;
 	}
 
-	public void setFileList(List<HashMap<String, Object>> fileList) {
+	public void setFileList(MultipartFile[] fileList) {
 		this.fileList = fileList;
 	}
 

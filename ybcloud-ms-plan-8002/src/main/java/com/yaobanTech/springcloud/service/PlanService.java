@@ -20,6 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class PlanService {
@@ -86,18 +88,7 @@ public class PlanService {
                         LoginUser u = urlUtils.getAll(request);
                         String user = u.getLoginname();
                         bizPlan.setPlanCreatedBy(user);
-                        BizPlan plan = bizPlanRepository.save(bizPlan);
-                        String code = bizPlan.getPlanPorid();
-                        EnumMenu key = EnumMenu.getEnumByKey(code);
-                        String desc = key.getDesc();
-                        String period = desc.substring(0, 1);
-                        HashMap<String,Object> map = new HashMap<>();
-                        map.put("routeId",bizPlan.getRouteId());
-                        map.put("planId",bizPlan.getId());
-                        map.put("startTime",dateFormat.format(bizPlan.getStartTime()));
-                        map.put("endTime",dateFormat.format(bizPlan.getEndTime()));
-                        map.put("period",period);
-                        inspectService.sendInspectInfo(map);
+                        bizPlanRepository.save(bizPlan);
                         RespBean detail = routeService.findDetail(bizPlan.getRouteId());
                         HashMap<String, Object> routeMap = (HashMap<String, Object>) detail.getObj();
                         routeName = (String) routeMap.get("routeName");
@@ -195,50 +186,35 @@ public class PlanService {
         LoginUser u = urlUtils.getAll(request);
         String user = u.getLoginname();
         String chineseName = (String)oauthService.getChineseName(u.getLoginname()).getObj();
+        String role = u.getRoleLists();
         List<BizPlan> list = null;
-        if("bzy".equals(user)){
-             list = planMapper.findAll(user);
-            if(!list.isEmpty()){
-                for (int i = 0; i < list.size(); i++) {
-                    BizPlan plan = list.get(i);
-                    Map map = (Map) findEnum(plan.getPlanType()).getObj();
-                    Map ps = (Map) findEnum(plan.getPlanStatus()).getObj();
-                    Map pp = (Map) findEnum(plan.getPlanPorid()).getObj();
-                    plan.setPlanTypeMenu(map);
-                    plan.setPlanStatusMenu(ps);
-                    plan.setPlanPoridMenu(pp);
-                    plan.setPlanCreatedByCN(chineseName);
-                    RespBean respBean = routeService.findDetail(plan.getRouteId());
-                    Object o = respBean.getObj();
-                    if(respBean.getStatus() == 500){
-                        throw new RuntimeException("Feign调用路线服务失败！");
-                    }
-                    plan.setRouteObj(o);
-                }
-            }
-        }else{
+        if(role.contains("BZZ")){
             list = bizPlanRepository.findAll();
-            if(!list.isEmpty()){
-                for (int i = 0; i < list.size(); i++) {
-                    BizPlan plan = list.get(i);
-                    Map map = (Map) findEnum(plan.getPlanType()).getObj();
-                    Map ps = (Map) findEnum(plan.getPlanStatus()).getObj();
-                    Map pp = (Map) findEnum(plan.getPlanPorid()).getObj();
-                    plan.setPlanTypeMenu(map);
-                    plan.setPlanStatusMenu(ps);
-                    plan.setPlanPoridMenu(pp);
-                    plan.setPlanCreatedByCN(chineseName);
-                    RespBean respBean = routeService.findDetail(plan.getRouteId());
-                    Object o = respBean.getObj();
-                    if(respBean.getStatus() == 500){
-                        throw new RuntimeException("Feign调用路线服务失败！");
-                    }
-                    plan.setRouteObj(o);
-                }
-            }
+        }else{
+            list = planMapper.findAll(user);
         }
 
-        return RespBean.ok("查询成功！",list);
+            if(!list.isEmpty()){
+                for (int i = 0; i < list.size(); i++) {
+                    BizPlan plan = list.get(i);
+                    Map map = (Map) findEnum(plan.getPlanType()).getObj();
+                    Map ps = (Map) findEnum(plan.getPlanStatus()).getObj();
+                    Map pp = (Map) findEnum(plan.getPlanPorid()).getObj();
+                    plan.setPlanTypeMenu(map);
+                    plan.setPlanStatusMenu(ps);
+                    plan.setPlanPoridMenu(pp);
+//                    plan.setPlanCreatedByCN(chineseName);
+                    RespBean respBean = routeService.findDetail(plan.getRouteId());
+                    Object o = respBean.getObj();
+                    if(respBean.getStatus() == 500){
+                        throw new RuntimeException("Feign调用路线服务失败！");
+                    }
+                    plan.setRouteObj(o);
+                }
+            }
+        List<BizPlan> planList = list.stream().sorted(Comparator.comparing(BizPlan::getEnabled).reversed().thenComparing(BizPlan::getPlanCreatedTime).reversed()).
+                collect(Collectors.toList());
+        return RespBean.ok("查询成功！",planList);
     }
 
     public RespBean findSelection(Integer routeId){
@@ -258,7 +234,7 @@ public class PlanService {
             bp.setPlanTypeMenu(map);
             bp.setPlanStatusMenu(ps);
             bp.setPlanPoridMenu(pp);
-            bp.setPlanCreatedByCN(chineseName);
+//            bp.setPlanCreatedByCN(chineseName);
             RespBean respBean = routeService.findDetail(bp.getRouteId());
             Object o = respBean.getObj();
             if(respBean.getStatus() == 500){
@@ -374,7 +350,7 @@ public class PlanService {
                 plan.setPlanTypeMenu(map);
                 plan.setPlanStatusMenu(ps);
                 plan.setPlanPoridMenu(pp);
-                plan.setPlanCreatedByCN(chineseName);
+//                plan.setPlanCreatedByCN(chineseName);
                 RespBean respBean = routeService.findDetail(plan.getRouteId());
                 Object o = respBean.getObj();
                 if(respBean.getStatus() == 500){
@@ -386,17 +362,32 @@ public class PlanService {
         return RespBean.ok("查询成功！", list);
     }
 
-    @Transactional
+    @GlobalTransactional
     public RespBean examinePlan(Integer id,String status) {
-        if(id != null && status != null) {
+        if(id != null && "14".equals(status)) {
             try {
-                bizPlanRepository.examinePlan(id,status);
+                BizPlan bizPlan = bizPlanRepository.findDetail(id);
+                String code = bizPlan.getPlanPorid();
+                EnumMenu key = EnumMenu.getEnumByKey(code);
+                String desc = key.getDesc();
+                String period = desc.substring(0, 1);
+                HashMap<String,Object> map = new HashMap<>();
+                map.put("routeId",bizPlan.getRouteId());
+                map.put("planId",bizPlan.getId());
+                map.put("startTime",dateFormat.format(bizPlan.getStartTime()));
+                map.put("endTime",dateFormat.format(bizPlan.getEndTime()));
+                map.put("period",period);
+                inspectService.sendInspectInfo(map);
             } catch (Exception e) {
                 e.printStackTrace();
-                return RespBean.error("审批失败！");
+                return RespBean.error("调用派发任务异常！");
             }
-        }else{
-            return RespBean.error("id或审核状态为空！");
+        }
+        try {
+            bizPlanRepository.examinePlan(id,status);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return RespBean.error("审批失败！");
         }
         return RespBean.ok("审批成功！");
     }

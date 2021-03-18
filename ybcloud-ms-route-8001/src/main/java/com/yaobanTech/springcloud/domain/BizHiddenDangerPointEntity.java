@@ -1,5 +1,7 @@
 package com.yaobanTech.springcloud.domain;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import javax.persistence.*;
 import java.util.HashMap;
 import java.util.List;

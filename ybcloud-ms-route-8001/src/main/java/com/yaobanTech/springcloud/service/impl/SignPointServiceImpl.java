@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -171,7 +172,8 @@ public class SignPointServiceImpl {
                 }
             }
         }
-        return RespBean.ok("查询成功！",list);
+        List<BizSignPoint> collect = list.stream().sorted(Comparator.comparing(BizSignPoint::getEnabled).reversed()).collect(Collectors.toList());
+        return RespBean.ok("查询成功！",collect);
     }
 
     public RespBean findList(Integer routeId) {
