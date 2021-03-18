@@ -29,8 +29,8 @@ public class HiddenDangerPointController {
     private HiddenDangerPointServiceImpl hiddenDangerPointService;
 
     @ApiOperation("保存隐患点")
-    @PostMapping("add")
-    public RespBean saveHiddenDangerPoint(String param,MultipartFile[] fileList, HttpServletRequest request){
+    @RequestMapping ("add")
+    public RespBean saveHiddenDangerPoint( @RequestParam String param,@RequestPart MultipartFile[] fileList, HttpServletRequest request){
         return hiddenDangerPointService.saveHiddenDangerPoint(param,fileList,request);
     }
 

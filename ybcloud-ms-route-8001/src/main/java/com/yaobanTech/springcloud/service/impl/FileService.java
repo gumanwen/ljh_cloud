@@ -17,6 +17,6 @@ public interface FileService {
     RespBean selectOneByPid(@RequestParam("pid") String pid, @RequestParam("type") String type);
 
     @PostMapping(value = "/api/file/importFiles")
-    RespBean saveByPid(@RequestParam("pid") String pid,@RequestParam("fileList") MultipartFile[] fileList, @RequestParam("type") String type);
+    RespBean saveByPid(@RequestParam("fileList") MultipartFile[] fileList,@RequestParam("pid") String pid, @RequestParam("type") String type);
 
 }

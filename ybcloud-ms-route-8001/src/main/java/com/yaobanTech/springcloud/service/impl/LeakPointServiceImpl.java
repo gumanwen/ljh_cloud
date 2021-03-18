@@ -77,7 +77,7 @@ public class LeakPointServiceImpl {
                 bizLeakPointEntity.setLeakPointStatus("53");
                 bizLeakPointEntity.setLeakPointCode(leakPointCode);
                 leakPointRepository.save(bizLeakPointEntity);
-                fileService.saveByPid(bizLeakPointEntity.getLeakPointCode(),fileList,type) ;
+                fileService.saveByPid(fileList,bizLeakPointEntity.getLeakPointCode(),type) ;
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("保存失败！");
