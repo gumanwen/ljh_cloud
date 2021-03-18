@@ -20,13 +20,15 @@ import lombok.EqualsAndHashCode;
 public class Inspect implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
     /**
      * 巡查任务编号
      */
     @TableId(value = "inspect_task_id")
     private String inspectTaskId;
-
+    /**
+    * 用水管理所
+    */
+    private String waterManagementOffice;
     /**
      * 任务开始时间
      */
@@ -125,8 +127,9 @@ public class Inspect implements Serializable {
     public Inspect() {
     }
 
-    public Inspect(String inspectTaskId, String beginTime, String deadTime, String actBeginTime, String actEndTime, String status, String inspectPerson, String sender, String completeRate, String arrivalRate, String liveSitustion, String checkInPointSituation, String gisMap, String taskType, String sendTime, String overReason, String modifyBy, String completeTime, Integer planId, Integer routeId) {
+    public Inspect(String inspectTaskId, String waterManagementOffice, String beginTime, String deadTime, String actBeginTime, String actEndTime, String status, String inspectPerson, String sender, String completeRate, String arrivalRate, String liveSitustion, String checkInPointSituation, String gisMap, String taskType, String sendTime, String overReason, String modifyBy, String completeTime, Integer planId, Integer routeId) {
         this.inspectTaskId = inspectTaskId;
+        this.waterManagementOffice = waterManagementOffice;
         this.beginTime = beginTime;
         this.deadTime = deadTime;
         this.actBeginTime = actBeginTime;
@@ -154,6 +157,14 @@ public class Inspect implements Serializable {
 
     public void setInspectTaskId(String inspectTaskId) {
         this.inspectTaskId = inspectTaskId;
+    }
+
+    public String getWaterManagementOffice() {
+        return waterManagementOffice;
+    }
+
+    public void setWaterManagementOffice(String waterManagementOffice) {
+        this.waterManagementOffice = waterManagementOffice;
     }
 
     public String getBeginTime() {

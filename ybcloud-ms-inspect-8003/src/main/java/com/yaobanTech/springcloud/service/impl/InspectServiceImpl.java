@@ -87,6 +87,11 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
 
     SimpleDateFormat daydateFormat= new SimpleDateFormat("yyyy-MM-dd");
 
+    SimpleDateFormat monthdateFormat= new SimpleDateFormat("yyyy-MM");
+
+    SimpleDateFormat yeardateFormat= new SimpleDateFormat("yyyy");
+
+
     private static final Logger logger = LoggerFactory.getLogger(InspectServiceImpl.class);
 
     @Value("${server.ip}")
@@ -354,7 +359,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
 
     @Override
     @Transactional
-    public RespBean addTempTask(Integer routeId,String routeName ,String inspector,String beginTime,String endTime) throws ParseException {
+    public RespBean addTempTask(String waterManagementOffice,Integer routeId,String routeName ,String inspector,String beginTime,String endTime) throws ParseException {
         Inspect inspect = new Inspect();
         if(FieldUtils.isObjectNotEmpty(routeId)&&FieldUtils.isStringNotEmpty(beginTime)&&FieldUtils.isStringNotEmpty(endTime)){
             Date start =  new Date(Long.parseLong(beginTime));
@@ -368,6 +373,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
             inspect.setDeadTime(daydateFormat.format(end));
             inspect.setCompleteRate("0");
             inspect.setStatus("处理中");
+            inspect.setWaterManagementOffice(waterManagementOffice);
             int id = inspectMapper.insert(inspect);
             return RespBean.ok("保存成功！"+ id );
         }else{
@@ -411,6 +417,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                         inspect.setTaskType("计划任务");
                         inspect.setCompleteRate("0");
                         inspect.setStatus("未处理");
+                        inspect.setWaterManagementOffice(waterManagementOffice);
                         list.add(inspect_task_id);
                         inspectMapper.insert(inspect);
                     }
@@ -616,18 +623,6 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
     @Override
     public RespBean findSignedList(Integer routeId, String inspectTaskId) {
         RespBean respBean = routeService.findSignedList(routeId,inspectTaskId);
-        /*List<HashMap<String,Object>> list = (List<HashMap<String, Object>>) respBean.getObj();
-        if(list.size()>0){
-            for(int i =0; i<list.size(); i++){
-                //获取报建文件列表
-                if(FieldUtils.isObjectNotEmpty(list.get(i).get("fileType"))) {
-                    List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) fileService.selectOneByPid(String.valueOf((Integer) list.get(i).get("id")), (String) list.get(i).get("fileType")).getObj();
-
-                    list.get(i).put("fileList", fileList);
-                }
-            }
-        }
-        return RespBean.ok("").setObj(list);*/
         return respBean;
     }
 
@@ -671,61 +666,153 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
     }
 
     @Override
-    public RespBean bijiao(Integer gid) {
-        List<Test> result1 = new ArrayList<>();
-        List<Test> result2 = new ArrayList<>();
-        List<Test> result3 = new ArrayList<>();
-        return RespBean.ok("").setObj(result3);
-    }
-
-    @Override
-    public RespBean digui(Integer gid) {
-        //1:查询出该gid对应的s/t
-       /* HashMap<String,Object> map = new HashMap<>();
-        List<Test> alllist = new ArrayList<>();
-        HashSet<Test> oalllist = new HashSet<>();
-        HashSet<Test> allnewlist = new HashSet<>();
-        HashSet<Test> list = new HashSet<>();
-        HashSet<Test> result = new HashSet<>();
-        QueryWrapper<Test> queryWrapper = new QueryWrapper<>();
-        alllist = testMapper.selectList(queryWrapper);
-        Test test = testMapper.selectOne(queryWrapper.eq("gid",gid));
-        for (int i = 0; i < alllist.size(); i++) {
-            if(!alllist.get(i).getGid().equals(test.getGid())){
-                allnewlist.add(alllist.get(i));
+    public RespBean inspectStatistics(String waterManagementOffice,String unit,String beginTime,String deadTime) throws ParseException {
+        HashMap resultMap = new HashMap();
+        String searchTime = null;
+        //判断时间段是否为空
+        if("null".equals(waterManagementOffice)){
+            waterManagementOffice = "";
+        }
+        List<HashMap<String,Object>> result = new ArrayList<>();
+        if(FieldUtils.isStringNotEmpty(unit)){
+            if(FieldUtils.isStringNotEmpty(beginTime) & FieldUtils.isStringNotEmpty(deadTime) & !"null".equals(beginTime) & !"null".equals(deadTime)){
+                SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd yyyy HH:mm:ss 'GMT'", Locale.US);
+                //根据管理所和单位查出时间段的数据
+                if("年".equals(unit)){
+                    beginTime = yeardateFormat.format(dateFormat.parse(beginTime));
+                    deadTime = yeardateFormat.format(dateFormat.parse(deadTime));
+                    searchTime = yeardateFormat.format(DateUtils.yearsAdd(dateFormat.parse(deadTime),1));
+                    result = inspectMapper.selectTasksByYears(waterManagementOffice,beginTime,searchTime);
+                }
+                if("月".equals(unit)){
+                    beginTime = monthdateFormat.format(dateFormat.parse(beginTime));
+                    deadTime = monthdateFormat.format(dateFormat.parse(deadTime));
+                    searchTime = monthdateFormat.format(DateUtils.monthsAdd(dateFormat.parse(deadTime),1));
+                    result = inspectMapper.selectTasksByMonths(waterManagementOffice,beginTime,searchTime);
+                }
+                if("日".equals(unit)){
+                    beginTime = daydateFormat.format(dateFormat.parse(beginTime));
+                    deadTime = daydateFormat.format(dateFormat.parse(deadTime));
+                    searchTime = daydateFormat.format(DateUtils.daysAdd(dateFormat.parse(deadTime),1));
+                    result = inspectMapper.selectTasksByDays(waterManagementOffice,beginTime,searchTime);
+                }
+            }else{
+                //根据管理所和单位查出近12单位的数据
+                Date currnetDate = new Date();
+                Calendar calendar = Calendar.getInstance();
+                if("年".equals(unit)){
+                    deadTime  = yeardateFormat.format(currnetDate);
+                    searchTime =  yeardateFormat.format(DateUtils.yearsAdd(currnetDate,1));
+                    beginTime = yeardateFormat.format(DateUtils.yearsAdd(yeardateFormat.parse(deadTime),-11));
+                    result = inspectMapper.selectTasksByYears(waterManagementOffice,beginTime,searchTime);
+                }
+                if("月".equals(unit)){
+                    deadTime = monthdateFormat.format(currnetDate);
+                    searchTime = monthdateFormat.format(DateUtils.monthsAdd(currnetDate,1));
+                    beginTime = monthdateFormat.format(DateUtils.monthsAdd(monthdateFormat.parse(deadTime),-11));
+                    result = inspectMapper.selectTasksByMonths(waterManagementOffice,beginTime,searchTime);
+                }
+                if("日".equals(unit)){
+                    deadTime = daydateFormat.format(currnetDate);
+                    searchTime = daydateFormat.format(DateUtils.daysAdd(currnetDate,1));
+                    beginTime = daydateFormat.format(DateUtils.daysAdd(daydateFormat.parse(deadTime),-11));
+                    result = inspectMapper.selectTasksByDays(waterManagementOffice,beginTime,searchTime);
+                }
             }
-            oalllist.add(alllist.get(i));
+        }else{
+            //默认查出近12天的数据
         }
-        allnewlist.remove(test);
-        list.add(test);
-        result = func(allnewlist,list,list);
-        oalllist.removeAll(result);
-        map.put("length",oalllist.size());
-        map.put("list",oalllist);
-        System.out.println(oalllist.size());*/
-        List<Test> alllist = new ArrayList<>();
-        //HashMap<String,Object> map = new HashMap<>();
-        alllist = testMapper.selectAllList(gid);
-        /*map.put("total",alllist.size());
-        map.put("list",alllist);*/
-        return RespBean.ok("").setObj(alllist);
-    }
-    //生成地图网络块
-    public RespBean create(){
-        List<Test> alllist = new ArrayList<>();
-        //排序查出表中的第一条数据
-        QueryWrapper<Test> queryWrapper = new QueryWrapper<>();
-        HashSet<Test> oalllist = new HashSet<>();
-        alllist = testMapper.selectList(queryWrapper);
-        for (int i = 0; i < alllist.size(); i++) {
-            oalllist.add(alllist.get(i));
-        }
-        return RespBean.ok("分析成功，一共生成"+createGeo(oalllist,0)+"条");
+        //补全空数据
+        result = supplement(result,unit,beginTime,deadTime);
+        resultMap.put("numsList",result);
+        return RespBean.ok("").setObj(resultMap);
     }
 
-    @Override
-    public RespBean inspectStatistics() {
-        return null;
+    public List<HashMap<String,Object>> supplement(List<HashMap<String,Object>> result,String unit,String beginTime,String deadTIme) throws ParseException {
+        List<HashMap<String,Object>> re = new ArrayList<>();
+        if("日".equals(unit)){
+            Date begin =  daydateFormat.parse(beginTime);
+            Date dead  =  daydateFormat.parse(deadTIme);
+            int days = DateUtils.daysBetween(begin,dead);
+            for (int i = 0; i < days+1; i++) {
+                String tempDate = daydateFormat.format(DateUtils.daysAdd(begin,i));
+                if(result.size()>0){
+                    Boolean flag =false;
+                    for (int j = 0; j < result.size(); j++) {
+                        if(result.get(j).get("time").equals(tempDate)){
+                            re.add(result.get(j));
+                            flag = true;
+                        }
+                    }
+                    if(!flag){
+                        HashMap map = new HashMap();
+                        map.put("time",tempDate);
+                        map.put("sum",0);
+                        re.add(map);
+                    }
+                }else{
+                    HashMap map = new HashMap();
+                    map.put("time",tempDate);
+                    map.put("sum",0);
+                    re.add(map);
+                }
+            }
+        }else if("月".equals(unit)){
+            Date begin =  monthdateFormat.parse(beginTime);
+            Date dead  =  monthdateFormat.parse(deadTIme);
+            int months = DateUtils.monthsBetween(begin,dead);
+            for (int i = 0; i < months+1; i++) {
+                String tempDate = monthdateFormat.format(DateUtils.monthsAdd(begin,i));
+                if(result.size()>0){
+                    Boolean flag =false;
+                    for (int j = 0; j < result.size(); j++) {
+                        if(result.get(j).get("time").equals(tempDate)){
+                            re.add(result.get(j));
+                            flag = true;
+                        }
+                    }
+                    if(!flag){
+                        HashMap map = new HashMap();
+                        map.put("time",tempDate);
+                        map.put("sum",0);
+                        re.add(map);
+                    }
+                }else{
+                    HashMap map = new HashMap();
+                    map.put("time",tempDate);
+                    map.put("sum",0);
+                    re.add(map);
+                }
+            }
+        }else if("年".equals(unit)){
+            Date begin =  yeardateFormat.parse(beginTime);
+            Date dead  =  yeardateFormat.parse(deadTIme);
+            int years = DateUtils.yearsBetween(begin,dead);
+            for (int i = 0; i < years+1; i++) {
+                String tempDate = yeardateFormat.format(DateUtils.yearsAdd(begin,i));
+                if(result.size()>0){
+                    Boolean flag =false;
+                    for (int j = 0; j < result.size(); j++) {
+                        if(result.get(j).get("time").equals(tempDate)){
+                            re.add(result.get(j));
+                            flag = true;
+                        }
+                    }
+                    if(!flag){
+                        HashMap map = new HashMap();
+                        map.put("time",tempDate);
+                        map.put("sum",0);
+                        re.add(map);
+                    }
+                }else{
+                    HashMap map = new HashMap();
+                    map.put("time",tempDate);
+                    map.put("sum",0);
+                    re.add(map);
+                }
+            }
+        }
+        return re;
     }
 
     @Override
@@ -836,6 +923,95 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
             //func(alllist,newlist,olist);
         }
         return olist;
+    }
+
+
+    @Override
+    public RespBean bijiao(Integer gid) {
+        List<Test> result1 = new ArrayList<>();
+        List<Test> result2 = new ArrayList<>();
+        List<Test> result3 = new ArrayList<>();
+        return RespBean.ok("").setObj(result3);
+    }
+
+    @Override
+    public RespBean digui(Integer gid) {
+        //1:查询出该gid对应的s/t
+       /* HashMap<String,Object> map = new HashMap<>();
+        List<Test> alllist = new ArrayList<>();
+        HashSet<Test> oalllist = new HashSet<>();
+        HashSet<Test> allnewlist = new HashSet<>();
+        HashSet<Test> list = new HashSet<>();
+        HashSet<Test> result = new HashSet<>();
+        QueryWrapper<Test> queryWrapper = new QueryWrapper<>();
+        alllist = testMapper.selectList(queryWrapper);
+        Test test = testMapper.selectOne(queryWrapper.eq("gid",gid));
+        for (int i = 0; i < alllist.size(); i++) {
+            if(!alllist.get(i).getGid().equals(test.getGid())){
+                allnewlist.add(alllist.get(i));
+            }
+            oalllist.add(alllist.get(i));
+        }
+        allnewlist.remove(test);
+        list.add(test);
+        result = func(allnewlist,list,list);
+        oalllist.removeAll(result);
+        map.put("length",oalllist.size());
+        map.put("list",oalllist);
+        System.out.println(oalllist.size());*/
+        List<Test> alllist = new ArrayList<>();
+        //HashMap<String,Object> map = new HashMap<>();
+        alllist = testMapper.selectAllList(gid);
+        /*map.put("total",alllist.size());
+        map.put("list",alllist);*/
+        return RespBean.ok("").setObj(alllist);
+    }
+    //生成地图网络块
+    public RespBean create(){
+        List<Test> alllist = new ArrayList<>();
+        //排序查出表中的第一条数据
+        QueryWrapper<Test> queryWrapper = new QueryWrapper<>();
+        HashSet<Test> oalllist = new HashSet<>();
+        alllist = testMapper.selectList(queryWrapper);
+        for (int i = 0; i < alllist.size(); i++) {
+            oalllist.add(alllist.get(i));
+        }
+        return RespBean.ok("分析成功，一共生成"+createGeo(oalllist,0)+"条");
+    }
+    //关阀分析
+    public RespBean getcloseValues(String gid){
+        //1：根据gid获取s，t
+        QueryWrapper<Test> queryWrapper = new QueryWrapper<>();
+        Test test = testMapper.selectOne(queryWrapper.eq("gid",gid));
+        //2：拿到s，t做深度遍历找到节点
+        findValves(test);
+        //3：判断每个节点是不是阀门，找出所有阀门
+        //4：跟水厂做联通分析
+        //5：关闭上游阀门
+        return RespBean.ok("");
+    }
+    public RespBean findValves(Test test){
+        List<Test> alllist = new ArrayList<>();
+        HashSet<Test> oalllist = new HashSet<>();
+        HashSet<Test> allnewlist = new HashSet<>();
+        QueryWrapper<Test> queryWrapper = new QueryWrapper<>();
+        alllist = testMapper.selectList(queryWrapper);
+        for (int i = 0; i < alllist.size(); i++) {
+            if(alllist.get(i).getGid().equals(test.getGid())){
+                alllist.get(i).setStatus(0);
+                oalllist.add(alllist.get(i));
+            }else{
+                oalllist.add(alllist.get(i));
+            }
+        }
+        //深度遍历
+        int s = test.getSource();
+        int t = test.getTarget();
+        //分别拿s/t去遍历
+        return RespBean.ok("");
+    }
+    public Boolean isvalve(){
+        return true;
     }
 
 }

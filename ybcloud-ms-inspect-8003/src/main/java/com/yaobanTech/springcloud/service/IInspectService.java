@@ -2,16 +2,11 @@ package com.yaobanTech.springcloud.service;
 
 import com.yaobanTech.springcloud.entity.Inspect;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.yaobanTech.springcloud.entity.Test;
 import com.yaobanTech.springcloud.entity.utils.RespBean;
-import org.springframework.web.bind.annotation.RequestBody;
-
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,7 +27,7 @@ public interface IInspectService extends IService<Inspect> {
 
     RespBean updateInspectDetailById(Map<String,Object> params);
 
-    RespBean addTempTask(Integer routeId,String  routeName ,String inspector,String beginTime,String endTime) throws ParseException;
+    RespBean addTempTask(String waterManagementOffice,Integer routeId,String  routeName ,String inspector,String beginTime,String endTime) throws ParseException;
 
     RespBean addPlanTask(String waterManagementOffice,Integer routeId,String  routeName ,Integer planId,String planName) throws ParseException;
 
@@ -60,13 +55,15 @@ public interface IInspectService extends IService<Inspect> {
 
     RespBean delete(String inspectTaskId);
 
+    RespBean inspectStatistics(String waterManagementOffice,String unit,String beginTime,String deadTime) throws ParseException;
+
+    RespBean uploadGPS(Map<String, Object> params);
+
     RespBean digui(Integer gid);
 
     RespBean bijiao(Integer gid);
 
     RespBean create();
 
-    RespBean inspectStatistics();
-
-    RespBean uploadGPS(Map<String, Object> params);
+    RespBean getcloseValues(String gid);
 }
