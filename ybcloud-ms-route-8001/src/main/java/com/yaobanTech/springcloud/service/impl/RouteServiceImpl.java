@@ -23,6 +23,7 @@ import javax.persistence.criteria.Root;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class RouteServiceImpl {
@@ -59,6 +60,7 @@ public class RouteServiceImpl {
 
     @Transactional
     public RespBean saveRoute(HashMap<String,Object> param,HttpServletRequest request) throws UnsupportedEncodingException {
+        HashMap<String,Object> hashMap = new HashMap<>();
         String header = request.getHeader("Authorization");
         String token =  StringUtils.substringAfter(header, "Bearer ");
         LoginUser u = urlUtils.getAll(request);
@@ -92,10 +94,13 @@ public class RouteServiceImpl {
                 e.printStackTrace();
                 return RespBean.error("保存失败！");
             }
+            hashMap.put("signPointList",bizRoute.getBizSignPoints());
+            hashMap.put("routeName",bizRoute.getRouteName());
+            hashMap.put("routeId",bizRoute.getId());
         }else{
             return RespBean.error("数据为空！");
         }
-        return RespBean.ok("保存成功！",bizRoute.getBizSignPoints());
+        return RespBean.ok("保存成功！",hashMap);
     }
 
     @Transactional
@@ -218,7 +223,7 @@ public class RouteServiceImpl {
                 route.setRouteTypeMenu(routeTypeMenu);
                 route.setWaterOfficeMenu(waterOfficeMenu);
                 route.setPointInspectionTypeMenu(pointInspectionTypeMenu);
-                route.setRouteCreatorCN(chineseName);
+//                route.setRouteCreatorCN(chineseName);
             }
         }
        return RespBean.ok("查询成功！",list);
@@ -230,7 +235,13 @@ public class RouteServiceImpl {
         LoginUser u = urlUtils.getAll(request);
         String user = u.getLoginname();
         String chineseName = (String)oauthService.getChineseName(u.getLoginname()).getObj();
-        List<BizRoute> list = bizRouteRepository.findList(user);
+        String role = u.getRoleLists();
+        List<BizRoute> list = null;
+        if(role.contains("BZZ")){
+            list = bizRouteRepository.findAll();
+        }else{
+            list = bizRouteRepository.findList(user);
+        }
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
                 BizRoute route = list.get(i);
@@ -254,10 +265,13 @@ public class RouteServiceImpl {
                 route.setRouteTypeMenu(routeTypeMenu);
                 route.setWaterOfficeMenu(waterOfficeMenu);
                 route.setPointInspectionTypeMenu(pointInspectionTypeMenu);
-                route.setRouteCreatorCN(chineseName);
+//                route.setRouteCreatorCN(chineseName);
             }
         }
-        return RespBean.ok("查询成功！",list);
+        List<BizRoute> routes = list.stream().
+                sorted(Comparator.comparing(BizRoute::getCreatedTime).reversed().thenComparing(BizRoute::getEnabled)).
+                collect(Collectors.toList());
+        return RespBean.ok("查询成功！",routes);
     }
 
     @Transactional(propagation= Propagation.NOT_SUPPORTED)
@@ -290,7 +304,7 @@ public class RouteServiceImpl {
                 route.setWaterOfficeMenu(waterOfficeMenu);
                 route.setPointInspectionTypeMenu(pointInspectionTypeMenu);
                 route.setRouteCreator(user);
-                route.setRouteCreatorCN(chineseName);
+//                route.setRouteCreatorCN(chineseName);
             }
         }
         return RespBean.ok("查询成功！",list);
@@ -330,7 +344,7 @@ public class RouteServiceImpl {
             br.setWaterOfficeMenu(waterOfficeMenu);
             br.setBizSignPoints(pointList);
             br.setPointInspectionTypeMenu(pointInspectionTypeMenu);
-            br.setRouteCreatorCN(chineseName);
+//            br.setRouteCreatorCN(chineseName);
         }
         return RespBean.ok("查询成功！",br);
     }

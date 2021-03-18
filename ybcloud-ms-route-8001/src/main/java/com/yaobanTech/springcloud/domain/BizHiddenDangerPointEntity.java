@@ -1,5 +1,7 @@
 package com.yaobanTech.springcloud.domain;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import javax.persistence.*;
 import java.util.HashMap;
 import java.util.List;
@@ -196,6 +198,12 @@ public class BizHiddenDangerPointEntity {
 	@Transient
 	private HashMap<String,Object> constructionTypeEnum;
 
+	/**
+	 * app附件
+	 */
+	@Transient
+	private List<HashMap<String,Object>> fileList;
+
 
 
 	public BizHiddenDangerPointEntity() {
@@ -232,6 +240,14 @@ public class BizHiddenDangerPointEntity {
 		this.projectTypeEnum = projectTypeEnum;
 		this.riskLevelEnum = riskLevelEnum;
 		this.constructionTypeEnum = constructionTypeEnum;
+	}
+
+	public List<HashMap<String, Object>> getFileList() {
+		return fileList;
+	}
+
+	public void setFileList(List<HashMap<String, Object>> fileList) {
+		this.fileList = fileList;
 	}
 
 	public Integer getId() {

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
@@ -26,8 +27,8 @@ public class LeakPointController {
 
     @ApiOperation("保存漏点")
     @PostMapping("add")
-    public RespBean saveHiddenDangerPoint(@RequestBody HashMap<String,Object> param,HttpServletRequest request){
-        return leakPointService.saveLeakPoint(param,request);
+    public RespBean saveHiddenDangerPoint(@RequestBody HashMap<String,Object> param, MultipartFile[] fileList, HttpServletRequest request){
+        return leakPointService.saveLeakPoint(param,fileList,request);
     }
 
     @ApiOperation("修改漏点")

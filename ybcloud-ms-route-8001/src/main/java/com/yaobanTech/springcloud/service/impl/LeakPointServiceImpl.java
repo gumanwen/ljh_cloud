@@ -3,10 +3,7 @@ package com.yaobanTech.springcloud.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.yaobanTech.springcloud.ToolUtils.DateFormatUtils;
 import com.yaobanTech.springcloud.ToolUtils.UrlUtils;
-import com.yaobanTech.springcloud.domain.BizLeakPointEntity;
-import com.yaobanTech.springcloud.domain.LeakPointQuery;
-import com.yaobanTech.springcloud.domain.LoginUser;
-import com.yaobanTech.springcloud.domain.RespBean;
+import com.yaobanTech.springcloud.domain.*;
 import com.yaobanTech.springcloud.repository.BizLeakPointRepository;
 import com.yaobanTech.springcloud.repository.BizSignPointMapper;
 import io.seata.spring.annotation.GlobalTransactional;
@@ -16,10 +13,12 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class LeakPointServiceImpl {
@@ -51,8 +50,9 @@ public class LeakPointServiceImpl {
     private UrlUtils urlUtils;
 
     @GlobalTransactional
-    public RespBean saveLeakPoint(HashMap<String,Object> param,HttpServletRequest request) {
+    public RespBean saveLeakPoint(HashMap<String,Object> param, MultipartFile[] fileList,HttpServletRequest request) {
         BizLeakPointEntity bizLeakPointEntity = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizLeakPointEntity.class);
+        String type = "ldfj";
         if(bizLeakPointEntity != null) {
             try {
                 String leakPointCode = null;
@@ -77,6 +77,7 @@ public class LeakPointServiceImpl {
                 bizLeakPointEntity.setLeakPointStatus("53");
                 bizLeakPointEntity.setLeakPointCode(leakPointCode);
                 leakPointRepository.save(bizLeakPointEntity);
+                fileService.saveByPid(fileList,bizLeakPointEntity.getLeakPointCode(),type) ;
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("保存失败！");
@@ -134,6 +135,7 @@ public class LeakPointServiceImpl {
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public RespBean findDetail(Integer id,HttpServletRequest request) {
         BizLeakPointEntity blpe = null;
+        String type = "ldfj";
         if(id != null) {
             try {
                 blpe = leakPointRepository.findBizLeakPointEntity(id);
@@ -141,9 +143,12 @@ public class LeakPointServiceImpl {
                 String chineseName = (String)oauthService.getChineseName(user).getObj();
                 HashMap<String,Object> leakPointStatusEnum = (HashMap)routeService.findEnum(blpe.getLeakPointStatus()).getObj();
                 HashMap<String,Object> abnormalPhenomenaEnum = (HashMap)routeService.findEnum(blpe.getAbnormalPhenomena()).getObj();
-                blpe.setCommitByCN(chineseName);
+//                blpe.setCommitByCN(chineseName);
                 blpe.setAbnormalPhenomenaEnum(abnormalPhenomenaEnum);
                 blpe.setLeakPointStatusEnum(leakPointStatusEnum);
+                RespBean bean = fileService.selectOneByPid(blpe.getLeakPointCode(), type);
+                List<HashMap<String, Object>> maps = (List<HashMap<String, Object>>) bean.getObj();
+                //blpe.setFileList(maps);
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("查询失败！");
@@ -159,8 +164,14 @@ public class LeakPointServiceImpl {
         LoginUser u = urlUtils.getAll(request);
         String user = u.getLoginname();
         String chineseName = u.getName();
+         String role = u.getRoleLists();
+         List<BizLeakPointEntity> list = null;
+         if(role.contains("BZZ")){
+             list = leakPointRepository.findAll();
+         }else{
+             list = leakPointRepository.findOfList(user);
+         }
 
-        List<BizLeakPointEntity> list = leakPointRepository.findOfList(user);
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
                 BizLeakPointEntity bizLeakPointEntity = list.get(i);
@@ -168,13 +179,14 @@ public class LeakPointServiceImpl {
                 HashMap<String,Object> abnormalPhenomenaEnum = (HashMap)routeService.findEnum(bizLeakPointEntity.getAbnormalPhenomena()).getObj();
                 HashMap<String,Object> assetTypeEnum = (HashMap)routeService.findEnum(bizLeakPointEntity.getAssetType()).getObj();
 
-                bizLeakPointEntity.setCommitByCN(chineseName);
+//                bizLeakPointEntity.setCommitByCN(chineseName);
                 bizLeakPointEntity.setLeakPointStatusEnum(leakPointStatusEnum);
                 bizLeakPointEntity.setAbnormalPhenomenaEnum(abnormalPhenomenaEnum);
                 bizLeakPointEntity.setAssetTypeEnum(assetTypeEnum);
             }
         }
-        return RespBean.ok("查询成功！",list);
+         List<BizLeakPointEntity> collect = list.stream().sorted(Comparator.comparing(BizLeakPointEntity::getEnabled).reversed().thenComparing(BizLeakPointEntity::getCommitDate).reversed()).collect(Collectors.toList());
+         return RespBean.ok("查询成功！",collect);
     }
 
     @Transactional(propagation= Propagation.NOT_SUPPORTED)
@@ -192,7 +204,7 @@ public class LeakPointServiceImpl {
                     BizLeakPointEntity bizLeakPointEntity = list.get(i);
                     HashMap<String,Object> leakPointStatusEnum = (HashMap)routeService.findEnum(bizLeakPointEntity.getLeakPointStatus()).getObj();
                     HashMap<String,Object> abnormalPhenomenaEnum = (HashMap)routeService.findEnum(bizLeakPointEntity.getAbnormalPhenomena()).getObj();
-                    bizLeakPointEntity.setCommitByCN(chineseName);
+//                    bizLeakPointEntity.setCommitByCN(chineseName);
                     bizLeakPointEntity.setLeakPointStatusEnum(leakPointStatusEnum);
                     bizLeakPointEntity.setAbnormalPhenomenaEnum(abnormalPhenomenaEnum);
                     codeList.add(bizLeakPointEntity.getLeakPointCode());

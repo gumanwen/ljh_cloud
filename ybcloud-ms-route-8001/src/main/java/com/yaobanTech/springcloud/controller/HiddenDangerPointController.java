@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
@@ -28,9 +29,9 @@ public class HiddenDangerPointController {
     private HiddenDangerPointServiceImpl hiddenDangerPointService;
 
     @ApiOperation("保存隐患点")
-    @PostMapping("add")
-    public RespBean saveHiddenDangerPoint(@RequestBody HashMap<String,Object> param,HttpServletRequest request){
-        return hiddenDangerPointService.saveHiddenDangerPoint(param,request);
+    @RequestMapping ("add")
+    public RespBean saveHiddenDangerPoint( @RequestParam String param,@RequestPart MultipartFile[] fileList, HttpServletRequest request){
+        return hiddenDangerPointService.saveHiddenDangerPoint(param,fileList,request);
     }
 
     @ApiOperation("修改隐患点")

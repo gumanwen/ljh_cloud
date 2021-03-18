@@ -18,9 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class SuggestServiceImpl {
@@ -159,7 +161,8 @@ public class SuggestServiceImpl {
 //                }
             }
         }
-        return RespBean.ok("查询成功！",list);
+        List<BizSuggestionEntity> collect = list.stream().sorted(Comparator.comparing(BizSuggestionEntity::getCommitDate).reversed()).collect(Collectors.toList());
+        return RespBean.ok("查询成功！",collect);
     }
 
 }

@@ -21,7 +21,7 @@ public interface BizSignedPointRepository extends JpaRepository<BizSignedPoint,I
 //    @Query(value = "SELECT a.*,b.route_type,b.point_inspection_type from biz_sign_point a LEFT JOIN biz_route b on a.route_id = b.id where b.id = ?1 and a.enabled = 1",nativeQuery = true)
 //    List<BizSignPoint> findSignPointListByRouteId(Integer routeId);
 
-    @Query(value = "SELECT a.*,b.route_type,b.point_inspection_type from biz_signed_point a LEFT JOIN biz_route b on a.route_id = b.id where b.id = ?1 and a.task_id = ?2 and a.enabled = 1 and a.sign_point_status = '已签到'",nativeQuery = true)
+    @Query(value = "SELECT a.*,b.route_type,b.point_inspection_type from biz_signed_point a LEFT JOIN biz_route b on a.route_id = b.id where b.id = ?1 and a.task_id = ?2 and a.enabled = 1 and a.sign_point_status = '合格'",nativeQuery = true)
     List<BizSignedPoint> findSignedList(Integer routeId,String taskId);
 
     @Query(value = "SELECT a.*,b.route_type,b.point_inspection_type from biz_signed_point a LEFT JOIN biz_route b on a.route_id = b.id where b.id = ?1 and a.task_id = ?2 and a.enabled = 1 ",nativeQuery = true)

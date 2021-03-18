@@ -14,13 +14,12 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class HiddenDangerPointServiceImpl {
@@ -57,8 +56,9 @@ public class HiddenDangerPointServiceImpl {
     private UrlUtils urlUtils;
 
     @GlobalTransactional
-    public RespBean saveHiddenDangerPoint(HashMap<String,Object> param,HttpServletRequest request) {
-        BizHiddenDangerPointEntity bizHiddenDangerPointEntity = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizHiddenDangerPointEntity.class);
+    public RespBean saveHiddenDangerPoint(String param,MultipartFile[] files,HttpServletRequest request) {
+        BizHiddenDangerPointEntity bizHiddenDangerPointEntity = JSONObject.parseObject(param, BizHiddenDangerPointEntity.class);
+        String type = "yhdfj";
         if(bizHiddenDangerPointEntity != null) {
             try {
                 String hiddenDangerPointCode = null;
@@ -83,7 +83,8 @@ public class HiddenDangerPointServiceImpl {
                 bizHiddenDangerPointEntity.setHiddenDangerStatus("53");
                 bizHiddenDangerPointEntity.setCommitBy(user);
                 bizHiddenDangerPointEntity.setHiddenDangerPointCode(hiddenDangerPointCode);
-               hiddenDangerPointRepository.save(bizHiddenDangerPointEntity);
+                hiddenDangerPointRepository.save(bizHiddenDangerPointEntity);
+                fileService.saveByPid(files,bizHiddenDangerPointEntity.getHiddenDangerPointCode(), type) ;
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("保存失败！");
@@ -131,6 +132,7 @@ public class HiddenDangerPointServiceImpl {
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public RespBean findDetail(Integer id,HttpServletRequest request) {
         BizHiddenDangerPointEntity bdpe = null;
+        String type = "yhdfj";
         if(id != null) {
             try {
                 bdpe = hiddenDangerPointRepository.findHiddenDangerPoint(id);
@@ -145,11 +147,11 @@ public class HiddenDangerPointServiceImpl {
                 bdpe.setProjectTypeEnum(projectTypeEnum);
                 bdpe.setRiskLevelEnum(riskLevelEnum);
                 bdpe.setConstructionTypeEnum(constructionTypeEnum);
-                bdpe.setCommitByCN(chineseName);
+//                bdpe.setCommitByCN(chineseName);
                 bdpe.setHandleAdvice(suggestionEntityList);
-                /*if(oauthService.getChineseName(bdpe.getCommitBy()).getStatus() == 500){
-                    throw new RuntimeException("Feign调用权限服务失败");
-                }*/
+                RespBean bean = fileService.selectOneByPid(bdpe.getHiddenDangerPointCode(), type);
+                List<HashMap<String, Object>> maps = (List<HashMap<String, Object>>) bean.getObj();
+                bdpe.setFileList(maps);
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("查询失败！");
@@ -165,12 +167,17 @@ public class HiddenDangerPointServiceImpl {
         LoginUser u = urlUtils.getAll(request);
         String chineseName = u.getName();
         String user = u.getLoginname();
-
-        List<BizHiddenDangerPointEntity> list = hiddenDangerPointRepository.findList(user);
+        String role = u.getRoleLists();
+        List<BizHiddenDangerPointEntity> list = null;
+        if(role.contains("BZZ")){
+            list = hiddenDangerPointRepository.findAll();
+        }else{
+            list = hiddenDangerPointRepository.findList(user);
+        }
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
                 BizHiddenDangerPointEntity bizHiddenDangerPointEntity = list.get(i);
-                bizHiddenDangerPointEntity.setCommitByCN(chineseName);;
+//                bizHiddenDangerPointEntity.setCommitByCN(chineseName);;
                 List<BizSuggestionEntity> suggestionEntityList = suggestionRepository.findList(bizHiddenDangerPointEntity.getHiddenDangerPointCode());
                 HashMap<String,Object> hiddenDangerStatusEnum = (HashMap)routeService.findEnum(bizHiddenDangerPointEntity.getHiddenDangerStatus()).getObj();
                 HashMap<String,Object> projectTypeEnum = (HashMap)routeService.findEnum(bizHiddenDangerPointEntity.getProjectType()).getObj();
@@ -202,7 +209,8 @@ public class HiddenDangerPointServiceImpl {
 //                }
             }
         }
-        return RespBean.ok("查询成功！",list);
+        List<BizHiddenDangerPointEntity> collect = list.stream().sorted(Comparator.comparing(BizHiddenDangerPointEntity::getEnabled).reversed().thenComparing(BizHiddenDangerPointEntity::getCommitDate).reversed()).collect(Collectors.toList());
+        return RespBean.ok("查询成功！",collect);
     }
 
     @Transactional
@@ -236,7 +244,7 @@ public class HiddenDangerPointServiceImpl {
                     hiddenDangerPointEntity.setProjectTypeEnum(projectTypeEnum);
                     hiddenDangerPointEntity.setRiskLevelEnum(riskLevelEnum);
                     hiddenDangerPointEntity.setConstructionTypeEnum(constructionTypeEnum);
-                    hiddenDangerPointEntity.setCommitByCN(chineseName);
+//                    hiddenDangerPointEntity.setCommitByCN(chineseName);
                     codeList.add(hiddenDangerPointEntity.getHiddenDangerPointCode());
 //                if(points.size()>0){
 //                    for(int j =0; j<points.size();j++){

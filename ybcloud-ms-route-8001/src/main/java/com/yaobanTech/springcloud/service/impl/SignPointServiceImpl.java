@@ -13,11 +13,13 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -70,7 +72,7 @@ public class SignPointServiceImpl {
         return RespBean.ok("保存成功！");
     }
 
-    @Transactional
+    @org.springframework.transaction.annotation.Transactional(propagation = Propagation.NOT_SUPPORTED)
     public RespBean updateSignPoint(HashMap<String,Object> param) {
         BizSignedPoint bizSignedPoint = null;
         Integer id = null;
@@ -132,7 +134,13 @@ public class SignPointServiceImpl {
         LoginUser u = urlUtils.getAll(request);
         String user = u.getLoginname();
         String chineseName = u.getName();
-        List<BizRoute> routeList = bizRouteRepository.findList(user);
+        String role = u.getRoleLists();
+        List<BizRoute> routeList = null;
+        if(role.contains("BZZ")){
+            routeList = bizRouteRepository.findAll();
+        }else{
+            routeList = bizRouteRepository.findList(user);
+        }
         List<BizSignPoint> list = new ArrayList<>();
         if(!routeList.isEmpty()){
             for (int i = 0; i < routeList.size(); i++) {
@@ -164,7 +172,8 @@ public class SignPointServiceImpl {
                 }
             }
         }
-        return RespBean.ok("查询成功！",list);
+        List<BizSignPoint> collect = list.stream().sorted(Comparator.comparing(BizSignPoint::getEnabled).reversed()).collect(Collectors.toList());
+        return RespBean.ok("查询成功！",collect);
     }
 
     public RespBean findList(Integer routeId) {
