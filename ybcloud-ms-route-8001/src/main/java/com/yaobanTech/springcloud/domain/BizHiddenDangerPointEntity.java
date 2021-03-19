@@ -1,7 +1,5 @@
 package com.yaobanTech.springcloud.domain;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import javax.persistence.*;
 import java.util.HashMap;
 import java.util.List;
@@ -157,6 +155,12 @@ public class BizHiddenDangerPointEntity {
 	private String endDate;
 
 	/**
+	 * 隐患原因
+	 */
+	@Column(name = "reason" )
+	private String reason;
+
+	/**
 	 * 隐患时长
 	 */
 	@Transient
@@ -240,6 +244,14 @@ public class BizHiddenDangerPointEntity {
 		this.projectTypeEnum = projectTypeEnum;
 		this.riskLevelEnum = riskLevelEnum;
 		this.constructionTypeEnum = constructionTypeEnum;
+	}
+
+	public String getReason() {
+		return reason;
+	}
+
+	public void setReason(String reason) {
+		this.reason = reason;
 	}
 
 	public List<HashMap<String, Object>> getFileList() {
