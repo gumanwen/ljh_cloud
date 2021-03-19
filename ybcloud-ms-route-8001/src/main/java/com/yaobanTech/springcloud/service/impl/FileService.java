@@ -18,7 +18,6 @@ public interface FileService {
 
 
     @RequestMapping(value = "/api/file/importFiles", method = RequestMethod.POST,
-//            produces = {MediaType.IMAGE_PNG_VALUE,MediaType.IMAGE_JPEG_VALUE},
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     RespBean saveByPid(@RequestPart("fileList") MultipartFile[] fileList,@RequestParam("pid") String pid, @RequestParam("type") String type);
 
