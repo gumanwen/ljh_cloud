@@ -41,7 +41,7 @@ public class FileController {
     }*/
 
     @ApiOperation(value ="文件上传接口")
-    @PostMapping("/importFiles")
+    @RequestMapping ("/importFiles")
     public RespBean importFiles(MultipartFile[] fileList, String pid, String type) throws IOException {
         return iFilesService.importFiles(fileList,pid,type);
     }

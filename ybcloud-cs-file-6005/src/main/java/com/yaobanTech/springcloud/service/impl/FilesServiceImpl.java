@@ -1,20 +1,21 @@
 package com.yaobanTech.springcloud.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yaobanTech.springcloud.entity.Files;
 import com.yaobanTech.springcloud.entity.utils.RespBean;
 import com.yaobanTech.springcloud.mapper.FilesMapper;
 import com.yaobanTech.springcloud.service.IFilesService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yaobanTech.springcloud.utils.FieldUtils;
+import io.seata.core.context.RootContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -52,7 +53,10 @@ public class FilesServiceImpl extends ServiceImpl<FilesMapper, Files> implements
     private String port;
 
     @Override
+
     public RespBean importFiles(MultipartFile[] fileList, String pid, String type) throws IOException {
+        String xid = RootContext.getXID();
+        System.out.println("xid="+xid);
         //acceptId:代表的是附件关联的主键
         String format = sdf.format(new Date());
         String realPath = path  +"upload/"+ format;

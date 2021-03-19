@@ -25,4 +25,8 @@ dependencies {
     compile group: 'org.apache.poi', name: 'poi', version: '4.1.2'
     // https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
     compile group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
+    // https://mvnrepository.com/artifact/com.alibaba.cloud/spring-cloud-alibaba-seata
+    compile group: 'com.alibaba.cloud', name: 'spring-cloud-alibaba-seata', version: '2.1.0.RELEASE'
+    // https://mvnrepository.com/artifact/io.seata/seata-server
+    compile group: 'io.seata', name: 'seata-server', version: '0.7.1'
 }
