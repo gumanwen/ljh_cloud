@@ -65,8 +65,8 @@ public class InspectController {
 
     @ApiOperation("web：新增临时任务")
     @GetMapping("/temp/addTempTask")
-    public RespBean addTempTask(Integer routeId,String  routeName ,String inspector,String beginTime,String endTime) throws ParseException {
-        return iInspectService.addTempTask(routeId,routeName,inspector,beginTime,endTime);
+    public RespBean addTempTask(String waterManagementOffice,Integer routeId,String  routeName ,String inspector,String beginTime,String endTime) throws ParseException {
+        return iInspectService.addTempTask(waterManagementOffice,routeId,routeName,inspector,beginTime,endTime);
     }
 
     @ApiOperation("web：新增计划任务")
@@ -207,8 +207,8 @@ public class InspectController {
 
     @ApiOperation("web：巡查统计")
     @GetMapping("/inspectStatistics")
-    public RespBean inspectStatistics(){
-        return iInspectService.inspectStatistics();
+    public RespBean inspectStatistics(String waterManagementOffice,String unit,String beginTime,String deadTime) throws ParseException {
+        return iInspectService.inspectStatistics(waterManagementOffice,unit,beginTime,deadTime);
     }
 
     @ApiOperation("/上传GPS坐标")
@@ -217,5 +217,10 @@ public class InspectController {
         return iInspectService.uploadGPS(params);
     }
 
+    @ApiOperation("/关阀分析")
+    @GetMapping("/getcloseValues")
+    public RespBean getcloseValues(String gid){
+        return iInspectService.getcloseValues(gid);
+    }
 }
 

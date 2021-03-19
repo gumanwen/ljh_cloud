@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yaobanTech.springcloud.mapper.InspectMapper">
+
+
+    <select id="selectTasksByYears" resultType="java.util.HashMap">
+        SELECT
+        m.time,
+        SUM ( m.sum ) sum
+        FROM
+        (
+        SELECT CAST
+        ( datepart( yy, begin_time ) AS VARCHAR ) AS TIME,
+        COUNT ( * ) SUM
+        FROM
+        BIZ_INSPECT
+        WHERE
+        <if test = "waterManagementOffice != null and waterManagementOffice !='' ">
+            water_management_office = #{waterManagementOffice} and
+        </if>
+        CONVERT ( VARCHAR ( 20 ), begin_time, 20 ) <![CDATA[ >= ]]> CONVERT ( VARCHAR ( 20 ), #{beginTime}, 20 )
+        AND CONVERT ( VARCHAR ( 20 ), begin_time, 20 ) <![CDATA[ <= ]]> CONVERT ( VARCHAR ( 20 ), #{deadTime}, 20 )
+        GROUP BY
+        begin_time
+        ) m
+        GROUP BY
+        m.time
+        ORDER BY
+        m.time
+    </select>
+    <select id="selectTasksByMonths" resultType="java.util.HashMap">
+        SELECT
+        m.time,
+        SUM ( m.sum ) sum
+        FROM
+        (
+        SELECT CAST
+        ( datepart( yy, begin_time ) AS VARCHAR ) + '-' + CAST ( RIGHT('00'+ Datename(mm,begin_time),2) AS VARCHAR ) TIME,
+        COUNT ( * ) SUM
+        FROM
+        BIZ_INSPECT
+        WHERE
+        <if test = "waterManagementOffice != null and waterManagementOffice !='' ">
+            water_management_office = #{waterManagementOffice} and
+        </if>
+        CONVERT ( VARCHAR ( 20 ), begin_time, 20 ) <![CDATA[ >= ]]> CONVERT ( VARCHAR ( 20 ), #{beginTime}, 20 )
+        AND CONVERT ( VARCHAR ( 20 ), begin_time, 20 ) <![CDATA[ <= ]]> CONVERT ( VARCHAR ( 20 ), #{deadTime}, 20 )
+        GROUP BY
+        begin_time
+        ) m
+        GROUP BY
+        m.time
+        ORDER BY
+        m.time
+    </select>
+    <select id="selectTasksByDays" resultType="java.util.HashMap">
+        SELECT
+        m.time,
+        SUM ( m.sum ) sum
+        FROM
+        (
+        SELECT
+        begin_time AS TIME,
+        COUNT ( * ) SUM
+        FROM
+        BIZ_INSPECT
+        WHERE
+        <if test = "waterManagementOffice != null and waterManagementOffice !='' ">
+            water_management_office = #{waterManagementOffice} and
+        </if>
+        CONVERT ( VARCHAR ( 20 ), begin_time, 20 ) <![CDATA[ >= ]]> CONVERT ( VARCHAR ( 20 ), #{beginTime}, 20 )
+        AND CONVERT ( VARCHAR ( 20 ), begin_time, 20 ) <![CDATA[ <= ]]> CONVERT ( VARCHAR ( 20 ), #{deadTime}, 20 )
+        GROUP BY
+        begin_time
+        ) m
+        GROUP BY
+        m.time
+        ORDER BY
+        m.time
+    </select>
+</mapper>
