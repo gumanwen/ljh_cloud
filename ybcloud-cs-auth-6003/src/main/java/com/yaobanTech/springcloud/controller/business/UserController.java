@@ -128,6 +128,7 @@ public class UserController {
             //这里的Object就是你专的集合里的数据类型，不知道可以属object.getClass看看
         }
         result.put("username",username);
+        result.put("name",u.getName());
         result.put("userId",u.getId());
         result.put("roles", String.valueOf(object));
         result.put("token", "Bearer "+map.get("access_token"));
