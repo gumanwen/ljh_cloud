@@ -65,9 +65,6 @@ public class RouteServiceImpl {
         String token =  StringUtils.substringAfter(header, "Bearer ");
         LoginUser u = urlUtils.getAll(request);
         String user =u.getLoginname();
-        /*if(oauthService.getCurrentUser(token).getStatus() == 500){
-            throw new RuntimeException("Feign调用权限服务失败");
-        }*/
         BizRoute bizRoute = null;
         if(param != null){
             bizRoute = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizRoute.class);

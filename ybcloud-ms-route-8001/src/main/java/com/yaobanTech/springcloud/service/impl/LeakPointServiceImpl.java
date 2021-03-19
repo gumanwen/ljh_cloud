@@ -50,8 +50,8 @@ public class LeakPointServiceImpl {
     private UrlUtils urlUtils;
 
     @GlobalTransactional
-    public RespBean saveLeakPoint(HashMap<String,Object> param, MultipartFile[] fileList,HttpServletRequest request) {
-        BizLeakPointEntity bizLeakPointEntity = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizLeakPointEntity.class);
+    public RespBean saveLeakPoint(String param, MultipartFile[] fileList,HttpServletRequest request) {
+        BizLeakPointEntity bizLeakPointEntity = JSONObject.parseObject(param, BizLeakPointEntity.class);
         String type = "ldfj";
         if(bizLeakPointEntity != null) {
             try {

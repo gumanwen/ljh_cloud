@@ -26,8 +26,8 @@ public class LeakPointController {
     private LeakPointServiceImpl leakPointService;
 
     @ApiOperation("保存漏点")
-    @PostMapping("add")
-    public RespBean saveHiddenDangerPoint(@RequestBody HashMap<String,Object> param, MultipartFile[] fileList, HttpServletRequest request){
+    @RequestMapping("add")
+    public RespBean saveHiddenDangerPoint(@RequestParam String param,@RequestPart MultipartFile[] fileList, HttpServletRequest request){
         return leakPointService.saveLeakPoint(param,fileList,request);
     }
 

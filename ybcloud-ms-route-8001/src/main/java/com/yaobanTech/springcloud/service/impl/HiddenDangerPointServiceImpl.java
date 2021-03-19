@@ -14,8 +14,10 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class HiddenDangerPointServiceImpl {
+
     @Autowired
     @Lazy
     private BizHiddenDangerPointRepository hiddenDangerPointRepository;
@@ -55,6 +58,10 @@ public class HiddenDangerPointServiceImpl {
     @Lazy
     private UrlUtils urlUtils;
 
+    @Resource
+    private HiddenDangerPointServiceImpl hiddenDangerPointService;
+
+    @Transactional
     @GlobalTransactional
     public RespBean saveHiddenDangerPoint(String param,MultipartFile[] files,HttpServletRequest request) {
         BizHiddenDangerPointEntity bizHiddenDangerPointEntity = JSONObject.parseObject(param, BizHiddenDangerPointEntity.class);
@@ -85,8 +92,10 @@ public class HiddenDangerPointServiceImpl {
                 bizHiddenDangerPointEntity.setHiddenDangerPointCode(hiddenDangerPointCode);
                 hiddenDangerPointRepository.save(bizHiddenDangerPointEntity);
                 fileService.saveByPid(files,bizHiddenDangerPointEntity.getHiddenDangerPointCode(), type) ;
+
             } catch (Exception e) {
                 e.printStackTrace();
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return RespBean.error("保存失败！");
             }
         }else{

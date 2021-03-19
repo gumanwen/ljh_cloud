@@ -49,7 +49,7 @@ spring:
                   predicates:
                       - Path=/api/activiti/**
                 - id: cs-file
-                  uri: http://192.168.50.168:6005 #负载均衡 动态路由
+                  uri: http://192.168.50.91:6005 #负载均衡 动态路由
                   predicates:
                       - Path=/api/file/**
                 - id: cs-file1
