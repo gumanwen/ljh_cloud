@@ -197,7 +197,7 @@ public class BizLeakPointEntity {
 	 * app附件上传
 	 */
 	@Transient
-	private MultipartFile[] fileList;
+	private List<HashMap<String,Object>> fileList;
 
 	public BizLeakPointEntity() {
 	}
@@ -234,11 +234,11 @@ public class BizLeakPointEntity {
 		this.assetTypeEnum = assetTypeEnum;
 	}
 
-	public MultipartFile[] getFileList() {
+	public List<HashMap<String, Object>> getFileList() {
 		return fileList;
 	}
 
-	public void setFileList(MultipartFile[] fileList) {
+	public void setFileList(List<HashMap<String, Object>> fileList) {
 		this.fileList = fileList;
 	}
 

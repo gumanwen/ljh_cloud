@@ -385,18 +385,18 @@ public class RouteServiceImpl {
         return RespBean.ok("查询成功！", map);
     }
 
-    public RespBean findRouteIds(String waterManagementOffice,String routeName,String pointInspectionType,String planName ,String planPorid,String planType){
+    public RespBean findRouteIds(String waterManagementOffice,Integer routeId,String pointInspectionType,Integer planId ,String planPorid,String planType){
         if("".equals(waterManagementOffice)){
             waterManagementOffice = null;
         }
-        if("".equals(routeName)){
-            routeName = null;
+        if("".equals(routeId)){
+            routeId = null;
         }
         if("".equals(pointInspectionType)){
             pointInspectionType = null;
         }
-        if("".equals(planName)){
-            planName = null;
+        if("".equals(planId)){
+            planId = null;
         }
         if("".equals(planPorid)){
             planPorid = null;
@@ -404,7 +404,7 @@ public class RouteServiceImpl {
         if("".equals(planType)){
             planType = null;
         }
-        List<HashMap<String, Object>> ids = bizSignPointMapper.findRouteIds(waterManagementOffice, routeName, pointInspectionType, planName, planPorid, planType);
+        List<HashMap<String, Object>> ids = bizSignPointMapper.findRouteIds(waterManagementOffice, routeId, pointInspectionType, planId, planPorid, planType);
         return RespBean.ok("查询成功！",ids);
     }
 

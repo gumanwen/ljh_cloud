@@ -90,13 +90,13 @@ public interface BizSignPointMapper {
             "JOIN `ybcloud-ms-route-8001`.`biz_route` a ON a.id = b.route_id " +
             "WHERE 1=1 " +
             "AND IF(#{waterManagementOffice} is not null,water_management_office = #{waterManagementOffice},1=1) " +
-            "AND IF(#{routeName} is not null,route_name = #{routeName},1=1) " +
+            "AND IF(#{routeId} is not null,a.id = #{routeId},1=1) " +
             "AND IF(#{pointInspectionType} is not null,point_inspection_type = #{pointInspectionType},1=1) " +
-            "AND IF(#{planName} is not null,plan_name = #{planName},1=1) " +
+            "AND IF(#{planId} is not null,b.id = #{planId},1=1) " +
             "AND IF(#{planPorid} is not null,plan_porid = #{planPorid},1=1) " +
             "AND IF(#{planType} is not null,plan_type = #{planType},1=1) ")
 
-    List<HashMap<String,Object>> findRouteIds(String waterManagementOffice, String routeName, String pointInspectionType, String planName , String planPorid, String planType);
+    List<HashMap<String,Object>> findRouteIds(String waterManagementOffice, Integer routeId, String pointInspectionType, Integer planId , String planPorid, String planType);
 
     @Select(value="SELECT a.* " +
             "FROM `ybcloud-ms-route-8001`.`biz_leak_point` a " +

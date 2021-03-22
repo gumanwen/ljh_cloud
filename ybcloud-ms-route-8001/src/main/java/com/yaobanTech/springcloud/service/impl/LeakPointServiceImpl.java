@@ -148,7 +148,7 @@ public class LeakPointServiceImpl {
                 blpe.setLeakPointStatusEnum(leakPointStatusEnum);
                 RespBean bean = fileService.selectOneByPid(blpe.getLeakPointCode(), type);
                 List<HashMap<String, Object>> maps = (List<HashMap<String, Object>>) bean.getObj();
-                //blpe.setFileList(maps);
+                blpe.setFileList(maps);
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("查询失败！");
@@ -183,6 +183,13 @@ public class LeakPointServiceImpl {
                 bizLeakPointEntity.setLeakPointStatusEnum(leakPointStatusEnum);
                 bizLeakPointEntity.setAbnormalPhenomenaEnum(abnormalPhenomenaEnum);
                 bizLeakPointEntity.setAssetTypeEnum(assetTypeEnum);
+                //获取报建文件列表
+                RespBean respBean = fileService.selectOneByPid(bizLeakPointEntity.getLeakPointCode(), "ldfj");
+                List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) respBean.getObj();
+                if(respBean.getStatus() == 500){
+                    throw new RuntimeException("Feign调用文件服务失败");
+                }
+                bizLeakPointEntity.setFileList(fileList);
             }
         }
          List<BizLeakPointEntity> collect = list.stream().sorted(Comparator.comparing(BizLeakPointEntity::getEnabled).reversed().thenComparing(BizLeakPointEntity::getCommitDate).reversed()).collect(Collectors.toList());
