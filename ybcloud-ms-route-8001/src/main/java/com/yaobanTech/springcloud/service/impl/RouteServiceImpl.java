@@ -389,14 +389,8 @@ public class RouteServiceImpl {
         if("".equals(waterManagementOffice)){
             waterManagementOffice = null;
         }
-        if("".equals(routeId)){
-            routeId = null;
-        }
         if("".equals(pointInspectionType)){
             pointInspectionType = null;
-        }
-        if("".equals(planId)){
-            planId = null;
         }
         if("".equals(planPorid)){
             planPorid = null;

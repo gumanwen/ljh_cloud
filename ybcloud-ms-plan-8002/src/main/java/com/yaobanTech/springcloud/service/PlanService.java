@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
@@ -53,9 +54,11 @@ public class PlanService {
     @Autowired
     @Lazy
     private UrlUtils urlUtils;
+
     @Autowired
     @Lazy
     private PlanMapper planMapper;
+
 
     SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -363,10 +366,14 @@ public class PlanService {
     }
 
     @GlobalTransactional
+    @Transactional
     public RespBean examinePlan(Integer id,String status) {
         if(id != null && "14".equals(status)) {
             try {
+                bizPlanRepository.examinePlan(id, status);
                 BizPlan bizPlan = bizPlanRepository.findDetail(id);
+                HashMap<String, Object> hashMap = (HashMap<String, Object>) routeService.findDetail(bizPlan.getRouteId()).getObj();
+                String waterManagementOffice = (String) hashMap.get("waterManagementOffice");
                 String code = bizPlan.getPlanPorid();
                 EnumMenu key = EnumMenu.getEnumByKey(code);
                 String desc = key.getDesc();
@@ -377,17 +384,13 @@ public class PlanService {
                 map.put("startTime",dateFormat.format(bizPlan.getStartTime()));
                 map.put("endTime",dateFormat.format(bizPlan.getEndTime()));
                 map.put("period",period);
+                map.put("waterManagementOffice",waterManagementOffice);
                 inspectService.sendInspectInfo(map);
             } catch (Exception e) {
                 e.printStackTrace();
-                return RespBean.error("调用派发任务异常！");
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return RespBean.error("审批失败！");
             }
-        }
-        try {
-            bizPlanRepository.examinePlan(id,status);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return RespBean.error("审批失败！");
         }
         return RespBean.ok("审批成功！");
     }
