@@ -3,11 +3,9 @@ package com.yaobanTech.springcloud.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.alibaba.nacos.client.utils.JSONUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
 import com.yaobanTech.springcloud.entity.Inspect;
 import com.yaobanTech.springcloud.entity.LoginUser;
 import com.yaobanTech.springcloud.entity.Test;
@@ -980,17 +978,18 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
     }
     //关阀分析
     public RespBean getcloseValues(String gid){
+        //0：根据gid查询出联通的节点
         //1：根据gid获取s，t
         QueryWrapper<Test> queryWrapper = new QueryWrapper<>();
         Test test = testMapper.selectOne(queryWrapper.eq("gid",gid));
         //2：拿到s，t做深度遍历找到节点
-        findValves(test);
+        findAllValves(test);
         //3：判断每个节点是不是阀门，找出所有阀门
         //4：跟水厂做联通分析
         //5：关闭上游阀门
         return RespBean.ok("");
     }
-    public RespBean findValves(Test test){
+    public RespBean findAllValves(Test test){
         List<Test> alllist = new ArrayList<>();
         HashSet<Test> oalllist = new HashSet<>();
         HashSet<Test> allnewlist = new HashSet<>();
@@ -1007,7 +1006,18 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         //深度遍历
         int s = test.getSource();
         int t = test.getTarget();
+        findValves(s,oalllist);
         //分别拿s/t去遍历
+        return RespBean.ok("");
+    }
+    public RespBean findValves(int node,HashSet<Test> list){
+        if(list.size()>0){
+            Iterator <Test> s = list.iterator();
+            Test test = new Test();
+            while(s.hasNext()){
+                test = s.next();
+            }
+        }
         return RespBean.ok("");
     }
     public Boolean isvalve(){
