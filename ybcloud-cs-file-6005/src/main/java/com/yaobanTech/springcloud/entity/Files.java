@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
  * @since 2020-12-27
  */
 @EqualsAndHashCode(callSuper = false)
-@TableName("BIZ_FILES")
+@TableName("biz_files")
 public class Files implements Serializable {
 
     private static final long serialVersionUID = 1L;

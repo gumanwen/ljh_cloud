@@ -93,7 +93,7 @@ public class BizRoute  implements Serializable {
 	 * 管径
 	 */
    	@Column(name = "pipe_diameter" )
-	private Integer pipeDiameter;
+	private String pipeDiameter;
 
 	/**
 	 * 实际巡查里程
@@ -177,7 +177,7 @@ public class BizRoute  implements Serializable {
 	public BizRoute() {
 	}
 
-	public BizRoute(Integer id, String waterManagementOffice, String status, String routeName, String routeType, String routeCreator, Integer signIn, Double planInspectionMileage, Date createdTime, Integer hiddenDangerAmount, Integer pipeDiameter, Double actInspectionMileage, Integer enabled, String location, String pointInspectionType, List<BizSignPoint> bizSignPoints) {
+	public BizRoute(Integer id, String waterManagementOffice, String status, String routeName, String routeType, String routeCreator, Integer signIn, Double planInspectionMileage, Date createdTime, Integer hiddenDangerAmount, String pipeDiameter, Double actInspectionMileage, Integer enabled, String location, String pointInspectionType, String hiddenDangerReason, String overReason, String modifyBy, String addr, Map<String, Object> waterOfficeMenu, Map<String, Object> routeTypeMenu, Map<String, Object> pointInspectionTypeMenu, String routeCreatorCN, List<BizSignPoint> bizSignPoints) {
 		this.id = id;
 		this.waterManagementOffice = waterManagementOffice;
 		this.status = status;
@@ -193,72 +193,15 @@ public class BizRoute  implements Serializable {
 		this.enabled = enabled;
 		this.location = location;
 		this.pointInspectionType = pointInspectionType;
-		this.bizSignPoints = bizSignPoints;
-	}
-
-
-	public String getRouteCreatorCN() {
-		return routeCreatorCN;
-	}
-
-	public void setRouteCreatorCN(String routeCreatorCN) {
-		this.routeCreatorCN = routeCreatorCN;
-	}
-
-	public Map<String, Object> getPointInspectionTypeMenu() {
-		return pointInspectionTypeMenu;
-	}
-
-	public void setPointInspectionTypeMenu(Map<String, Object> pointInspectionTypeMenu) {
-		this.pointInspectionTypeMenu = pointInspectionTypeMenu;
-	}
-
-	public String getAddr() {
-		return addr;
-	}
-
-	public void setAddr(String addr) {
-		this.addr = addr;
-	}
-
-	public Map<String, Object> getWaterOfficeMenu() {
-		return waterOfficeMenu;
-	}
-
-	public void setWaterOfficeMenu(Map<String, Object> waterOfficeMenu) {
-		this.waterOfficeMenu = waterOfficeMenu;
-	}
-
-	public Map<String, Object> getRouteTypeMenu() {
-		return routeTypeMenu;
-	}
-
-	public void setRouteTypeMenu(Map<String, Object> routeTypeMenu) {
-		this.routeTypeMenu = routeTypeMenu;
-	}
-
-	public String getHiddenDangerReason() {
-		return hiddenDangerReason;
-	}
-
-	public void setHiddenDangerReason(String hiddenDangerReason) {
 		this.hiddenDangerReason = hiddenDangerReason;
-	}
-
-	public String getOverReason() {
-		return overReason;
-	}
-
-	public void setOverReason(String overReason) {
 		this.overReason = overReason;
-	}
-
-	public String getModifyBy() {
-		return modifyBy;
-	}
-
-	public void setModifyBy(String modifyBy) {
 		this.modifyBy = modifyBy;
+		this.addr = addr;
+		this.waterOfficeMenu = waterOfficeMenu;
+		this.routeTypeMenu = routeTypeMenu;
+		this.pointInspectionTypeMenu = pointInspectionTypeMenu;
+		this.routeCreatorCN = routeCreatorCN;
+		this.bizSignPoints = bizSignPoints;
 	}
 
 	public static long getSerialVersionUID() {
@@ -345,11 +288,11 @@ public class BizRoute  implements Serializable {
 		this.hiddenDangerAmount = hiddenDangerAmount;
 	}
 
-	public Integer getPipeDiameter() {
+	public String getPipeDiameter() {
 		return pipeDiameter;
 	}
 
-	public void setPipeDiameter(Integer pipeDiameter) {
+	public void setPipeDiameter(String pipeDiameter) {
 		this.pipeDiameter = pipeDiameter;
 	}
 
@@ -383,6 +326,70 @@ public class BizRoute  implements Serializable {
 
 	public void setPointInspectionType(String pointInspectionType) {
 		this.pointInspectionType = pointInspectionType;
+	}
+
+	public String getHiddenDangerReason() {
+		return hiddenDangerReason;
+	}
+
+	public void setHiddenDangerReason(String hiddenDangerReason) {
+		this.hiddenDangerReason = hiddenDangerReason;
+	}
+
+	public String getOverReason() {
+		return overReason;
+	}
+
+	public void setOverReason(String overReason) {
+		this.overReason = overReason;
+	}
+
+	public String getModifyBy() {
+		return modifyBy;
+	}
+
+	public void setModifyBy(String modifyBy) {
+		this.modifyBy = modifyBy;
+	}
+
+	public String getAddr() {
+		return addr;
+	}
+
+	public void setAddr(String addr) {
+		this.addr = addr;
+	}
+
+	public Map<String, Object> getWaterOfficeMenu() {
+		return waterOfficeMenu;
+	}
+
+	public void setWaterOfficeMenu(Map<String, Object> waterOfficeMenu) {
+		this.waterOfficeMenu = waterOfficeMenu;
+	}
+
+	public Map<String, Object> getRouteTypeMenu() {
+		return routeTypeMenu;
+	}
+
+	public void setRouteTypeMenu(Map<String, Object> routeTypeMenu) {
+		this.routeTypeMenu = routeTypeMenu;
+	}
+
+	public Map<String, Object> getPointInspectionTypeMenu() {
+		return pointInspectionTypeMenu;
+	}
+
+	public void setPointInspectionTypeMenu(Map<String, Object> pointInspectionTypeMenu) {
+		this.pointInspectionTypeMenu = pointInspectionTypeMenu;
+	}
+
+	public String getRouteCreatorCN() {
+		return routeCreatorCN;
+	}
+
+	public void setRouteCreatorCN(String routeCreatorCN) {
+		this.routeCreatorCN = routeCreatorCN;
 	}
 
 	public List<BizSignPoint> getBizSignPoints() {

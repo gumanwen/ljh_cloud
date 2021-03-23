@@ -198,24 +198,13 @@ public class HiddenDangerPointServiceImpl {
                 bizHiddenDangerPointEntity.setConstructionTypeEnum(constructionTypeEnum);
                 bizHiddenDangerPointEntity.setHandleAdvice(suggestionEntityList);
 
-//                if(points.size()>0){
-//                    for(int j =0; j<points.size();j++){
-//                        //获取报建文件列表
-//                        if(FieldUtils.isObjectNotEmpty(points.get(j).getFileType())) {
-//                            RespBean respBean = fileService.selectOneByPid(String.valueOf((Integer) points.get(j).getId()), (String) points.get(j).getFileType());
-//                            List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) respBean.getObj();
-//                            if(respBean.getStatus() == 500){
-//                                throw new RuntimeException("Feign调用文件服务失败");
-//                            }
-//                            Map signPointTypeEnum = (Map) EnumMenu.findEnum(points.get(j).getSignPointType()).getObj();
-//                            points.get(j).setFileList(fileList);
-//                            points.get(j).setWaterUseOfficeEnum(waterManagementOfficeEnum);
-//                            points.get(j).setSignPointTypeEnum(pointInspectionTypeEnum);
-//                            points.get(j).setRouteTypeEnum(routeTypeEnum);
-//                        }
-//                        list.add(points.get(j));
-//                    }
-//                }
+                //获取报建文件列表
+                RespBean respBean = fileService.selectOneByPid(bizHiddenDangerPointEntity.getHiddenDangerPointCode(), "yhdfj");
+                List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) respBean.getObj();
+                if(respBean.getStatus() == 500){
+                    throw new RuntimeException("Feign调用文件服务失败");
+                }
+                bizHiddenDangerPointEntity.setFileList(fileList);
             }
         }
         List<BizHiddenDangerPointEntity> collect = list.stream().sorted(Comparator.comparing(BizHiddenDangerPointEntity::getEnabled).reversed().thenComparing(BizHiddenDangerPointEntity::getCommitDate).reversed()).collect(Collectors.toList());

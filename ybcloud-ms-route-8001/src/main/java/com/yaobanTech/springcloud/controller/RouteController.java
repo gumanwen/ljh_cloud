@@ -85,9 +85,9 @@ public class RouteController {
 
     @ApiOperation("条件查询路线id列表")
     @GetMapping("findRouteIds")
-    public RespBean findRouteIds(@RequestParam String waterManagementOffice,@RequestParam String routeName,@RequestParam String pointInspectionType,
-    @RequestParam String planName ,@RequestParam String planPorid,@RequestParam String planType) throws UnsupportedEncodingException {
-        return routeService.findRouteIds(waterManagementOffice,routeName,pointInspectionType,planName,planPorid,planType);
+    public RespBean findRouteIds(@RequestParam String waterManagementOffice, Integer routeId,@RequestParam String pointInspectionType,
+           Integer planId ,@RequestParam String planPorid,@RequestParam String planType) throws UnsupportedEncodingException {
+        return routeService.findRouteIds(waterManagementOffice,routeId,pointInspectionType,planId,planPorid,planType);
     }
 
 }
