@@ -131,7 +131,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
             if(FieldUtils.isObjectNotEmpty(map.get("end_d2"))){
                 Date end_d2 =  new Date(Long.parseLong((String) map.get("end_d2")));
                 queryWrapper.apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),end_time,20) <= convert(varchar(20),'"+end_d2+"',20)");}
-            feignRespBean = routeService.findRouteIds((String)FieldUtils.ifObjectEmptyToNullStr(map.get("waterManagementOffice")),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("routeName")),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("pointInspectionType")),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("planName")),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("planPorid")),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("planType")));
+            feignRespBean = routeService.findRouteIds((String)FieldUtils.ifObjectEmptyToNullStr(map.get("waterManagementOffice")), (Integer) map.get("routeName"),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("pointInspectionType")), (Integer) map.get("planName"),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("planPorid")),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("planType")));
         }
         List<HashMap<String,Object>> feignMap = (List<HashMap<String, Object>>) feignRespBean.getObj();
         /*if (FieldUtils.isObjectNotEmpty(feignMap)){
@@ -152,7 +152,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
             }
         }*/
 
-        queryWrapper.eq("task_type","计划任务");
+        //queryWrapper.eq("task_type","计划任务");
         if(feignMap.size()>0){
             queryWrapper.and(wrapper -> {
                 for(HashMap<String,Object> info: feignMap){
@@ -161,6 +161,9 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                             .eq("plan_id",info.get("planIds"));
                 }
             });
+        }else{
+            queryWrapper.eq("route_id",0);
+            queryWrapper.eq("plan_id",0);
         }
         RespBean respBean = new RespBean();
         List<Inspect> list = new ArrayList<>();
@@ -384,7 +387,6 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
     public RespBean addPlanTask(String waterManagementOffice,Integer routeId,String  routeName ,Integer planId,String planName) throws ParseException {
         if(FieldUtils.isObjectNotEmpty(planId) && FieldUtils.isObjectNotEmpty(routeId) ){
             RespBean re = planService.findById(planId);
-            List<String> list = new ArrayList<>();
             Map map = (Map) re.getObj();
             Map enumMap = new HashMap();
             String cycleStr = null;
@@ -398,37 +400,71 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                         cycleStr = (String) enumMap.get("desc");
                     }
                 }
-                int days = DateUtils.daysBetween(start,end)+1;
-                Integer cycle = Integer.valueOf(cycleStr.substring(0,1));
-                int nums = (int) Math.floor(days/cycle);
-                if(nums>0){
-                    for(int i=0;i<nums;i++){
-                        Inspect inspect = new Inspect();
-                        String inspect_task_id = "";
-                        inspect_task_id = redisGeneratorCode.createGenerateCode("计划任务","JH",true,4);
-                        logger.info("生成的任务编号："+inspect_task_id +"           ------------------------");
-                        inspect.setInspectTaskId(inspect_task_id);
-                        inspect.setBeginTime(daydateFormat.format(DateUtils.daysAdd(start,cycle*i)));
-                        inspect.setDeadTime(daydateFormat.format(DateUtils.daysAdd(start,cycle*(i+1)-1)));
-                        inspect.setPlanId(planId);
-                        inspect.setRouteId(routeId);
-                        inspect.setTaskType("计划任务");
-                        inspect.setCompleteRate("0");
-                        inspect.setStatus("未处理");
-                        inspect.setWaterManagementOffice(waterManagementOffice);
-                        list.add(inspect_task_id);
-                        inspectMapper.insert(inspect);
-                    }
-                }
-                //feign接口 routeService
-                routeService.taskPoint(list,routeId);
-                return RespBean.ok("生成任务完成！");
+                return createTask(start,end,cycleStr,routeId,planId,waterManagementOffice);
             }else{
                 return RespBean.error("计划开始时间，计划结束时间或计划周期不完整，创建不了任务！map="+map+",re="+re);
             }
         }else{
             return RespBean.error("参数为空！");
         }
+    }
+
+    @Override
+    @Transactional
+    public RespBean autoCreate(Map<String, Object> params) throws ParseException {
+        String cycleStr =null;
+        Map enumMap = new HashMap();
+        if(FieldUtils.isObjectNotEmpty(params.get("waterManagementOffice")) && FieldUtils.isObjectNotEmpty(params.get("planId")) && FieldUtils.isObjectNotEmpty(params.get("routeId"))){
+            if(FieldUtils.isObjectNotEmpty(params.get("period")) && FieldUtils.isObjectNotEmpty(params.get("startTime")) && FieldUtils.isObjectNotEmpty(params.get("endTime"))){
+                String waterManagementOffice = (String) params.get("waterManagementOffice");
+                Integer planId = (Integer) params.get("planId");
+                Integer routeId = (Integer) params.get("routeId");
+                int period = Integer.valueOf((String) params.get("period"));
+                Date start = daydateFormat.parse((String) params.get("startTime"));
+                Date end = daydateFormat.parse((String) params.get("endTime"));
+                RespBean respBean = routeService.findEnum(String.valueOf(period));
+                if(FieldUtils.isObjectNotEmpty(respBean)){
+                    enumMap = (Map)respBean.getObj();
+                    if(FieldUtils.isObjectNotEmpty(enumMap.get("desc"))){
+                        cycleStr = (String) enumMap.get("desc");
+                    }
+                }
+                return createTask(start,end,cycleStr,routeId,planId,waterManagementOffice);
+            }else{
+                return RespBean.error("计划开始时间，计划结束时间或计划周期不完整，无法创建计划任务！");
+            }
+        }else{
+            return RespBean.error("参数为空！");
+        }
+    }
+
+    public RespBean createTask(Date start,Date end,String cycleStr,Integer routeId,Integer planId,String waterManagementOffice) throws ParseException {
+        List<String> list = new ArrayList<>();
+        int days = DateUtils.daysBetween(start,end)+1;
+        Integer cycle = Integer.valueOf(cycleStr.substring(0,1));
+        int nums = (int) Math.floor(days/cycle);
+        if(nums>0){
+            for(int i=0;i<nums;i++){
+                Inspect inspect = new Inspect();
+                String inspect_task_id = "";
+                inspect_task_id = redisGeneratorCode.createGenerateCode("计划任务","JH",true,4);
+                logger.info("生成的任务编号："+inspect_task_id +"           ------------------------");
+                inspect.setInspectTaskId(inspect_task_id);
+                inspect.setBeginTime(daydateFormat.format(DateUtils.daysAdd(start,cycle*i)));
+                inspect.setDeadTime(daydateFormat.format(DateUtils.daysAdd(start,cycle*(i+1)-1)));
+                inspect.setPlanId(planId);
+                inspect.setRouteId(routeId);
+                inspect.setTaskType("计划任务");
+                inspect.setCompleteRate("0");
+                inspect.setStatus("未处理");
+                inspect.setWaterManagementOffice(waterManagementOffice);
+                list.add(inspect_task_id);
+                inspectMapper.insert(inspect);
+            }
+        }
+        //feign接口 routeService
+        routeService.taskPoint(list,routeId);
+        return RespBean.ok("生成任务完成！");
     }
 
     @Override
@@ -498,53 +534,6 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         }
     }
 
-    @Override
-    @Transactional
-    public RespBean autoCreate(Map<String, Object> params) throws ParseException {
-        return RespBean.ok("");
-        /*if(FieldUtils.isObjectNotEmpty(params.get("planId")) && FieldUtils.isObjectNotEmpty(params.get("routeId"))){
-            Integer planId = (Integer) params.get("planId");
-            Integer routeId = (Integer) params.get("routeId");
-            if(FieldUtils.isObjectNotEmpty(params.get("period")) && FieldUtils.isObjectNotEmpty(params.get("startTime")) && FieldUtils.isObjectNotEmpty(params.get("endTime"))){
-                int period = Integer.valueOf((String) params.get("period"));
-                Date start = daydateFormat.parse((String) params.get("startTime"));
-                Date end = daydateFormat.parse((String) params.get("endTime"));
-                int days = DateUtils.daysBetween(start,end);
-                int nums = Integer.valueOf((int) Math.floor(days/period));
-                if(nums>1){
-                    for(int i=0;i<nums;i++){
-                        Inspect inspect = new Inspect();
-                        String inspect_task_id = "";
-                        inspect_task_id = redisGeneratorCode.createGenerateCode("计划任务","JH",true,4);
-                        inspect.setInspectTaskId(inspect_task_id);
-                        inspect.setBeginTime(daydateFormat.format(DateUtils.daysAdd(start,period*i)));
-                        inspect.setDeadTime(daydateFormat.format(DateUtils.daysAdd(start,period*(i+1))));
-                        inspect.setPlanId(planId);
-                        inspect.setRouteId(routeId);
-                        inspect.setTaskType("计划任务");
-                        inspect.setCompleteRate("0");
-                        inspect.setStatus("未处理");
-                        inspectMapper.insert(inspect);
-                        //启动流程
-                        Map<String,Object> map = new HashMap<>();
-                        Map<String, Object> variable = new HashMap<String, Object>();
-                        variable.put("ROLE_BZY","bzy");
-                        variable.put("ROLE_BZZ","bzz" );
-                        map.put("key","inspect");
-                        map.put("businessKey",inspect_task_id);
-                        map.put("variable",variable);
-                        activitiService.startProcess(map);
-                    }
-                }
-                return RespBean.ok("计划已制定好，！");
-            }else{
-                 return RespBean.error("计划开始时间，计划结束时间或计划周期不完整，无法创建计划任务！");
-            }
-
-        }else{
-            return RespBean.error("参数为空！");
-        }*/
-    }
 
     @Override
     @Transactional
@@ -816,9 +805,12 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
     @Override
     public RespBean uploadGPS(Map<String, Object> params) {
         if(FieldUtils.isObjectNotEmpty(params)){
+
             Track track = JSONObject.parseObject(JSONObject.toJSONString(params), Track.class);
             //创建对象
             if(FieldUtils.isStringNotEmpty(track.getInspectTaskId())){
+                String date = dateFormat.format(new Date());
+                track.setGpsTime(date);
                 trackMapper.insert(track);
                 return RespBean.ok("修改成功！").setObj(track);
             }else{
