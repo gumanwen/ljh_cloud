@@ -375,15 +375,12 @@ public class PlanService {
                 HashMap<String, Object> hashMap = (HashMap<String, Object>) routeService.findDetail(bizPlan.getRouteId()).getObj();
                 String waterManagementOffice = (String) hashMap.get("waterManagementOffice");
                 String code = bizPlan.getPlanPorid();
-                EnumMenu key = EnumMenu.getEnumByKey(code);
-                String desc = key.getDesc();
-                String period = desc.substring(0, 1);
                 HashMap<String,Object> map = new HashMap<>();
                 map.put("routeId",bizPlan.getRouteId());
                 map.put("planId",bizPlan.getId());
                 map.put("startTime",dateFormat.format(bizPlan.getStartTime()));
                 map.put("endTime",dateFormat.format(bizPlan.getEndTime()));
-                map.put("period",period);
+                map.put("period",code);
                 map.put("waterManagementOffice",waterManagementOffice);
                 inspectService.sendInspectInfo(map);
             } catch (Exception e) {
