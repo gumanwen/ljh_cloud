@@ -53,7 +53,6 @@ public class FilesServiceImpl extends ServiceImpl<FilesMapper, Files> implements
     private String port;
 
     @Override
-
     public RespBean importFiles(MultipartFile[] fileList, String pid, String type) throws IOException {
         String xid = RootContext.getXID();
         System.out.println("xid="+xid);

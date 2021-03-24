@@ -36,6 +36,6 @@ public interface RouteService {
     @GetMapping("/api/route/signPoint/taskPoint")
     RespBean taskPoint(@RequestParam("taskIds") List<String> taskIds, @RequestParam("routeId") Integer routeId);
     @GetMapping("/api/route/way/findRouteIds")
-    RespBean findRouteIds(@RequestParam("waterManagementOffice") String waterManagementOffice,@RequestParam("routeName") String routeName,@RequestParam("pointInspectionType") String pointInspectionType,
-                          @RequestParam("planName") String planName ,@RequestParam("planPorid") String planPorid,@RequestParam("planType") String planType);
+    RespBean findRouteIds(@RequestParam("waterManagementOffice") String waterManagementOffice,@RequestParam("routeId") Integer routeId,@RequestParam("pointInspectionType") String pointInspectionType,
+                          @RequestParam("planId") Integer planId ,@RequestParam("planPorid") String planPorid,@RequestParam("planType") String planType);
 }
