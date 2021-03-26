@@ -70,4 +70,22 @@ public class HiddenDangerPointController {
         return hiddenDangerPointService.findCondition(hiddenDangerPointQuery,request);
     }
 
+    @ApiOperation("条件查询隐患安全记录")
+    @PostMapping("conditionRecord")
+    public RespBean conditionRecord(@RequestBody HashMap<String,Object> hashMap) {
+        return hiddenDangerPointService.conditionRecord(hashMap);
+    }
+
+    @ApiOperation("问题对比分析")
+    @PostMapping("compare")
+    public RespBean compare(@RequestBody HashMap<String,Object> hashMap) {
+        return hiddenDangerPointService.compare(hashMap);
+    }
+
+//    @ApiOperation("问题处理分析")
+//    @PostMapping("handle")
+//    public RespBean handle() {
+//        return hiddenDangerPointService.handle();
+//    }
+
 }

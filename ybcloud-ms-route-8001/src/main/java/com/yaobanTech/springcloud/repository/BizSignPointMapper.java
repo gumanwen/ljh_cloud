@@ -163,4 +163,63 @@ public interface BizSignPointMapper {
             "AND FIND_IN_SET(c.task_id, #{taskidList}) <> 0 " +
             "ORDER BY c.modify_time DESC")
     List<HashMap<String,Object>> findConditionElse(SignPointQuery signPointQuery);
+
+    @Select(value = "SELECT * FROM `biz_hidden_danger_point` WHERE 1 = 1 AND\n" +
+            "IF\n" +
+            "\t( #{waterUseOffice} IS NOT NULL, water_use_office = #{waterUseOffice}, 1 = 1 ) \n" +
+            "and hidden_danger_point_status != '56' " +
+            "AND\n" +
+            "IF\n" +
+            "\t( #{start} IS NOT NULL, end_date >#{start}, end_date > ( SELECT DATE_SUB( CURDATE( ), INTERVAL 12 DAY ) ) ) \n" +
+            "AND\n" +
+            "IF\n" +
+            "\t( #{end} IS NOT NULL, end_date <#{end}, end_date < ( SELECT DATE_SUB( now( ), INTERVAL 1 SECOND ) ) )")
+    List<BizHiddenDangerPointEntity> countDangerPointList(String waterUseOffice ,  String start ,  String end);
+
+    @Select(value = "SELECT a.sum + b.sum FROM ( " +
+            "SELECT count( * ) AS sum FROM `biz_hidden_danger_point` WHERE 1 = 1 " +
+            "AND IF ( #{waterUseOffice} IS NOT NULL, `biz_hidden_danger_point`.water_use_office = #{waterUseOffice}, 1 = 1 ) " +
+            "AND IF ( #{start} IS NOT NULL, `biz_hidden_danger_point`.end_date > #{start}, `biz_hidden_danger_point`.commit_date > ( SELECT DATE_SUB( CURDATE( ), INTERVAL 12 DAY ))) " +
+            "AND IF ( #{start} IS NOT NULL, `biz_hidden_danger_point`.end_date < #{end}, `biz_hidden_danger_point`.commit_date < ( SELECT date_sub(now(),interval 1 second))) " +
+            ") a, " +
+            "( SELECT count( * ) AS sum FROM `biz_leak_point` WHERE 1 = 1 " +
+            "AND IF ( #{waterUseOffice} IS NOT NULL, `biz_leak_point`.water_use_office = #{waterUseOffice}, 1 = 1 ) " +
+            "AND IF ( #{start} IS NOT NULL, `biz_leak_point`.end > #{start}, `biz_leak_point`.commit_date > ( SELECT DATE_SUB( CURDATE( ), INTERVAL 12 DAY ))) " +
+            "AND IF ( #{end} IS NOT NULL, `biz_leak_point`.end < #{end}, `biz_leak_point`.commit_date < ( SELECT date_sub(now(),interval 1 second))) " +
+            ") b ")
+    Integer countSum(String waterUseOffice ,  String start ,  String end);
+
+    @Select(value = "SELECT\n" +
+            "\tcount( * ) * 1.0 AS k \n" +
+            "FROM\n" +
+            "\t`biz_hidden_danger_point` \n" +
+            "WHERE\n" +
+            "\t1 = 1 \n" +
+            "AND\n" +
+            "IF\n" +
+            "\t( #{waterUseOffice} IS NOT NULL, water_use_office = #{waterUseOffice}, 1 = 1 ) \n" +
+            "AND\n" +
+            "IF\n" +
+            "\t( #{start} IS NOT NULL, end_date >#{start}, end_date > ( SELECT DATE_SUB( CURDATE( ), INTERVAL 12 DAY ) ) ) \n" +
+            "AND\n" +
+            "IF\n" +
+            "\t( #{end} IS NOT NULL, end_date <#{end}, end_date < ( SELECT DATE_SUB( now( ), INTERVAL 1 SECOND ) ) )")
+    Double countDangerPoint(String waterUseOffice ,  String start ,  String end);
+
+    @Select(value = "SELECT\n" +
+            "\tcount( * ) * 1.0 AS k \n" +
+            "FROM\n" +
+            "\t`biz_leak_point` \n" +
+            "WHERE\n" +
+            "\t1 = 1 \n" +
+            "AND\n" +
+            "IF\n" +
+            "\t( #{waterUseOffice} IS NOT NULL, water_use_office = #{waterUseOffice}, 1 = 1 ) \n" +
+            "AND\n" +
+            "IF\n" +
+            "\t( #{start} IS NOT NULL, end_date >#{start}, end_date > ( SELECT DATE_SUB( CURDATE( ), INTERVAL 12 DAY ) ) ) \n" +
+            "AND\n" +
+            "IF\n" +
+            "\t( #{end} IS NOT NULL, end_date <#{end}, end_date < ( SELECT DATE_SUB( now( ), INTERVAL 1 SECOND ) ) )")
+    Double countLeakPoint(String waterUseOffice ,  String start ,  String end);
 }

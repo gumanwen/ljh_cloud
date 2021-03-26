@@ -29,4 +29,9 @@ public interface BizHiddenDangerPointRepository extends JpaRepository<BizHiddenD
     @Query(value = " from BizHiddenDangerPointEntity t where t.enabled = 1 and t.commitBy = ?1")
     List<BizHiddenDangerPointEntity> findList(String user);
 
+    @Query(value = "select count(*) from biz_hidden_danger_point a where a.hidden_danger_point_status = '54' ",nativeQuery = true)
+    Integer countFollowed();
+
+    @Query(value = "select count(*) from biz_hidden_danger_point a",nativeQuery = true)
+    Integer countAll();
 }

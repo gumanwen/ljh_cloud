@@ -325,7 +325,8 @@ public class RouteServiceImpl {
                     //获取报建文件列表
                     if(FieldUtils.isObjectNotEmpty(list.get(i).getFileType())) {
                         RespBean respBean = fileService.selectOneByPid(String.valueOf((Integer) list.get(i).getId()), (String) list.get(i).getFileType());
-                        List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) respBean.getObj();
+                        Object o = respBean.getObj();
+                        List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>)o ;
                         if(respBean.getStatus() == 500){
                             throw new RuntimeException("Feign调用文件服务失败");
                         }
@@ -341,6 +342,7 @@ public class RouteServiceImpl {
             br.setWaterOfficeMenu(waterOfficeMenu);
             br.setBizSignPoints(pointList);
             br.setPointInspectionTypeMenu(pointInspectionTypeMenu);
+            br.setBizSignPoints(list);
 //            br.setRouteCreatorCN(chineseName);
         }
         return RespBean.ok("查询成功！",br);

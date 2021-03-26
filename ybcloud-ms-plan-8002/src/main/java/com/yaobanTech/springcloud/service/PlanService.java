@@ -374,6 +374,7 @@ public class PlanService {
                 BizPlan bizPlan = bizPlanRepository.findDetail(id);
                 HashMap<String, Object> hashMap = (HashMap<String, Object>) routeService.findDetail(bizPlan.getRouteId()).getObj();
                 String waterManagementOffice = (String) hashMap.get("waterManagementOffice");
+                String diameter = (String) hashMap.get("pipeDiameter");
                 String code = bizPlan.getPlanPorid();
                 HashMap<String,Object> map = new HashMap<>();
                 map.put("routeId",bizPlan.getRouteId());
@@ -382,6 +383,7 @@ public class PlanService {
                 map.put("endTime",dateFormat.format(bizPlan.getEndTime()));
                 map.put("period",code);
                 map.put("waterManagementOffice",waterManagementOffice);
+                map.put("diameter",diameter);
                 inspectService.sendInspectInfo(map);
             } catch (Exception e) {
                 e.printStackTrace();

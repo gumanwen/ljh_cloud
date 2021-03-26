@@ -106,7 +106,7 @@ public class BizLeakPointEntity {
 	/**
 	 * 提交时间
 	 */
-   @Column(name = "commit_Date" )
+   @Column(name = "commit_date" )
 	private String commitDate;
 
 	/**

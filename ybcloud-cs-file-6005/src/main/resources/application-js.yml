@@ -1,0 +1,59 @@
+spring:
+    main:
+        allow-bean-definition-overriding: true
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://47.92.144.224:3306/ybcloud-cs-file-6005?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
+        username: root
+        password: 123456
+        type: com.alibaba.druid.pool.DruidDataSource
+        initial-size: 1
+        min-idle: 1
+        max-wait-millis: 60000
+        timeBetweenEvictionRunsMillis: 60000
+        # 配置一个连接在池中最小生存的时间，单位是毫秒
+        minEvictableIdleTimeMillis: 300000
+        validationQuery: SELECT 1 FROM DUAL
+        testWhileIdle: true
+        testOnBorrow: true
+        testOnReturn: false
+        maxPoolPreparedStatementPerConnectionSize: 20
+        # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+        filters: stat,wall
+        # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
+        connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+    application:
+        name: fileService
+    cloud:
+        nacos:
+            discovery:
+                server-addr: 192.168.10.3:8848 #Nacos作为服务中心地址
+                ip: 192.168.10.3
+            config:
+                server-addr: 192.168.10.3:8848
+                #file-extension: properties
+                #namespace: 8740fef6-e5cd-4bee-aa59-1982b454323e
+                #group: DEFAULT_GROUP
+    servlet:
+        multipart:
+            max-file-size: 100MB
+            max-request-size: 100MB
+mybatis-plus:
+    #mapper-locations: classpath:mapping/*Mapper.xml
+    type-aliases-package: com.yaobanTech.springCloud.pojos
+    global-config:
+        db-config:
+            table-prefix: biz_
+    configuration:
+        call-setters-on-nulls: true
+server:
+    port: 6005
+    ip: 192.168.10.3
+    max-http-header-size: 8192
+web:
+    upload-path: C:/fujian/
+    upload-vpath: /file/
+    download-path: http://192.168.50.103:6005
+ribbon:
+    ConnectTimeout: 30000
+    ReadTimeout: 7000

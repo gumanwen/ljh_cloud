@@ -8,18 +8,19 @@ import com.yaobanTech.springcloud.repository.BizHiddenDangerPointRepository;
 import com.yaobanTech.springcloud.repository.BizSignPointMapper;
 import com.yaobanTech.springcloud.repository.SuggestionRepository;
 import io.seata.spring.annotation.GlobalTransactional;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -111,6 +112,8 @@ public class HiddenDangerPointServiceImpl {
             bizHiddenDangerPointEntity = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizHiddenDangerPointEntity.class);
             if(bizHiddenDangerPointEntity.getId() != null){
             try {
+                String s = DateFormatUtils.DateToStr(new Date());
+                bizHiddenDangerPointEntity.setEndDate(s);
                 hiddenDangerPointRepository.save(bizHiddenDangerPointEntity);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -271,5 +274,74 @@ public class HiddenDangerPointServiceImpl {
         }
         return RespBean.ok("查询成功！",hashMap);
     }
+
+    public RespBean conditionRecord(HashMap<String,Object> map) {
+        List<BizHiddenDangerPointEntity> list = null;
+        String waterUseOffice = (String)map.get("waterUseOffice");
+        String start = (String)map.get("start");
+        String end = (String)map.get("end");
+        List<BizHiddenDangerPointEntity> dangerPointEntities = bizSignPointMapper.countDangerPointList(waterUseOffice, start, end);
+        return RespBean.ok("查询成功！",dangerPointEntities);
+    }
+
+    public RespBean compare(HashMap<String,Object> map) {
+        List<HashMap<String,Object>> list = new ArrayList<>();
+        HashMap<String,Object> hashMap = new HashMap<>();
+        HashMap<String,Object> hashMap2 = new HashMap<>();
+        String waterUseOffice = (String)map.get("waterUseOffice");
+        String start = (String)map.get("start");
+        String end = (String)map.get("end");
+        //统计总量
+        Integer sum = bizSignPointMapper.countSum(waterUseOffice,start,end);
+        //统计隐患点
+        Double countDangerPoint = bizSignPointMapper.countDangerPoint(waterUseOffice,start,end);
+        //统计漏点
+        Double countLeakPoint = bizSignPointMapper.countLeakPoint(waterUseOffice,start,end);
+        //计算隐患点/漏点占比
+        double perH = 0;
+        double perl = 0;
+        try {
+            perH = countDangerPoint / sum;
+            BigDecimal bg = new BigDecimal(perH);
+            perH = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+            perl = countLeakPoint / sum;
+            BigDecimal bg2 = new BigDecimal(perl);
+            perl = bg2.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        hashMap.put("item","隐患点比率");
+        hashMap.put("count",countDangerPoint);
+        hashMap.put("percent",perH);
+        list.add(hashMap);
+        hashMap2.put("item","漏点比率");
+        hashMap2.put("count",countLeakPoint);
+        hashMap2.put("percent",perl);
+        list.add(hashMap2);
+        return RespBean.ok("查询成功！",list);
+    }
+
+//    public RespBean handle() {
+//        List<HashMap<String,Object>> list = new ArrayList<>();
+//        HashMap<String,Object> hashMap = new HashMap<>();
+//        //查询全部
+//        Integer all = hiddenDangerPointRepository.countAll();
+//        //查询已解决
+//        Integer sum = hiddenDangerPointRepository.countFollowed();
+//
+//        //计算隐患点/漏点占比
+//        double perH = 0;
+//        double perl = 0;
+//        try {
+//            BigDecimal bg = new BigDecimal(perH);
+//            perH = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+//            perl = 1-perH;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        hashMap.put("item","隐患点比率");
+//        hashMap.put("count",);
+//        return RespBean.ok("查询成功！",hashMap);
+//    }
 
 }
