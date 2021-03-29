@@ -185,6 +185,18 @@ public class BizPlan  implements Serializable {
     @Transient
 	private String planCreatedByCN;
 
+	/**
+	 * 计划制定人
+	 */
+	@Transient
+	private String waterUseOffice;
+
+	/**
+	 * 计划制定人
+	 */
+	@Transient
+	private HashMap<String,Object> waterUseOfficeEnum;
+
 	public BizPlan() {
 	}
 
@@ -207,6 +219,22 @@ public class BizPlan  implements Serializable {
 		this.routeId = routeId;
 		this.mainKey = mainKey;
 		this.troubleCode = troubleCode;
+	}
+
+	public String getWaterUseOffice() {
+		return waterUseOffice;
+	}
+
+	public void setWaterUseOffice(String waterUseOffice) {
+		this.waterUseOffice = waterUseOffice;
+	}
+
+	public HashMap<String, Object> getWaterUseOfficeEnum() {
+		return waterUseOfficeEnum;
+	}
+
+	public void setWaterUseOfficeEnum(HashMap<String, Object> waterUseOfficeEnum) {
+		this.waterUseOfficeEnum = waterUseOfficeEnum;
 	}
 
 	public List<HashMap<String, Object>> getAttachment() {

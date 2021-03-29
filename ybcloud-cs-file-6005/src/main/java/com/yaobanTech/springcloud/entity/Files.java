@@ -1,5 +1,7 @@
 package com.yaobanTech.springcloud.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
@@ -20,14 +22,15 @@ public class Files implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @TableId(value = "id",type = IdType.AUTO)
+    private Integer id;
+
     private String name;
 
-    @TableField("pid")
     private String pid;
 
     private String url;
 
-    @TableField("uploadDate")
     private String uploadDate;
 
     /**
@@ -43,7 +46,6 @@ public class Files implements Serializable {
     /**
      * 照片/视频
      */
-    @TableField("mimeType")
     private String mimeType;
 
     /**
@@ -63,6 +65,14 @@ public class Files implements Serializable {
         this.type = type;
         this.mimeType = mimeType;
         this.isvalid = isvalid;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public static long getSerialVersionUID() {

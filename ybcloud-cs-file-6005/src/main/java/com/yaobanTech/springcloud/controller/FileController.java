@@ -34,4 +34,10 @@ public class FileController {
     public RespBean selectOneByPid(@RequestParam("pid") String pid,@RequestParam("type") String type){
         return iFilesService.selectOneByPid(pid,type);
     }
+
+    @ApiOperation(value ="根据pid删除文件")
+    @GetMapping("/remove")
+    public RespBean remove(@RequestParam("id") String id){
+        return iFilesService.remove(id);
+    }
 }

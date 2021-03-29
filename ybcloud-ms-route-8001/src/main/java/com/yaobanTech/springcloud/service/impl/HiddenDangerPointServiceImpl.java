@@ -293,6 +293,9 @@ public class HiddenDangerPointServiceImpl {
         String end = (String)map.get("end");
         //统计总量
         Integer sum = bizSignPointMapper.countSum(waterUseOffice,start,end);
+        if(sum == 0){
+            return RespBean.ok("未查询到任何数据！");
+        }
         //统计隐患点
         Double countDangerPoint = bizSignPointMapper.countDangerPoint(waterUseOffice,start,end);
         //统计漏点

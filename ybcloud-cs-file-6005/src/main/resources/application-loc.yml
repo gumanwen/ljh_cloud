@@ -46,6 +46,7 @@ mybatis-plus:
             table-prefix: biz_
     configuration:
         call-setters-on-nulls: true
+        map-underscore-to-camel-case: true
 server:
     port: 6005
     ip: 192.168.50.91

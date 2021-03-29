@@ -2,11 +2,14 @@ package com.yaobanTech.springcloud.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yaobanTech.springcloud.entity.Files;
 import com.yaobanTech.springcloud.entity.utils.RespBean;
 import com.yaobanTech.springcloud.mapper.FilesMapper;
 import com.yaobanTech.springcloud.service.IFilesService;
+import com.yaobanTech.springcloud.utils.DateFormatUtils;
 import com.yaobanTech.springcloud.utils.FieldUtils;
 import io.seata.core.context.RootContext;
 import org.slf4j.Logger;
@@ -14,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -53,6 +57,7 @@ public class FilesServiceImpl extends ServiceImpl<FilesMapper, Files> implements
     private String port;
 
     @Override
+    @Transactional
     public RespBean importFiles(MultipartFile[] fileList, String pid, String type) throws IOException {
         String xid = RootContext.getXID();
         System.out.println("xid="+xid);
@@ -89,6 +94,7 @@ public class FilesServiceImpl extends ServiceImpl<FilesMapper, Files> implements
                     Files file = new Files();
                     file.setPid(pid);
                     file.setName(newName);
+                    file.setUploadDate(DateFormatUtils.DateToStr(new Date()));
                     file.setUrl(url);
                     file.setType(type);
                     file.setMimeType(mimeType);
@@ -126,5 +132,15 @@ public class FilesServiceImpl extends ServiceImpl<FilesMapper, Files> implements
         }else{
             return RespBean.error("缺少编号pid");
         }
+    }
+
+    @Override
+    public RespBean remove(String id) {
+        if(id != null && !"".equals(id) ){
+            filesMapper.update(null, new LambdaUpdateWrapper<Files>().eq(Files::getId, id).set(Files::getIsvalid, "0"));
+        }else{
+            return RespBean.error("缺少编号pid");
+        }
+        return RespBean.ok("删除成功！");
     }
 }

@@ -231,15 +231,20 @@ public class PlanService {
         if(bp != null) {
             String user = bp.getPlanCreatedBy();
             String chineseName = (String)oauthService.getChineseName(user).getObj();
+            RespBean respBean = routeService.findDetail(bp.getRouteId());
+            Object o = respBean.getObj();
             Map map = (Map) findEnum(bp.getPlanType()).getObj();
             Map ps = (Map) findEnum(bp.getPlanStatus()).getObj();
             Map pp = (Map) findEnum(bp.getPlanPorid()).getObj();
+            HashMap<String, Object> hashMap = (HashMap<String, Object>) o;
+            String office = (String) hashMap.get("waterManagementOffice");
+            HashMap<String, Object> waterUseOffice = (HashMap<String, Object>) findEnum(office).getObj();
             bp.setPlanTypeMenu(map);
             bp.setPlanStatusMenu(ps);
             bp.setPlanPoridMenu(pp);
+            bp.setWaterUseOffice(office);
+            bp.setWaterUseOfficeEnum(waterUseOffice);
 //            bp.setPlanCreatedByCN(chineseName);
-            RespBean respBean = routeService.findDetail(bp.getRouteId());
-            Object o = respBean.getObj();
             if(respBean.getStatus() == 500){
                 throw new RuntimeException("Feign调用路线服务失败！");
             }
