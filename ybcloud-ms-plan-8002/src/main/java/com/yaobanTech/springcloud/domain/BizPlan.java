@@ -186,9 +186,9 @@ public class BizPlan  implements Serializable {
 	private String planCreatedByCN;
 
 	/**
-	 * 计划制定人
+	 * 用水管理所
 	 */
-	@Transient
+	@Column(name="water_use_office")
 	private String waterUseOffice;
 
 	/**

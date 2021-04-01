@@ -4,7 +4,6 @@ import com.yaobanTech.springcloud.domain.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -160,19 +159,19 @@ public interface BizSignPointMapper {
             "AND IF(#{pipeDiameter} is not null, c.pipe_diameter = #{pipeDiameter},1=1 ) " +
             "AND IF(#{signStatus} is not null, c.sign_point_status = #{signStatus},1=1 ) " +
             "AND IF(#{hiddenCode} is not null, c.trouble_code = #{hiddenCode},1=1 ) " +
-            "AND FIND_IN_SET(c.task_id, #{taskidList}) <> 0 " +
+            "AND FIND_IN_SET(c.task_id, #{taskidList}) " +
             "ORDER BY c.modify_time DESC")
     List<HashMap<String,Object>> findConditionElse(SignPointQuery signPointQuery);
 
     @Select(value = "SELECT * FROM `biz_hidden_danger_point` WHERE 1 = 1 " +
-            "AND IF( #{waterUseOffice} not like 'null', water_use_office = #{waterUseOffice}, 1 = 1 ) " +
+            "AND IF( #{waterUseOffice} not like '', water_use_office = #{waterUseOffice}, 1 = 1 ) " +
             "and end_date is null " +
-            "and IF ( #{end} not like 'null', commit_date <= #{end}, 1=1 ) " +
+            "and IF ( #{end} IS NOT NULL, commit_date <= #{end}, 1=1 ) " +
             "or end_date is not null " +
 //            "AND IF ( #{start} IS NOT NULL, commit_date >#{start}, commit_date > ( SELECT DATE_SUB( CURDATE( ), INTERVAL 12 DAY ) ) ) " +
 //            "and IF ( #{end} IS NOT NULL, commit_date <= #{end}, commit_date <= ( SELECT DATE_SUB( now( ), INTERVAL 1 SECOND ) ) ) ")
-            "AND IF ( #{start} not like 'null', commit_date >#{start}, 1 = 1 ) " +
-            "and IF ( #{end} not like 'null', commit_date <= #{end}, 1 = 1 ) ")
+            "AND IF ( #{start} IS NOT NULL, commit_date >#{start}, 1 = 1 ) " +
+            "and IF ( #{end} IS NOT NULL, commit_date <= #{end}, 1 = 1 ) ")
             List<BizHiddenDangerPointEntity> countDangerPointList(String waterUseOffice ,  String start ,  String end);
 
     @Select(value = "SELECT a.sum + b.sum FROM ( " +
@@ -221,4 +220,5 @@ public interface BizSignPointMapper {
             "IF\n" +
             "\t( #{end} IS NOT NULL, commit_date <#{end}, commit_date < ( SELECT DATE_SUB( now( ), INTERVAL 1 SECOND ) ) )")
     Double countLeakPoint(String waterUseOffice ,  String start ,  String end);
+
 }

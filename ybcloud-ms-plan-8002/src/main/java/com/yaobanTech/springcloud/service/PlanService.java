@@ -73,15 +73,6 @@ public class PlanService {
         Boolean flag = false;
         if(param != null){
             bizPlan = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizPlan.class);
-            List<String> list = bizPlanRepository.findPlanName(bizPlan.getRouteId());
-            if(!list.isEmpty()){
-                for (int i = 0; i < list.size(); i++) {
-                    String planName = list.get(i);
-                    if(planName.equals(bizPlan.getPlanName())){
-                        flag = true;
-                    }
-                }
-            }
             if(flag == false){
                 if(bizPlan != null) {
                     try {
@@ -122,17 +113,20 @@ public class PlanService {
         Boolean flag = false;
         if(param != null){
             bizPlan = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizPlan.class);
-            List<String> list = bizPlanRepository.findPlanName(bizPlan.getRouteId());
-            if(!list.isEmpty()){
-                for (int i = 0; i < list.size(); i++) {
-                    String planName = list.get(i);
-                    if(planName.equals(bizPlan.getPlanName())){
-                        flag = true;
-                    }
+            List<String> nameList = bizPlanRepository.findPlanName(bizPlan.getWaterUseOffice());
+            String dbName = bizPlanRepository.findDetail(bizPlan.getId()).getPlanName();
+            String parmName = bizPlan.getPlanName();
+           //重名计划禁止修改判定
+            if(parmName.equals(dbName)){
+                flag = true;
+            }else {
+                boolean match = nameList.stream().anyMatch(a -> a.equals(parmName));
+                if(!match){
+                    flag = true;
                 }
             }
         }
-        if(flag == false){
+        if(flag == true){
             if(bizPlan.getId() != null) {
                 try {
                     bizPlanMapper.update(bizPlan);
@@ -143,6 +137,8 @@ public class PlanService {
             }else{
                 return RespBean.error("id为空！");
             }
+        }else{
+            return RespBean.error("计划名称重复！");
         }
         return RespBean.ok("修改成功！");
     }
@@ -206,7 +202,7 @@ public class PlanService {
                     plan.setPlanTypeMenu(map);
                     plan.setPlanStatusMenu(ps);
                     plan.setPlanPoridMenu(pp);
-//                    plan.setPlanCreatedByCN(chineseName);
+                    plan.setPlanCreatedByCN(chineseName);
                     RespBean respBean = routeService.findDetail(plan.getRouteId());
                     Object o = respBean.getObj();
                     if(respBean.getStatus() == 500){
@@ -244,7 +240,7 @@ public class PlanService {
             bp.setPlanPoridMenu(pp);
             bp.setWaterUseOffice(office);
             bp.setWaterUseOfficeEnum(waterUseOffice);
-//            bp.setPlanCreatedByCN(chineseName);
+            bp.setPlanCreatedByCN(chineseName);
             if(respBean.getStatus() == 500){
                 throw new RuntimeException("Feign调用路线服务失败！");
             }
@@ -358,7 +354,7 @@ public class PlanService {
                 plan.setPlanTypeMenu(map);
                 plan.setPlanStatusMenu(ps);
                 plan.setPlanPoridMenu(pp);
-//                plan.setPlanCreatedByCN(chineseName);
+                plan.setPlanCreatedByCN(chineseName);
                 RespBean respBean = routeService.findDetail(plan.getRouteId());
                 Object o = respBean.getObj();
                 if(respBean.getStatus() == 500){

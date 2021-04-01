@@ -143,7 +143,7 @@ public class LeakPointServiceImpl {
                 String chineseName = (String)oauthService.getChineseName(user).getObj();
                 HashMap<String,Object> leakPointStatusEnum = (HashMap)routeService.findEnum(blpe.getLeakPointStatus()).getObj();
                 HashMap<String,Object> abnormalPhenomenaEnum = (HashMap)routeService.findEnum(blpe.getAbnormalPhenomena()).getObj();
-//                blpe.setCommitByCN(chineseName);
+                blpe.setCommitByCN(chineseName);
                 blpe.setAbnormalPhenomenaEnum(abnormalPhenomenaEnum);
                 blpe.setLeakPointStatusEnum(leakPointStatusEnum);
                 RespBean bean = fileService.selectOneByPid(blpe.getLeakPointCode(), type);
@@ -179,7 +179,7 @@ public class LeakPointServiceImpl {
                 HashMap<String,Object> abnormalPhenomenaEnum = (HashMap)routeService.findEnum(bizLeakPointEntity.getAbnormalPhenomena()).getObj();
                 HashMap<String,Object> assetTypeEnum = (HashMap)routeService.findEnum(bizLeakPointEntity.getAssetType()).getObj();
 
-//                bizLeakPointEntity.setCommitByCN(chineseName);
+                bizLeakPointEntity.setCommitByCN(chineseName);
                 bizLeakPointEntity.setLeakPointStatusEnum(leakPointStatusEnum);
                 bizLeakPointEntity.setAbnormalPhenomenaEnum(abnormalPhenomenaEnum);
                 bizLeakPointEntity.setAssetTypeEnum(assetTypeEnum);
@@ -211,7 +211,7 @@ public class LeakPointServiceImpl {
                     BizLeakPointEntity bizLeakPointEntity = list.get(i);
                     HashMap<String,Object> leakPointStatusEnum = (HashMap)routeService.findEnum(bizLeakPointEntity.getLeakPointStatus()).getObj();
                     HashMap<String,Object> abnormalPhenomenaEnum = (HashMap)routeService.findEnum(bizLeakPointEntity.getAbnormalPhenomena()).getObj();
-//                    bizLeakPointEntity.setCommitByCN(chineseName);
+                    bizLeakPointEntity.setCommitByCN(chineseName);
                     bizLeakPointEntity.setLeakPointStatusEnum(leakPointStatusEnum);
                     bizLeakPointEntity.setAbnormalPhenomenaEnum(abnormalPhenomenaEnum);
                     codeList.add(bizLeakPointEntity.getLeakPointCode());

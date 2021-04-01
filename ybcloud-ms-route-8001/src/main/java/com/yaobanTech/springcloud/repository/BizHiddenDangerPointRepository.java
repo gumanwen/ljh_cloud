@@ -15,6 +15,9 @@ public interface BizHiddenDangerPointRepository extends JpaRepository<BizHiddenD
     @Query("update BizHiddenDangerPointEntity t set t.enabled = '0' where t.id = ?1")
     void deleteHiddenDangerPoint(Integer id);
 
+    @Query("update BizHiddenDangerPointEntity t set t.memo = ?2 where t.hiddenDangerPointCode = ?1")
+    void synchronization(String code,String handle);
+
     @Modifying
     @Query("update BizHiddenDangerPointEntity t set t.hiddenDangerStatus = 54 where t.hiddenDangerPointCode = ?1")
     void updateHiddenDangerPoint(String hiddenDangerPointCode);

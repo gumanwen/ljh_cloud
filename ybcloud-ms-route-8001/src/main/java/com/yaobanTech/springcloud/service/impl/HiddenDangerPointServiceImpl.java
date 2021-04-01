@@ -128,6 +128,19 @@ public class HiddenDangerPointServiceImpl {
         }
     }
 
+
+    public RespBean synchronization(String code,String handle) {
+        if(code != null && handle != null){
+            try {
+                hiddenDangerPointRepository.synchronization(code,handle);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return RespBean.ok("同步失败！");
+            }
+        }
+        return RespBean.ok("同步成功！");
+    }
+
     public RespBean deleteHiddenDangerPoint(Integer id) {
         if(id != null) {
             try { hiddenDangerPointRepository.deleteHiddenDangerPoint(id);
@@ -159,7 +172,7 @@ public class HiddenDangerPointServiceImpl {
                 bdpe.setProjectTypeEnum(projectTypeEnum);
                 bdpe.setRiskLevelEnum(riskLevelEnum);
                 bdpe.setConstructionTypeEnum(constructionTypeEnum);
-//                bdpe.setCommitByCN(chineseName);
+                bdpe.setCommitByCN(chineseName);
                 bdpe.setHandleAdvice(suggestionEntityList);
                 RespBean bean = fileService.selectOneByPid(bdpe.getHiddenDangerPointCode(), type);
                 List<HashMap<String, Object>> maps = (List<HashMap<String, Object>>) bean.getObj();
@@ -189,7 +202,7 @@ public class HiddenDangerPointServiceImpl {
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
                 BizHiddenDangerPointEntity bizHiddenDangerPointEntity = list.get(i);
-//                bizHiddenDangerPointEntity.setCommitByCN(chineseName);;
+                bizHiddenDangerPointEntity.setCommitByCN(chineseName);;
                 List<BizSuggestionEntity> suggestionEntityList = suggestionRepository.findList(bizHiddenDangerPointEntity.getHiddenDangerPointCode());
                 HashMap<String,Object> hiddenDangerStatusEnum = (HashMap)routeService.findEnum(bizHiddenDangerPointEntity.getHiddenDangerStatus()).getObj();
                 HashMap<String,Object> projectTypeEnum = (HashMap)routeService.findEnum(bizHiddenDangerPointEntity.getProjectType()).getObj();
@@ -245,7 +258,7 @@ public class HiddenDangerPointServiceImpl {
                     hiddenDangerPointEntity.setProjectTypeEnum(projectTypeEnum);
                     hiddenDangerPointEntity.setRiskLevelEnum(riskLevelEnum);
                     hiddenDangerPointEntity.setConstructionTypeEnum(constructionTypeEnum);
-//                    hiddenDangerPointEntity.setCommitByCN(chineseName);
+                    hiddenDangerPointEntity.setCommitByCN(chineseName);
                     codeList.add(hiddenDangerPointEntity.getHiddenDangerPointCode());
 //                if(points.size()>0){
 //                    for(int j =0; j<points.size();j++){

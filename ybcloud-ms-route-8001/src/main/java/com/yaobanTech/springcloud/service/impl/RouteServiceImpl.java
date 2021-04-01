@@ -15,6 +15,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -50,6 +51,10 @@ public class RouteServiceImpl {
     @Autowired
     @Lazy
     private OauthService oauthService;
+
+    @Autowired
+    @Lazy
+    private InspectService inspectService;
 
     @Autowired
     @Lazy
@@ -103,17 +108,29 @@ public class RouteServiceImpl {
     @Transactional
     public RespBean updateRoute(HashMap<String,Object> param) {
         BizRoute bizRoute = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizRoute.class);
-        if(bizRoute.getId() != null && !bizRoute.getBizSignPoints().isEmpty()) {
+        Boolean flag = null;
+        if(bizRoute.getId() != null){
+            flag = (Boolean) inspectService.comfirmModify(bizRoute.getId()).getObj();
+        }
+        if(flag == true && !bizRoute.getBizSignPoints().isEmpty()) {
             try {
-               bizSignPointRepository.saveAll(bizRoute.getBizSignPoints());
+                List<BizSignPoint> list = bizRoute.getBizSignPoints();
+                List<BizSignPoint> points = list.stream().map(a -> {
+                    a.setEnabled(1);
+                    a.setPointInspectionType(bizRoute.getPointInspectionType());
+                    a.setRouteType(bizRoute.getRouteType());
+                    return a;
+                }).collect(Collectors.toList());
+                bizSignPointRepository.saveAll(points);
                bizRouteRepository.save(bizRoute);
 
             } catch (Exception e) {
                 e.printStackTrace();
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return RespBean.error("修改失败！");
             }
         }else{
-            return RespBean.error("id为空或签到点信息为空！");
+            return RespBean.error("id、签到点信息为空或该路线包含任务,无法修改！");
         }
         return RespBean.ok("修改成功！",bizRoute.getBizSignPoints());
     }
