@@ -1,6 +1,7 @@
 package com.yaobanTech.springcloud.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.yaobanTech.springcloud.ToolUtils.DateFormatUtils;
 import com.yaobanTech.springcloud.ToolUtils.UrlUtils;
 import com.yaobanTech.springcloud.domain.*;
 import com.yaobanTech.springcloud.domain.enumDef.EnumMenu;
@@ -88,7 +89,7 @@ public class SignPointServiceImpl {
                 bizSignedPoint.setModifyTime(new Date());
 //                signPointRepository.save(signPoint);
                 bizSignedPoint.setSignPointStatus("合格");
-                bizSignedPoint.setSignedTime(new Date());
+                bizSignedPoint.setSignedTime(DateFormatUtils.DateToStr(new Date()));
                 BizSignedPoint signedPoint = signedPointRepository.save(bizSignedPoint);
                 id = signedPoint.getId();
                 if( bizSignedPoint.getTroubleCode() != null && bizSignedPoint.getTroubleCode().contains("Y")){
@@ -121,11 +122,27 @@ public class SignPointServiceImpl {
         return RespBean.ok("删除成功！");
     }
 
+    public RespBean findSignedPoint(Integer id) {
+        BizSignedPoint byId = null;
+        if(id != null) {
+            try {
+                byId = signedPointRepository.findbyId(id);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return RespBean.error("查询失败！");
+            }
+        }else{
+            return RespBean.error("id为空！");
+        }
+        return RespBean.ok("查询成功！",byId);
+    }
+
     public RespBean findSignPoint(Integer id) {
         BizSignPoint byId = null;
         if(id != null) {
             try {
-                 byId = signPointRepository.findSignPointById(id);
+                byId = signPointRepository.findSignPointById(id);
+
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("查询失败！");
@@ -143,9 +160,10 @@ public class SignPointServiceImpl {
         String chineseName = u.getName();
         String role = u.getRoleLists();
         List<BizRoute> routeList = null;
-        if(role.contains("BZZ")){
+        if(!"".equals(role) && role !=null && role.contains("BZZ")){
             routeList = bizRouteRepository.findAll();
-        }else{
+        }
+        else{
             routeList = bizRouteRepository.findList(user);
         }
         List<BizSignPoint> list = new ArrayList<>();
@@ -160,7 +178,7 @@ public class SignPointServiceImpl {
                 Map routeTypeEnum = (Map) EnumMenu.findEnum(routeType).getObj();
                 Map waterManagementOfficeEnum = (Map) EnumMenu.findEnum(waterManagementOffice).getObj();
                 List<BizSignPoint> points = route.getBizSignPoints();
-                if(points.size()>0){
+                if(!points.isEmpty()){
                     for(int j =0; j<points.size();j++){
                         //获取报建文件列表
                         if(FieldUtils.isObjectNotEmpty(points.get(j).getFileType())) {
@@ -169,7 +187,7 @@ public class SignPointServiceImpl {
                             if(respBean.getStatus() == 500){
                                 throw new RuntimeException("Feign调用文件服务失败");
                             }
-                            Map signPointTypeEnum = (Map) EnumMenu.findEnum(points.get(j).getSignPointType()).getObj();
+//                            Map signPointTypeEnum = (Map) EnumMenu.findEnum(points.get(j).getSignPointType()).getObj();
                             points.get(j).setFileList(fileList);
                             points.get(j).setRouteName(routeName);
                             points.get(j).setWaterUseOfficeEnum(waterManagementOfficeEnum);

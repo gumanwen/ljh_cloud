@@ -162,9 +162,6 @@ public class RouteServiceImpl {
         //获取当前用户
         LoginUser u = urlUtils.getAll(request);
         String chineseName = (String)oauthService.getChineseName(u.getLoginname()).getObj();
-        /*if(oauthService.getCurrentUser(token).getStatus() == 500){
-            throw new RuntimeException("Feign调用权限服务失败");
-        }*/
         RouteCondition routeCondition = JSONObject.parseObject(JSONObject.toJSONString(hashMap.get("form")), RouteCondition.class);
         Specification<BizRoute> spec = new Specification<BizRoute>() {
             @Override
@@ -237,7 +234,7 @@ public class RouteServiceImpl {
                 route.setRouteTypeMenu(routeTypeMenu);
                 route.setWaterOfficeMenu(waterOfficeMenu);
                 route.setPointInspectionTypeMenu(pointInspectionTypeMenu);
-//                route.setRouteCreatorCN(chineseName);
+                route.setRouteCreatorCN(chineseName);
             }
         }
        return RespBean.ok("查询成功！",list);
@@ -251,9 +248,10 @@ public class RouteServiceImpl {
         String chineseName = (String)oauthService.getChineseName(u.getLoginname()).getObj();
         String role = u.getRoleLists();
         List<BizRoute> list = null;
-        if(role.contains("BZZ")){
-            list = bizRouteRepository.findAll();
-        }else{
+        if(!"".equals(role) && role !=null && role.contains("BZZ")){
+                list = bizRouteRepository.findAll();
+        }
+          else{
             list = bizRouteRepository.findList(user);
         }
         if(!list.isEmpty()){
@@ -279,7 +277,7 @@ public class RouteServiceImpl {
                 route.setRouteTypeMenu(routeTypeMenu);
                 route.setWaterOfficeMenu(waterOfficeMenu);
                 route.setPointInspectionTypeMenu(pointInspectionTypeMenu);
-//                route.setRouteCreatorCN(chineseName);
+                route.setRouteCreatorCN(chineseName);
             }
         }
         List<BizRoute> routes = list.stream().
@@ -318,7 +316,7 @@ public class RouteServiceImpl {
                 route.setWaterOfficeMenu(waterOfficeMenu);
                 route.setPointInspectionTypeMenu(pointInspectionTypeMenu);
                 route.setRouteCreator(user);
-//                route.setRouteCreatorCN(chineseName);
+                route.setRouteCreatorCN(chineseName);
             }
         }
         return RespBean.ok("查询成功！",list);
@@ -360,7 +358,7 @@ public class RouteServiceImpl {
             br.setBizSignPoints(pointList);
             br.setPointInspectionTypeMenu(pointInspectionTypeMenu);
             br.setBizSignPoints(list);
-//            br.setRouteCreatorCN(chineseName);
+            br.setRouteCreatorCN(chineseName);
         }
         return RespBean.ok("查询成功！",br);
     }

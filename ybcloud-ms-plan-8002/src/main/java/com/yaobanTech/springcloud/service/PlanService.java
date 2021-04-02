@@ -187,9 +187,10 @@ public class PlanService {
         String chineseName = (String)oauthService.getChineseName(u.getLoginname()).getObj();
         String role = u.getRoleLists();
         List<BizPlan> list = null;
-        if(role.contains("BZZ")){
+        if(!"".equals(role) && role !=null && role.contains("BZZ")){
             list = bizPlanRepository.findAll();
-        }else{
+        }
+        else{
             list = planMapper.findAll(user);
         }
 

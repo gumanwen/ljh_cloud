@@ -180,13 +180,8 @@ public class BizSignedPoint implements Serializable {
 	/**
 	 * 签到时间
 	 */
-	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(
-			pattern = "yyyy-MM-dd HH:mm:ss",
-			timezone = "GMT+8"
-	)
 	@Column(name = "signed_time" )
-	private Date signedTime;
+	private String signedTime;
 
 	/**
 	 * 任务表id
@@ -243,11 +238,11 @@ public class BizSignedPoint implements Serializable {
 		this.modifyTime = modifyTime;
 	}
 
-	public Date getSignedTime() {
+	public String getSignedTime() {
 		return signedTime;
 	}
 
-	public void setSignedTime(Date signedTime) {
+	public void setSignedTime(String signedTime) {
 		this.signedTime = signedTime;
 	}
 

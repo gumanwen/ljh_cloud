@@ -166,12 +166,12 @@ public class LeakPointServiceImpl {
         String chineseName = u.getName();
          String role = u.getRoleLists();
          List<BizLeakPointEntity> list = null;
-         if(role.contains("BZZ")){
+         if(!"".equals(role) && role !=null && role.contains("BZZ")){
              list = leakPointRepository.findAll();
-         }else{
+         }
+         else{
              list = leakPointRepository.findOfList(user);
          }
-
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
                 BizLeakPointEntity bizLeakPointEntity = list.get(i);

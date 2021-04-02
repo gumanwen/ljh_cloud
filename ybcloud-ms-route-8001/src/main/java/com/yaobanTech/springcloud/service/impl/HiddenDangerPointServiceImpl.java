@@ -194,9 +194,10 @@ public class HiddenDangerPointServiceImpl {
         String user = u.getLoginname();
         String role = u.getRoleLists();
         List<BizHiddenDangerPointEntity> list = null;
-        if(role.contains("BZZ")){
+        if(!"".equals(role) && role !=null && role.contains("BZZ")){
             list = hiddenDangerPointRepository.findAll();
-        }else{
+        }
+        else{
             list = hiddenDangerPointRepository.findList(user);
         }
         if(!list.isEmpty()){

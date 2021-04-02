@@ -143,7 +143,7 @@ public interface BizSignPointMapper {
             "ORDER BY c.modify_time DESC")
     List<HashMap<String,Object>> findCondition(SignPointQuery signPointQuery);
 
-    @Select(value="SELECT a.*,b.plan_name,c.* " +
+    @Select(value="SELECT a.*,b.plan_name,c.*,c.id as sign_point_id " +
             "FROM `ybcloud-ms-route-8001`.`biz_route` a " +
             "JOIN `ybcloud-ms-plan-8002`.`biz_plan` b ON a.id = b.route_id " +
             "JOIN `ybcloud-ms-route-8001`.`biz_signed_point` c ON a.id = c.route_id " +
