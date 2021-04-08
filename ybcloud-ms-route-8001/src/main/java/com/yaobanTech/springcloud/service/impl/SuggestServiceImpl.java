@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
@@ -56,13 +57,14 @@ public class SuggestServiceImpl {
                 suggestionRepository.save(bizSuggestionEntity);
                 String fCode = bizSuggestionEntity.getFCode();
                 if(fCode.contains("CNY")||fCode.contains("CBY")||fCode.contains("SJY")){
-                    hiddenDangerPointRepository.updateHiddenDangerPoint(bizSuggestionEntity.getFCode());
+                    hiddenDangerPointRepository.updateHiddenDangerPoint(bizSuggestionEntity.getFCode(),bizSuggestionEntity.getOpration());
                 }
                 if(fCode.contains("CNL")||fCode.contains("CBL")||fCode.contains("SJL")){
-                    leakPointRepository.updateBizLeakPoint(bizSuggestionEntity.getFCode());
+                    leakPointRepository.updateBizLeakPoint(bizSuggestionEntity.getFCode(),bizSuggestionEntity.getOpration());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return RespBean.error("保存失败！");
             }
         }else{

@@ -187,6 +187,39 @@ public class HiddenDangerPointServiceImpl {
         return RespBean.ok("查询成功！",bdpe);
     }
 
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public RespBean findDetailByCode(String code,HttpServletRequest request) {
+        BizHiddenDangerPointEntity bdpe = null;
+        String type = "yhdfj";
+        if(code != null) {
+            try {
+                bdpe = hiddenDangerPointRepository.findHiddenDangerPoint(code);
+                List<BizSuggestionEntity> suggestionEntityList = suggestionRepository.findList(bdpe.getHiddenDangerPointCode());
+                String user = bdpe.getCommitBy();
+                String chineseName = (String)oauthService.getChineseName(user).getObj();
+                HashMap<String,Object> hiddenDangerStatusEnum = (HashMap)routeService.findEnum(bdpe.getHiddenDangerStatus()).getObj();
+                HashMap<String,Object> projectTypeEnum = (HashMap)routeService.findEnum(bdpe.getProjectType()).getObj();
+                HashMap<String,Object> riskLevelEnum = (HashMap)routeService.findEnum(bdpe.getRiskLevel()).getObj();
+                HashMap<String,Object> constructionTypeEnum = (HashMap)routeService.findEnum(bdpe.getConstructionType()).getObj();
+                bdpe.setHiddenDangerPointStatusEnum(hiddenDangerStatusEnum);
+                bdpe.setProjectTypeEnum(projectTypeEnum);
+                bdpe.setRiskLevelEnum(riskLevelEnum);
+                bdpe.setConstructionTypeEnum(constructionTypeEnum);
+                bdpe.setCommitByCN(chineseName);
+                bdpe.setHandleAdvice(suggestionEntityList);
+                RespBean bean = fileService.selectOneByPid(bdpe.getHiddenDangerPointCode(), type);
+                List<HashMap<String, Object>> maps = (List<HashMap<String, Object>>) bean.getObj();
+                bdpe.setFileList(maps);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return RespBean.error("查询失败！");
+            }
+        }else{
+            return RespBean.error("编号为空！");
+        }
+        return RespBean.ok("查询成功！",bdpe);
+    }
+
     @Transactional(propagation= Propagation.NOT_SUPPORTED)
     public RespBean findListByUser(HttpServletRequest request) throws UnsupportedEncodingException {
         LoginUser u = urlUtils.getAll(request);

@@ -195,7 +195,6 @@ public class BizHiddenDangerPointEntity {
 	 */
 	@Transient
 	private List<BizSuggestionEntity> handleAdvice;
-
 	/**
 	 * 提交人
 	 */

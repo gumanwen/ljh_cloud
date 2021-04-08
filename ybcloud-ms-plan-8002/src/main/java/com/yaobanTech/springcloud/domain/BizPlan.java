@@ -197,6 +197,18 @@ public class BizPlan  implements Serializable {
 	@Transient
 	private HashMap<String,Object> waterUseOfficeEnum;
 
+	/**
+	 * 审批时间
+	 */
+	@Column(name="examine_date")
+	private String examineDate;
+
+	/**
+	 * 审批意见
+	 */
+	@Column(name="examine_advice")
+	private String examineAdvice;
+
 	public BizPlan() {
 	}
 
@@ -219,6 +231,22 @@ public class BizPlan  implements Serializable {
 		this.routeId = routeId;
 		this.mainKey = mainKey;
 		this.troubleCode = troubleCode;
+	}
+
+	public String getExamineDate() {
+		return examineDate;
+	}
+
+	public void setExamineDate(String examineDate) {
+		this.examineDate = examineDate;
+	}
+
+	public String getExamineAdvice() {
+		return examineAdvice;
+	}
+
+	public void setExamineAdvice(String examineAdvice) {
+		this.examineAdvice = examineAdvice;
 	}
 
 	public String getWaterUseOffice() {

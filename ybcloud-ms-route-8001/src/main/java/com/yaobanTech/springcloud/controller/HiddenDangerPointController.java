@@ -46,10 +46,16 @@ public class HiddenDangerPointController {
         return hiddenDangerPointService.deleteHiddenDangerPoint(id);
     }
 
-    @ApiOperation("查询隐患点详情")
+    @ApiOperation("根据id查询隐患点详情")
     @GetMapping("findDetail")
     public RespBean findDetail(@RequestParam Integer id,HttpServletRequest request){
         return hiddenDangerPointService.findDetail(id,request);
+    }
+
+    @ApiOperation("根据编号查询隐患点详情")
+    @GetMapping("findDetailByCode")
+    public RespBean findDetailByCode(@RequestParam String code,HttpServletRequest request){
+        return hiddenDangerPointService.findDetailByCode(code,request);
     }
 
     @ApiOperation("查询角色所有隐患点列表")
