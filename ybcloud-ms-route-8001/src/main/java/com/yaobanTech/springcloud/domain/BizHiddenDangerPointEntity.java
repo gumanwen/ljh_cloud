@@ -134,6 +134,7 @@ public class BizHiddenDangerPointEntity {
 	/**
 	 * 提交时间
 	 */
+	@Column(name = "commit_date" )
 	private String commitDate;
 
 	/**

@@ -370,7 +370,7 @@ public class PlanService {
     @GlobalTransactional
     @Transactional
     public RespBean examinePlan(Integer id,String status) {
-        if(id != null && "14".equals(status)) {
+        if(id != null && status != null) {
             try {
                 bizPlanRepository.examinePlan(id, status);
                 BizPlan bizPlan = bizPlanRepository.findDetail(id);

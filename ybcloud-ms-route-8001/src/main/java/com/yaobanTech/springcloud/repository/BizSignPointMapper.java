@@ -110,12 +110,14 @@ public interface BizSignPointMapper {
     @Select(value="SELECT a.* " +
             "FROM `ybcloud-ms-route-8001`.`biz_hidden_danger_point` a " +
             "WHERE a.enabled = 1 " +
-            "AND IF(#{assetType} is not null,  a.asset_type = #{assetType},1=1)" +
-            "AND IF(#{equipmentSize} is not null, a.equipment_size = #{equipmentSize},1=1 ) " +
-            "AND IF(#{hiddenDangerPointStatus} is not null, a.hidden_danger_point_status = #{hiddenDangerPointStatus},1=1 ) " +
             "AND IF(#{waterUseOffice} is not null, a.water_use_office = #{waterUseOffice},1=1 ) " +
+            "AND IF(#{hiddenDangerPointStatus} is not null, a.hidden_danger_point_status = #{hiddenDangerPointStatus},1=1 ) " +
+            "AND IF(#{constructionS1} is not null, a.construction_start_date >= #{constructionS1},1=1 ) " +
+            "AND IF(#{constructionS2} is not null, a.construction_start_date < #{constructionS2},1=1 ) " +
+            "AND IF(#{constructionE1} is not null, a.construction_start_date >= #{constructionE1},1=1 ) " +
+            "AND IF(#{constructionE2} is not null, a.construction_start_date < #{constructionE2},1=1 ) " +
             "AND IF(#{commitDate} is not null, a.commit_date >= #{commitDate},1=1 ) " +
-            "AND IF(#{endDate} is not null, a.end_date <= #{endDate},1=1 ) " +
+            "AND IF(#{endDate} is not null, a.end_date < #{endDate},1=1 ) " +
             "AND IF(#{hiddenDangerPointStatus} is not null, a.hidden_danger_point_status = #{hiddenDangerPointStatus},1=1 ) " +
             "AND IF(#{riskLevel} is not null, a.risk_level = #{riskLevel},1=1 ) " +
             "AND IF(#{projectType} is not null, a.project_type = #{projectType},1=1 ) " +
