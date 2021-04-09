@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(value ="routeService")
 public interface RouteService {
     @GetMapping("/api/route/way/findDetail")
-    RespBean findDetail(@RequestParam Integer id);
+    RespBean findDetail(@RequestParam("id") Integer id);
 
+    @GetMapping("/api/route/way/findEnum")
+    RespBean findEnum(@RequestParam String code);
 }

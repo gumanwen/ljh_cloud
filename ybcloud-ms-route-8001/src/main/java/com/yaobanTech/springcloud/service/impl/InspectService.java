@@ -15,4 +15,7 @@ public interface InspectService {
                         @RequestParam("taskStart2")Date taskStart2,@RequestParam("taskEnd2")Date taskEnd2,
                         @RequestParam("checkMan")String checkMan);
 
+    @GetMapping("/api/inspect/isModifiable")
+    RespBean comfirmModify(@RequestParam("routeId") Integer routeId);
+
 }

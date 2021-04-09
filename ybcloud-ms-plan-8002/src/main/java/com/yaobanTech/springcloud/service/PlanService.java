@@ -73,15 +73,6 @@ public class PlanService {
         Boolean flag = false;
         if(param != null){
             bizPlan = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizPlan.class);
-            List<String> list = bizPlanRepository.findPlanName(bizPlan.getRouteId());
-            if(!list.isEmpty()){
-                for (int i = 0; i < list.size(); i++) {
-                    String planName = list.get(i);
-                    if(planName.equals(bizPlan.getPlanName())){
-                        flag = true;
-                    }
-                }
-            }
             if(flag == false){
                 if(bizPlan != null) {
                     try {
@@ -122,17 +113,20 @@ public class PlanService {
         Boolean flag = false;
         if(param != null){
             bizPlan = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizPlan.class);
-            List<String> list = bizPlanRepository.findPlanName(bizPlan.getRouteId());
-            if(!list.isEmpty()){
-                for (int i = 0; i < list.size(); i++) {
-                    String planName = list.get(i);
-                    if(planName.equals(bizPlan.getPlanName())){
-                        flag = true;
-                    }
+            List<String> nameList = bizPlanRepository.findPlanName(bizPlan.getWaterUseOffice());
+            String dbName = bizPlanRepository.findDetail(bizPlan.getId()).getPlanName();
+            String parmName = bizPlan.getPlanName();
+           //重名计划禁止修改判定
+            if(parmName.equals(dbName)){
+                flag = true;
+            }else {
+                boolean match = nameList.stream().anyMatch(a -> a.equals(parmName));
+                if(!match){
+                    flag = true;
                 }
             }
         }
-        if(flag == false){
+        if(flag == true){
             if(bizPlan.getId() != null) {
                 try {
                     bizPlanMapper.update(bizPlan);
@@ -143,6 +137,8 @@ public class PlanService {
             }else{
                 return RespBean.error("id为空！");
             }
+        }else{
+            return RespBean.error("计划名称重复！");
         }
         return RespBean.ok("修改成功！");
     }
@@ -191,9 +187,10 @@ public class PlanService {
         String chineseName = (String)oauthService.getChineseName(u.getLoginname()).getObj();
         String role = u.getRoleLists();
         List<BizPlan> list = null;
-        if(role.contains("BZZ")){
+        if(!"".equals(role) && role !=null && role.contains("BZZ")){
             list = bizPlanRepository.findAll();
-        }else{
+        }
+        else{
             list = planMapper.findAll(user);
         }
 
@@ -206,7 +203,7 @@ public class PlanService {
                     plan.setPlanTypeMenu(map);
                     plan.setPlanStatusMenu(ps);
                     plan.setPlanPoridMenu(pp);
-//                    plan.setPlanCreatedByCN(chineseName);
+                    plan.setPlanCreatedByCN(chineseName);
                     RespBean respBean = routeService.findDetail(plan.getRouteId());
                     Object o = respBean.getObj();
                     if(respBean.getStatus() == 500){
@@ -231,15 +228,20 @@ public class PlanService {
         if(bp != null) {
             String user = bp.getPlanCreatedBy();
             String chineseName = (String)oauthService.getChineseName(user).getObj();
+            RespBean respBean = routeService.findDetail(bp.getRouteId());
+            Object o = respBean.getObj();
             Map map = (Map) findEnum(bp.getPlanType()).getObj();
             Map ps = (Map) findEnum(bp.getPlanStatus()).getObj();
             Map pp = (Map) findEnum(bp.getPlanPorid()).getObj();
+            HashMap<String, Object> hashMap = (HashMap<String, Object>) o;
+            String office = (String) hashMap.get("waterManagementOffice");
+            HashMap<String, Object> waterUseOffice = (HashMap<String, Object>) findEnum(office).getObj();
             bp.setPlanTypeMenu(map);
             bp.setPlanStatusMenu(ps);
             bp.setPlanPoridMenu(pp);
-//            bp.setPlanCreatedByCN(chineseName);
-            RespBean respBean = routeService.findDetail(bp.getRouteId());
-            Object o = respBean.getObj();
+            bp.setWaterUseOffice(office);
+            bp.setWaterUseOfficeEnum(waterUseOffice);
+            bp.setPlanCreatedByCN(chineseName);
             if(respBean.getStatus() == 500){
                 throw new RuntimeException("Feign调用路线服务失败！");
             }
@@ -353,7 +355,7 @@ public class PlanService {
                 plan.setPlanTypeMenu(map);
                 plan.setPlanStatusMenu(ps);
                 plan.setPlanPoridMenu(pp);
-//                plan.setPlanCreatedByCN(chineseName);
+                plan.setPlanCreatedByCN(chineseName);
                 RespBean respBean = routeService.findDetail(plan.getRouteId());
                 Object o = respBean.getObj();
                 if(respBean.getStatus() == 500){
@@ -368,12 +370,13 @@ public class PlanService {
     @GlobalTransactional
     @Transactional
     public RespBean examinePlan(Integer id,String status) {
-        if(id != null && "14".equals(status)) {
+        if(id != null && status != null) {
             try {
                 bizPlanRepository.examinePlan(id, status);
                 BizPlan bizPlan = bizPlanRepository.findDetail(id);
                 HashMap<String, Object> hashMap = (HashMap<String, Object>) routeService.findDetail(bizPlan.getRouteId()).getObj();
                 String waterManagementOffice = (String) hashMap.get("waterManagementOffice");
+                String diameter = (String) hashMap.get("pipeDiameter");
                 String code = bizPlan.getPlanPorid();
                 HashMap<String,Object> map = new HashMap<>();
                 map.put("routeId",bizPlan.getRouteId());
@@ -382,6 +385,7 @@ public class PlanService {
                 map.put("endTime",dateFormat.format(bizPlan.getEndTime()));
                 map.put("period",code);
                 map.put("waterManagementOffice",waterManagementOffice);
+                map.put("diameter",diameter);
                 inspectService.sendInspectInfo(map);
             } catch (Exception e) {
                 e.printStackTrace();

@@ -20,4 +20,8 @@ public interface IFilesService extends IService<Files> {
     RespBean importFiles(MultipartFile[] fileList, String pid, String type) throws IOException;
 
     RespBean selectOneByPid(String pid,String type);
+
+    RespBean remove(String id);
+
+
 }

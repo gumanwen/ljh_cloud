@@ -15,6 +15,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -50,6 +51,10 @@ public class RouteServiceImpl {
     @Autowired
     @Lazy
     private OauthService oauthService;
+
+    @Autowired
+    @Lazy
+    private InspectService inspectService;
 
     @Autowired
     @Lazy
@@ -103,17 +108,29 @@ public class RouteServiceImpl {
     @Transactional
     public RespBean updateRoute(HashMap<String,Object> param) {
         BizRoute bizRoute = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizRoute.class);
-        if(bizRoute.getId() != null && !bizRoute.getBizSignPoints().isEmpty()) {
+        Boolean flag = null;
+        if(bizRoute.getId() != null){
+            flag = (Boolean) inspectService.comfirmModify(bizRoute.getId()).getObj();
+        }
+        if(flag == true && !bizRoute.getBizSignPoints().isEmpty()) {
             try {
-               bizSignPointRepository.saveAll(bizRoute.getBizSignPoints());
+                List<BizSignPoint> list = bizRoute.getBizSignPoints();
+                List<BizSignPoint> points = list.stream().map(a -> {
+                    a.setEnabled(1);
+                    a.setPointInspectionType(bizRoute.getPointInspectionType());
+                    a.setRouteType(bizRoute.getRouteType());
+                    return a;
+                }).collect(Collectors.toList());
+                bizSignPointRepository.saveAll(points);
                bizRouteRepository.save(bizRoute);
 
             } catch (Exception e) {
                 e.printStackTrace();
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return RespBean.error("修改失败！");
             }
         }else{
-            return RespBean.error("id为空或签到点信息为空！");
+            return RespBean.error("id、签到点信息为空或该路线包含任务,无法修改！");
         }
         return RespBean.ok("修改成功！",bizRoute.getBizSignPoints());
     }
@@ -145,9 +162,6 @@ public class RouteServiceImpl {
         //获取当前用户
         LoginUser u = urlUtils.getAll(request);
         String chineseName = (String)oauthService.getChineseName(u.getLoginname()).getObj();
-        /*if(oauthService.getCurrentUser(token).getStatus() == 500){
-            throw new RuntimeException("Feign调用权限服务失败");
-        }*/
         RouteCondition routeCondition = JSONObject.parseObject(JSONObject.toJSONString(hashMap.get("form")), RouteCondition.class);
         Specification<BizRoute> spec = new Specification<BizRoute>() {
             @Override
@@ -220,7 +234,7 @@ public class RouteServiceImpl {
                 route.setRouteTypeMenu(routeTypeMenu);
                 route.setWaterOfficeMenu(waterOfficeMenu);
                 route.setPointInspectionTypeMenu(pointInspectionTypeMenu);
-//                route.setRouteCreatorCN(chineseName);
+                route.setRouteCreatorCN(chineseName);
             }
         }
        return RespBean.ok("查询成功！",list);
@@ -234,9 +248,10 @@ public class RouteServiceImpl {
         String chineseName = (String)oauthService.getChineseName(u.getLoginname()).getObj();
         String role = u.getRoleLists();
         List<BizRoute> list = null;
-        if(role.contains("BZZ")){
-            list = bizRouteRepository.findAll();
-        }else{
+        if(!"".equals(role) && role !=null && role.contains("BZZ")){
+                list = bizRouteRepository.findAll();
+        }
+          else{
             list = bizRouteRepository.findList(user);
         }
         if(!list.isEmpty()){
@@ -262,7 +277,7 @@ public class RouteServiceImpl {
                 route.setRouteTypeMenu(routeTypeMenu);
                 route.setWaterOfficeMenu(waterOfficeMenu);
                 route.setPointInspectionTypeMenu(pointInspectionTypeMenu);
-//                route.setRouteCreatorCN(chineseName);
+                route.setRouteCreatorCN(chineseName);
             }
         }
         List<BizRoute> routes = list.stream().
@@ -301,7 +316,7 @@ public class RouteServiceImpl {
                 route.setWaterOfficeMenu(waterOfficeMenu);
                 route.setPointInspectionTypeMenu(pointInspectionTypeMenu);
                 route.setRouteCreator(user);
-//                route.setRouteCreatorCN(chineseName);
+                route.setRouteCreatorCN(chineseName);
             }
         }
         return RespBean.ok("查询成功！",list);
@@ -325,7 +340,8 @@ public class RouteServiceImpl {
                     //获取报建文件列表
                     if(FieldUtils.isObjectNotEmpty(list.get(i).getFileType())) {
                         RespBean respBean = fileService.selectOneByPid(String.valueOf((Integer) list.get(i).getId()), (String) list.get(i).getFileType());
-                        List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) respBean.getObj();
+                        Object o = respBean.getObj();
+                        List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>)o ;
                         if(respBean.getStatus() == 500){
                             throw new RuntimeException("Feign调用文件服务失败");
                         }
@@ -341,7 +357,8 @@ public class RouteServiceImpl {
             br.setWaterOfficeMenu(waterOfficeMenu);
             br.setBizSignPoints(pointList);
             br.setPointInspectionTypeMenu(pointInspectionTypeMenu);
-//            br.setRouteCreatorCN(chineseName);
+            br.setBizSignPoints(list);
+            br.setRouteCreatorCN(chineseName);
         }
         return RespBean.ok("查询成功！",br);
     }

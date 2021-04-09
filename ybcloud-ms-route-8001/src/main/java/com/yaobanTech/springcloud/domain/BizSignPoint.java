@@ -223,6 +223,12 @@ public class BizSignPoint  implements Serializable {
 	@Transient
 	private Map<String,Object> signPointTypeEnum;
 
+	/**
+	 * 签到点类型枚举
+	 */
+	@Transient
+	private String routeName;
+
 
 	public BizSignPoint() {
 	}
@@ -252,6 +258,14 @@ public class BizSignPoint  implements Serializable {
 		this.pointInspectionType = pointInspectionType;
 		this.signPointStatus = signPointStatus;
 		this.modifyTime = modifyTime;
+	}
+
+	public String getRouteName() {
+		return routeName;
+	}
+
+	public void setRouteName(String routeName) {
+		this.routeName = routeName;
 	}
 
 	public Map<String, Object> getWaterUseOfficeEnum() {

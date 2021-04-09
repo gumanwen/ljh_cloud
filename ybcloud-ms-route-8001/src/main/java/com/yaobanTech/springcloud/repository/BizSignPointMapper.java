@@ -4,7 +4,6 @@ import com.yaobanTech.springcloud.domain.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -111,12 +110,14 @@ public interface BizSignPointMapper {
     @Select(value="SELECT a.* " +
             "FROM `ybcloud-ms-route-8001`.`biz_hidden_danger_point` a " +
             "WHERE a.enabled = 1 " +
-            "AND IF(#{assetType} is not null,  a.asset_type = #{assetType},1=1)" +
-            "AND IF(#{equipmentSize} is not null, a.equipment_size = #{equipmentSize},1=1 ) " +
-            "AND IF(#{hiddenDangerPointStatus} is not null, a.hidden_danger_point_status = #{hiddenDangerPointStatus},1=1 ) " +
             "AND IF(#{waterUseOffice} is not null, a.water_use_office = #{waterUseOffice},1=1 ) " +
+            "AND IF(#{hiddenDangerPointStatus} is not null, a.hidden_danger_point_status = #{hiddenDangerPointStatus},1=1 ) " +
+            "AND IF(#{constructionS1} is not null, a.construction_start_date >= #{constructionS1},1=1 ) " +
+            "AND IF(#{constructionS2} is not null, a.construction_start_date < #{constructionS2},1=1 ) " +
+            "AND IF(#{constructionE1} is not null, a.construction_start_date >= #{constructionE1},1=1 ) " +
+            "AND IF(#{constructionE2} is not null, a.construction_start_date < #{constructionE2},1=1 ) " +
             "AND IF(#{commitDate} is not null, a.commit_date >= #{commitDate},1=1 ) " +
-            "AND IF(#{endDate} is not null, a.end_date <= #{endDate},1=1 ) " +
+            "AND IF(#{endDate} is not null, a.end_date < #{endDate},1=1 ) " +
             "AND IF(#{hiddenDangerPointStatus} is not null, a.hidden_danger_point_status = #{hiddenDangerPointStatus},1=1 ) " +
             "AND IF(#{riskLevel} is not null, a.risk_level = #{riskLevel},1=1 ) " +
             "AND IF(#{projectType} is not null, a.project_type = #{projectType},1=1 ) " +
@@ -144,7 +145,7 @@ public interface BizSignPointMapper {
             "ORDER BY c.modify_time DESC")
     List<HashMap<String,Object>> findCondition(SignPointQuery signPointQuery);
 
-    @Select(value="SELECT a.*,b.plan_name,c.* " +
+    @Select(value="SELECT a.*,b.plan_name,c.*,c.id as sign_point_id " +
             "FROM `ybcloud-ms-route-8001`.`biz_route` a " +
             "JOIN `ybcloud-ms-plan-8002`.`biz_plan` b ON a.id = b.route_id " +
             "JOIN `ybcloud-ms-route-8001`.`biz_signed_point` c ON a.id = c.route_id " +
@@ -160,7 +161,66 @@ public interface BizSignPointMapper {
             "AND IF(#{pipeDiameter} is not null, c.pipe_diameter = #{pipeDiameter},1=1 ) " +
             "AND IF(#{signStatus} is not null, c.sign_point_status = #{signStatus},1=1 ) " +
             "AND IF(#{hiddenCode} is not null, c.trouble_code = #{hiddenCode},1=1 ) " +
-            "AND FIND_IN_SET(c.task_id, #{taskidList}) <> 0 " +
+            "AND FIND_IN_SET(c.task_id, #{taskidList}) " +
             "ORDER BY c.modify_time DESC")
     List<HashMap<String,Object>> findConditionElse(SignPointQuery signPointQuery);
+
+    @Select(value = "SELECT * FROM `biz_hidden_danger_point` WHERE 1 = 1 " +
+            "AND IF( #{waterUseOffice} not like '', water_use_office = #{waterUseOffice}, 1 = 1 ) " +
+            "and end_date is null " +
+            "and IF ( #{end} IS NOT NULL, commit_date <= #{end}, 1=1 ) " +
+            "or end_date is not null " +
+//            "AND IF ( #{start} IS NOT NULL, commit_date >#{start}, commit_date > ( SELECT DATE_SUB( CURDATE( ), INTERVAL 12 DAY ) ) ) " +
+//            "and IF ( #{end} IS NOT NULL, commit_date <= #{end}, commit_date <= ( SELECT DATE_SUB( now( ), INTERVAL 1 SECOND ) ) ) ")
+            "AND IF ( #{start} IS NOT NULL, commit_date >#{start}, 1 = 1 ) " +
+            "and IF ( #{end} IS NOT NULL, commit_date <= #{end}, 1 = 1 ) ")
+            List<BizHiddenDangerPointEntity> countDangerPointList(String waterUseOffice ,  String start ,  String end);
+
+    @Select(value = "SELECT a.sum + b.sum FROM ( " +
+            "SELECT count( * ) AS sum FROM `biz_hidden_danger_point` WHERE 1 = 1 " +
+            "AND IF ( #{waterUseOffice} IS NOT NULL, `biz_hidden_danger_point`.water_use_office = #{waterUseOffice}, 1 = 1 ) " +
+            "AND IF ( #{start} IS NOT NULL, `biz_hidden_danger_point`.commit_date > #{start}, `biz_hidden_danger_point`.commit_date > ( SELECT DATE_SUB( CURDATE( ), INTERVAL 12 DAY ))) " +
+            "AND IF ( #{start} IS NOT NULL, `biz_hidden_danger_point`.commit_date < #{end}, `biz_hidden_danger_point`.commit_date < ( SELECT date_sub(now(),interval 1 second))) " +
+            ") a, " +
+            "( SELECT count( * ) AS sum FROM `biz_leak_point` WHERE 1 = 1 " +
+            "AND IF ( #{waterUseOffice} IS NOT NULL, `biz_leak_point`.water_use_office = #{waterUseOffice}, 1 = 1 ) " +
+            "AND IF ( #{start} IS NOT NULL, `biz_leak_point`.commit_date > #{start}, `biz_leak_point`.commit_date > ( SELECT DATE_SUB( CURDATE( ), INTERVAL 12 DAY ))) " +
+            "AND IF ( #{end} IS NOT NULL, `biz_leak_point`.commit_date < #{end}, `biz_leak_point`.commit_date < ( SELECT date_sub(now(),interval 1 second))) " +
+            ") b ")
+    Integer countSum(String waterUseOffice ,  String start ,  String end);
+
+    @Select(value = "SELECT\n" +
+            "\tcount( * ) * 1.0 AS k \n" +
+            "FROM\n" +
+            "\t`biz_hidden_danger_point` \n" +
+            "WHERE\n" +
+            "\t1 = 1 \n" +
+            "AND\n" +
+            "IF\n" +
+            "\t( #{waterUseOffice} IS NOT NULL, water_use_office = #{waterUseOffice}, 1 = 1 ) \n" +
+            "AND\n" +
+            "IF\n" +
+            "\t( #{start} IS NOT NULL, commit_date >#{start}, commit_date > ( SELECT DATE_SUB( CURDATE( ), INTERVAL 12 DAY ) ) ) \n" +
+            "AND\n" +
+            "IF\n" +
+            "\t( #{end} IS NOT NULL, commit_date <#{end}, commit_date < ( SELECT DATE_SUB( now( ), INTERVAL 1 SECOND ) ) )")
+    Double countDangerPoint(String waterUseOffice ,  String start ,  String end);
+
+    @Select(value = "SELECT\n" +
+            "\tcount( * ) * 1.0 AS k \n" +
+            "FROM\n" +
+            "\t`biz_leak_point` \n" +
+            "WHERE\n" +
+            "\t1 = 1 \n" +
+            "AND\n" +
+            "IF\n" +
+            "\t( #{waterUseOffice} IS NOT NULL, water_use_office = #{waterUseOffice}, 1 = 1 ) \n" +
+            "AND\n" +
+            "IF\n" +
+            "\t( #{start} IS NOT NULL, commit_date >#{start}, commit_date > ( SELECT DATE_SUB( CURDATE( ), INTERVAL 12 DAY ) ) ) \n" +
+            "AND\n" +
+            "IF\n" +
+            "\t( #{end} IS NOT NULL, commit_date <#{end}, commit_date < ( SELECT DATE_SUB( now( ), INTERVAL 1 SECOND ) ) )")
+    Double countLeakPoint(String waterUseOffice ,  String start ,  String end);
+
 }

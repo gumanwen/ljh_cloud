@@ -134,6 +134,7 @@ public class BizHiddenDangerPointEntity {
 	/**
 	 * 提交时间
 	 */
+	@Column(name = "commit_date" )
 	private String commitDate;
 
 	/**
@@ -161,6 +162,30 @@ public class BizHiddenDangerPointEntity {
 	private String reason;
 
 	/**
+	 * 施工开始时间
+	 */
+	@Column(name = "construction_start_date" )
+	private String constructionStartDate;
+
+	/**
+	 * 施工结束时间
+	 */
+	@Column(name = "construction_end_date" )
+	private String constructionEndDate;
+
+	/**
+	 * x坐标
+	 */
+	@Column(name = "x" )
+	private String x;
+
+	/**
+	 * x坐标
+	 */
+	@Column(name = "y" )
+	private String y;
+
+	/**
 	 * 隐患时长
 	 */
 	@Transient
@@ -171,7 +196,6 @@ public class BizHiddenDangerPointEntity {
 	 */
 	@Transient
 	private List<BizSuggestionEntity> handleAdvice;
-
 	/**
 	 * 提交人
 	 */
@@ -244,6 +268,38 @@ public class BizHiddenDangerPointEntity {
 		this.projectTypeEnum = projectTypeEnum;
 		this.riskLevelEnum = riskLevelEnum;
 		this.constructionTypeEnum = constructionTypeEnum;
+	}
+
+	public String getConstructionStartDate() {
+		return constructionStartDate;
+	}
+
+	public void setConstructionStartDate(String constructionStartDate) {
+		this.constructionStartDate = constructionStartDate;
+	}
+
+	public String getConstructionEndDate() {
+		return constructionEndDate;
+	}
+
+	public void setConstructionEndDate(String constructionEndDate) {
+		this.constructionEndDate = constructionEndDate;
+	}
+
+	public String getX() {
+		return x;
+	}
+
+	public void setX(String x) {
+		this.x = x;
+	}
+
+	public String getY() {
+		return y;
+	}
+
+	public void setY(String y) {
+		this.y = y;
 	}
 
 	public String getReason() {

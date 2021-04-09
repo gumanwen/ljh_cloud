@@ -60,6 +60,12 @@ public class BizSuggestionEntity {
    @Column(name = "enabled" )
 	private Integer enabled;
 
+	/**
+	 * 是否有效
+	 */
+	@Transient
+	private String opration;
+
 	public BizSuggestionEntity() {
 	}
 
@@ -70,6 +76,15 @@ public class BizSuggestionEntity {
 		this.commitDate = commitDate;
 		this.commitBy = commitBy;
 		this.enabled = enabled;
+	}
+
+
+	public String getOpration() {
+		return opration;
+	}
+
+	public void setOpration(String opration) {
+		this.opration = opration;
 	}
 
 	public Integer getId() {

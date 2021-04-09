@@ -37,12 +37,6 @@ public class BizRoute  implements Serializable {
 	private String waterManagementOffice;
 
 	/**
-	 * 状态
-	 */
-   	@Column(name = "status" )
-	private String status;
-
-	/**
 	 * 路线名称
 	 */
    	@Column(name = "route_name" )
@@ -177,10 +171,9 @@ public class BizRoute  implements Serializable {
 	public BizRoute() {
 	}
 
-	public BizRoute(Integer id, String waterManagementOffice, String status, String routeName, String routeType, String routeCreator, Integer signIn, Double planInspectionMileage, Date createdTime, Integer hiddenDangerAmount, String pipeDiameter, Double actInspectionMileage, Integer enabled, String location, String pointInspectionType, String hiddenDangerReason, String overReason, String modifyBy, String addr, Map<String, Object> waterOfficeMenu, Map<String, Object> routeTypeMenu, Map<String, Object> pointInspectionTypeMenu, String routeCreatorCN, List<BizSignPoint> bizSignPoints) {
+	public BizRoute(Integer id, String waterManagementOffice, String routeName, String routeType, String routeCreator, Integer signIn, Double planInspectionMileage, Date createdTime, Integer hiddenDangerAmount, String pipeDiameter, Double actInspectionMileage, Integer enabled, String location, String pointInspectionType, String hiddenDangerReason, String overReason, String modifyBy, String addr, Map<String, Object> waterOfficeMenu, Map<String, Object> routeTypeMenu, Map<String, Object> pointInspectionTypeMenu, String routeCreatorCN, List<BizSignPoint> bizSignPoints) {
 		this.id = id;
 		this.waterManagementOffice = waterManagementOffice;
-		this.status = status;
 		this.routeName = routeName;
 		this.routeType = routeType;
 		this.routeCreator = routeCreator;
@@ -222,14 +215,6 @@ public class BizRoute  implements Serializable {
 
 	public void setWaterManagementOffice(String waterManagementOffice) {
 		this.waterManagementOffice = waterManagementOffice;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
 	}
 
 	public String getRouteName() {
@@ -405,7 +390,6 @@ public class BizRoute  implements Serializable {
 		return "BizRoute{" +
 				"id=" + id +
 				", waterManagementOffice='" + waterManagementOffice + '\'' +
-				", status='" + status + '\'' +
 				", routeName='" + routeName + '\'' +
 				", routeType='" + routeType + '\'' +
 				", routeCreator='" + routeCreator + '\'' +

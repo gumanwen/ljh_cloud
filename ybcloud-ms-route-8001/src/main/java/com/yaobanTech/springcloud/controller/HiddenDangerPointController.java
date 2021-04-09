@@ -46,10 +46,16 @@ public class HiddenDangerPointController {
         return hiddenDangerPointService.deleteHiddenDangerPoint(id);
     }
 
-    @ApiOperation("查询隐患点详情")
+    @ApiOperation("根据id查询隐患点详情")
     @GetMapping("findDetail")
     public RespBean findDetail(@RequestParam Integer id,HttpServletRequest request){
         return hiddenDangerPointService.findDetail(id,request);
+    }
+
+    @ApiOperation("根据编号查询隐患点详情")
+    @GetMapping("findDetailByCode")
+    public RespBean findDetailByCode(@RequestParam String code,HttpServletRequest request){
+        return hiddenDangerPointService.findDetailByCode(code,request);
     }
 
     @ApiOperation("查询角色所有隐患点列表")
@@ -69,5 +75,23 @@ public class HiddenDangerPointController {
     public RespBean findCondition(@RequestBody HiddenDangerPointQuery hiddenDangerPointQuery, HttpServletRequest request) throws UnsupportedEncodingException {
         return hiddenDangerPointService.findCondition(hiddenDangerPointQuery,request);
     }
+
+    @ApiOperation("条件查询隐患安全记录")
+    @PostMapping("conditionRecord")
+    public RespBean conditionRecord(@RequestBody HashMap<String,Object> hashMap) {
+        return hiddenDangerPointService.conditionRecord(hashMap);
+    }
+
+    @ApiOperation("问题对比分析")
+    @PostMapping("compare")
+    public RespBean compare(@RequestBody HashMap<String,Object> hashMap) {
+        return hiddenDangerPointService.compare(hashMap);
+    }
+
+//    @ApiOperation("问题处理分析")
+//    @PostMapping("handle")
+//    public RespBean handle() {
+//        return hiddenDangerPointService.handle();
+//    }
 
 }

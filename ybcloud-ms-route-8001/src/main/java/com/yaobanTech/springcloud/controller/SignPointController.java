@@ -49,6 +49,12 @@ public class SignPointController {
         return signPointService.findSignPoint(id);
     }
 
+    @ApiOperation("查询签到点详情")
+    @GetMapping("findSignedPoint")
+    public RespBean findSignedPoint(@RequestParam Integer id){
+        return signPointService.findSignedPoint(id);
+    }
+
     @ApiOperation("查询路线对应签到点列表")
     @GetMapping("findList")
     public RespBean findList(@RequestParam Integer routeId){

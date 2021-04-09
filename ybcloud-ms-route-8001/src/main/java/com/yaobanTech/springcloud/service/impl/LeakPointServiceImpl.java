@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -143,7 +144,7 @@ public class LeakPointServiceImpl {
                 String chineseName = (String)oauthService.getChineseName(user).getObj();
                 HashMap<String,Object> leakPointStatusEnum = (HashMap)routeService.findEnum(blpe.getLeakPointStatus()).getObj();
                 HashMap<String,Object> abnormalPhenomenaEnum = (HashMap)routeService.findEnum(blpe.getAbnormalPhenomena()).getObj();
-//                blpe.setCommitByCN(chineseName);
+                blpe.setCommitByCN(chineseName);
                 blpe.setAbnormalPhenomenaEnum(abnormalPhenomenaEnum);
                 blpe.setLeakPointStatusEnum(leakPointStatusEnum);
                 RespBean bean = fileService.selectOneByPid(blpe.getLeakPointCode(), type);
@@ -166,12 +167,12 @@ public class LeakPointServiceImpl {
         String chineseName = u.getName();
          String role = u.getRoleLists();
          List<BizLeakPointEntity> list = null;
-         if(role.contains("BZZ")){
+         if(!"".equals(role) && role !=null && role.contains("BZZ")){
              list = leakPointRepository.findAll();
-         }else{
+         }
+         else{
              list = leakPointRepository.findOfList(user);
          }
-
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
                 BizLeakPointEntity bizLeakPointEntity = list.get(i);
@@ -179,7 +180,7 @@ public class LeakPointServiceImpl {
                 HashMap<String,Object> abnormalPhenomenaEnum = (HashMap)routeService.findEnum(bizLeakPointEntity.getAbnormalPhenomena()).getObj();
                 HashMap<String,Object> assetTypeEnum = (HashMap)routeService.findEnum(bizLeakPointEntity.getAssetType()).getObj();
 
-//                bizLeakPointEntity.setCommitByCN(chineseName);
+                bizLeakPointEntity.setCommitByCN(chineseName);
                 bizLeakPointEntity.setLeakPointStatusEnum(leakPointStatusEnum);
                 bizLeakPointEntity.setAbnormalPhenomenaEnum(abnormalPhenomenaEnum);
                 bizLeakPointEntity.setAssetTypeEnum(assetTypeEnum);
@@ -211,7 +212,7 @@ public class LeakPointServiceImpl {
                     BizLeakPointEntity bizLeakPointEntity = list.get(i);
                     HashMap<String,Object> leakPointStatusEnum = (HashMap)routeService.findEnum(bizLeakPointEntity.getLeakPointStatus()).getObj();
                     HashMap<String,Object> abnormalPhenomenaEnum = (HashMap)routeService.findEnum(bizLeakPointEntity.getAbnormalPhenomena()).getObj();
-//                    bizLeakPointEntity.setCommitByCN(chineseName);
+                    bizLeakPointEntity.setCommitByCN(chineseName);
                     bizLeakPointEntity.setLeakPointStatusEnum(leakPointStatusEnum);
                     bizLeakPointEntity.setAbnormalPhenomenaEnum(abnormalPhenomenaEnum);
                     codeList.add(bizLeakPointEntity.getLeakPointCode());

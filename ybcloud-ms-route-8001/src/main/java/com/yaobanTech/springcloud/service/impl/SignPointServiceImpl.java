@@ -1,6 +1,7 @@
 package com.yaobanTech.springcloud.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.yaobanTech.springcloud.ToolUtils.DateFormatUtils;
 import com.yaobanTech.springcloud.ToolUtils.UrlUtils;
 import com.yaobanTech.springcloud.domain.*;
 import com.yaobanTech.springcloud.domain.enumDef.EnumMenu;
@@ -35,6 +36,10 @@ public class SignPointServiceImpl {
     @Autowired
     @Lazy
     private BizRouteRepository bizRouteRepository;
+
+    @Autowired
+    @Lazy
+    private HiddenDangerPointServiceImpl hiddenDangerPointService;
 
     @Autowired
     @Lazy
@@ -78,15 +83,18 @@ public class SignPointServiceImpl {
         Integer id = null;
         if(!param.isEmpty() && param.get("form") != null) {
              bizSignedPoint = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizSignedPoint.class);
-            BizSignPoint signPoint = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizSignPoint.class);
+//            BizSignPoint signPoint = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizSignPoint.class);
             if(bizSignedPoint != null){
             try {
                 bizSignedPoint.setModifyTime(new Date());
-                signPointRepository.save(signPoint);
+//                signPointRepository.save(signPoint);
                 bizSignedPoint.setSignPointStatus("合格");
-                bizSignedPoint.setSignedTime(new Date());
+                bizSignedPoint.setSignedTime(DateFormatUtils.DateToStr(new Date()));
                 BizSignedPoint signedPoint = signedPointRepository.save(bizSignedPoint);
                 id = signedPoint.getId();
+                if( bizSignedPoint.getTroubleCode() != null && bizSignedPoint.getTroubleCode().contains("Y")){
+                  hiddenDangerPointService.synchronization(bizSignedPoint.getTroubleCode(),bizSignedPoint.getHandleSuggestion());
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("修改失败！");
@@ -114,11 +122,27 @@ public class SignPointServiceImpl {
         return RespBean.ok("删除成功！");
     }
 
+    public RespBean findSignedPoint(Integer id) {
+        BizSignedPoint byId = null;
+        if(id != null) {
+            try {
+                byId = signedPointRepository.findbyId(id);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return RespBean.error("查询失败！");
+            }
+        }else{
+            return RespBean.error("id为空！");
+        }
+        return RespBean.ok("查询成功！",byId);
+    }
+
     public RespBean findSignPoint(Integer id) {
         BizSignPoint byId = null;
         if(id != null) {
             try {
-                 byId = signPointRepository.findSignPointById(id);
+                byId = signPointRepository.findSignPointById(id);
+
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("查询失败！");
@@ -136,9 +160,10 @@ public class SignPointServiceImpl {
         String chineseName = u.getName();
         String role = u.getRoleLists();
         List<BizRoute> routeList = null;
-        if(role.contains("BZZ")){
+        if(!"".equals(role) && role !=null && role.contains("BZZ")){
             routeList = bizRouteRepository.findAll();
-        }else{
+        }
+        else{
             routeList = bizRouteRepository.findList(user);
         }
         List<BizSignPoint> list = new ArrayList<>();
@@ -148,11 +173,12 @@ public class SignPointServiceImpl {
                 String pointInspectionType = route.getPointInspectionType();
                 String routeType = route.getRouteType();
                 String waterManagementOffice = route.getWaterManagementOffice();
+                String routeName = route.getRouteName();
                 Map pointInspectionTypeEnum = (Map) EnumMenu.findEnum(pointInspectionType).getObj();
                 Map routeTypeEnum = (Map) EnumMenu.findEnum(routeType).getObj();
                 Map waterManagementOfficeEnum = (Map) EnumMenu.findEnum(waterManagementOffice).getObj();
                 List<BizSignPoint> points = route.getBizSignPoints();
-                if(points.size()>0){
+                if(!points.isEmpty()){
                     for(int j =0; j<points.size();j++){
                         //获取报建文件列表
                         if(FieldUtils.isObjectNotEmpty(points.get(j).getFileType())) {
@@ -161,8 +187,9 @@ public class SignPointServiceImpl {
                             if(respBean.getStatus() == 500){
                                 throw new RuntimeException("Feign调用文件服务失败");
                             }
-                            Map signPointTypeEnum = (Map) EnumMenu.findEnum(points.get(j).getSignPointType()).getObj();
+//                            Map signPointTypeEnum = (Map) EnumMenu.findEnum(points.get(j).getSignPointType()).getObj();
                             points.get(j).setFileList(fileList);
+                            points.get(j).setRouteName(routeName);
                             points.get(j).setWaterUseOfficeEnum(waterManagementOfficeEnum);
                             points.get(j).setSignPointTypeEnum(pointInspectionTypeEnum);
                             points.get(j).setRouteTypeEnum(routeTypeEnum);
@@ -263,16 +290,16 @@ public class SignPointServiceImpl {
         List<HashMap<String, Object>> list = new ArrayList<>();
         if(map != null){
             signPointQuery = JSONObject.parseObject(JSONObject.toJSONString(map.get("form")), SignPointQuery.class);
-            if(signPointQuery.getTaskStart1() != null || signPointQuery.getTaskEnd1() != null||
-                    signPointQuery.getTaskStart2() != null || signPointQuery.getTaskEnd2() != null || signPointQuery.getCheckMan() != null){
                 RespBean respBean = inspectService.getTaskIds(signPointQuery.getTaskStart1(), signPointQuery.getTaskEnd1(), signPointQuery.getTaskStart2(), signPointQuery.getTaskEnd2(),signPointQuery.getCheckMan());
                 list = (List<HashMap<String, Object>>) respBean.getObj();
                 if(list.size()>0){
                     for (int i = 0; i < list.size(); i++) {
                         taskids.add((String) list.get(i).get("inspect_task_id"));
                     }
+                }else {
+                   return RespBean.error("未查询到数据！");
                 }
-                signPointQuery.setTaskidList(StringUtils.strip(taskids.toString(),"[]"));
+                signPointQuery.setTaskidList(StringUtils.strip(taskids.toString(),"[]").replace(" ",""));
                 maps = bizSignPointMapper.findConditionElse(signPointQuery);
                 //根据查询结果查出巡查人
                 if(maps.size()>0){
@@ -280,13 +307,13 @@ public class SignPointServiceImpl {
                         for (int j = 0; j < list.size(); j++) {
                             if(maps.get(i).get("task_id").equals(list.get(j).get("inspect_task_id"))){
                                 maps.get(i).put("inspect_person",list.get(j).get("inspect_person"));
+                                maps.get(i).put("begin_time",list.get(j).get("begin_time"));
+                                maps.get(i).put("dead_time",list.get(j).get("dead_time"));
+                                maps.get(i).put("plan_name",list.get(j).get("plan_name"));
                             }
                         }
                     }
                 }
-            }else{
-                 maps = bizSignPointMapper.findCondition(signPointQuery);
-            }
         }else {
             return RespBean.error("查询参数对象为空！");
         }
