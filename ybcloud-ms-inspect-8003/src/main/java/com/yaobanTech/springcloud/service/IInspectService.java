@@ -57,6 +57,8 @@ public interface IInspectService extends IService<Inspect> {
 
     RespBean inspectStatistics(String waterManagementOffice,String unit,String beginTime,String deadTime) throws ParseException;
 
+    RespBean appInspectStatistics(HttpServletRequest request) throws UnsupportedEncodingException;
+
     RespBean uploadGPS(Map<String, Object> params);
 
     RespBean digui(Integer gid);
@@ -66,4 +68,8 @@ public interface IInspectService extends IService<Inspect> {
     RespBean create();
 
     RespBean getcloseValues(String gid);
+
+    RespBean isModifiable(Integer routeId);
+
+
 }

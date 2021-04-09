@@ -3,7 +3,6 @@ package com.yaobanTech.springcloud.entity;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
@@ -29,6 +28,10 @@ public class Inspect implements Serializable {
     * 用水管理所
     */
     private String waterManagementOffice;
+    /**
+     *管径
+     */
+    private String diameter;
     /**
      * 任务开始时间
      */
@@ -58,6 +61,11 @@ public class Inspect implements Serializable {
      * 巡查人员
      */
     private String inspectPerson;
+
+    /**
+     * 巡查人员中文
+     */
+    private String name;
 
     /**
      * 派发人
@@ -124,18 +132,40 @@ public class Inspect implements Serializable {
      */
     private Integer routeId;
 
+    /**
+     * 巡查周期
+     */
+    private String cycle;
+
+    /**
+     * 巡查结果
+     */
+    private String result;
+
+    /**
+     * 创建时间
+     */
+    private String createTime;
+
+    /**
+     * 终止原因
+     */
+    private String endReason;
+
     public Inspect() {
     }
 
-    public Inspect(String inspectTaskId, String waterManagementOffice, String beginTime, String deadTime, String actBeginTime, String actEndTime, String status, String inspectPerson, String sender, String completeRate, String arrivalRate, String liveSitustion, String checkInPointSituation, String gisMap, String taskType, String sendTime, String overReason, String modifyBy, String completeTime, Integer planId, Integer routeId) {
+    public Inspect(String inspectTaskId, String waterManagementOffice, String diameter, String beginTime, String deadTime, String actBeginTime, String actEndTime, String status, String inspectPerson, String name, String sender, String completeRate, String arrivalRate, String liveSitustion, String checkInPointSituation, String gisMap, String taskType, String sendTime, String overReason, String modifyBy, String completeTime, Integer planId, Integer routeId, String cycle, String result, String createTime, String endReason) {
         this.inspectTaskId = inspectTaskId;
         this.waterManagementOffice = waterManagementOffice;
+        this.diameter = diameter;
         this.beginTime = beginTime;
         this.deadTime = deadTime;
         this.actBeginTime = actBeginTime;
         this.actEndTime = actEndTime;
         this.status = status;
         this.inspectPerson = inspectPerson;
+        this.name = name;
         this.sender = sender;
         this.completeRate = completeRate;
         this.arrivalRate = arrivalRate;
@@ -149,6 +179,10 @@ public class Inspect implements Serializable {
         this.completeTime = completeTime;
         this.planId = planId;
         this.routeId = routeId;
+        this.cycle = cycle;
+        this.result = result;
+        this.createTime = createTime;
+        this.endReason = endReason;
     }
 
     public String getInspectTaskId() {
@@ -165,6 +199,14 @@ public class Inspect implements Serializable {
 
     public void setWaterManagementOffice(String waterManagementOffice) {
         this.waterManagementOffice = waterManagementOffice;
+    }
+
+    public String getDiameter() {
+        return diameter;
+    }
+
+    public void setDiameter(String diameter) {
+        this.diameter = diameter;
     }
 
     public String getBeginTime() {
@@ -213,6 +255,14 @@ public class Inspect implements Serializable {
 
     public void setInspectPerson(String inspectPerson) {
         this.inspectPerson = inspectPerson;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getSender() {
@@ -317,5 +367,37 @@ public class Inspect implements Serializable {
 
     public void setRouteId(Integer routeId) {
         this.routeId = routeId;
+    }
+
+    public String getCycle() {
+        return cycle;
+    }
+
+    public void setCycle(String cycle) {
+        this.cycle = cycle;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
+    }
+
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
+    }
+
+    public String getEndReason() {
+        return endReason;
+    }
+
+    public void setEndReason(String endReason) {
+        this.endReason = endReason;
     }
 }

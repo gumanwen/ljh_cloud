@@ -116,7 +116,7 @@ public class UserRightsController {
         return userRightsService.getMenusByRole(name);
     }
 
-    @ApiOperation(value ="根据角色查询用户")
+    @ApiOperation(value ="openfeign 根据角色查询用户")
     @GetMapping("selectUserByRole")
     public RespBean selectUserByRole(@RequestParam  String role){
         return userRightsService.selectUserByRole(role);

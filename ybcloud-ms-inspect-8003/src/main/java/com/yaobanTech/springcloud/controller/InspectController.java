@@ -1,6 +1,7 @@
 package com.yaobanTech.springcloud.controller;
 
 
+import com.yaobanTech.springcloud.entity.Inspect;
 import com.yaobanTech.springcloud.entity.Test;
 import com.yaobanTech.springcloud.entity.utils.RespBean;
 import com.yaobanTech.springcloud.service.IInspectService;
@@ -211,6 +212,12 @@ public class InspectController {
         return iInspectService.inspectStatistics(waterManagementOffice,unit,beginTime,deadTime);
     }
 
+    @ApiOperation("手机：巡查统计")
+    @GetMapping("/appInspectStatistics")
+    public RespBean appInspectStatistics(HttpServletRequest request) throws UnsupportedEncodingException {
+        return iInspectService.appInspectStatistics(request);
+    }
+
     @ApiOperation("/上传GPS坐标")
     @PostMapping("/uploadGPS")
     public RespBean uploadGPS(@RequestBody Map<String, Object> params){
@@ -221,6 +228,12 @@ public class InspectController {
     @GetMapping("/getcloseValues")
     public RespBean getcloseValues(String gid){
         return iInspectService.getcloseValues(gid);
+    }
+
+    @ApiOperation("openfeign: 路线是否可修改")
+    @GetMapping("/isModifiable")
+    public Object isModifiable(Integer routeId) {
+        return iInspectService.isModifiable(routeId);
     }
 }
 
