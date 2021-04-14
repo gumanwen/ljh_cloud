@@ -81,8 +81,8 @@ public class SignPointController {
 
     @ApiOperation("新增任务签到点")
     @GetMapping("taskPoint")
-    public RespBean taskPoint(@RequestParam List<String> taskIds, @RequestParam Integer routeId ){
-        return signPointService.taskPoint(taskIds,routeId);
+    public RespBean taskPoint(@RequestParam List<String> taskIds, @RequestParam Integer routeId,@RequestParam Integer planId ){
+        return signPointService.taskPoint(taskIds,routeId,planId);
     }
 
     @ApiOperation("条件查询签到点")

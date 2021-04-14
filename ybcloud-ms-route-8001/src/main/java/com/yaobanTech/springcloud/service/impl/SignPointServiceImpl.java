@@ -83,11 +83,9 @@ public class SignPointServiceImpl {
         Integer id = null;
         if(!param.isEmpty() && param.get("form") != null) {
              bizSignedPoint = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizSignedPoint.class);
-//            BizSignPoint signPoint = JSONObject.parseObject(JSONObject.toJSONString(param.get("form")), BizSignPoint.class);
             if(bizSignedPoint != null){
             try {
                 bizSignedPoint.setModifyTime(new Date());
-//                signPointRepository.save(signPoint);
                 bizSignedPoint.setSignPointStatus("合格");
                 bizSignedPoint.setSignedTime(DateFormatUtils.DateToStr(new Date()));
                 BizSignedPoint signedPoint = signedPointRepository.save(bizSignedPoint);
@@ -262,7 +260,7 @@ public class SignPointServiceImpl {
         return RespBean.ok("查询成功！",list);
     }
 
-    public RespBean taskPoint(List<String> taskIds,Integer routeId) {
+    public RespBean taskPoint(List<String> taskIds,Integer routeId,Integer planId) {
         if(!taskIds.isEmpty() && routeId != null){
             List<BizSignPoint> signPointList = signPointRepository.findSignPointListByRouteId(routeId);
             for (int i = 0; i < taskIds.size(); i++) {
@@ -275,6 +273,7 @@ public class SignPointServiceImpl {
                     bizSignedPoint.setId(null);
                     bizSignedPoint.setSignPointStatus("不合格");
                     bizSignedPoint.setEnabled(1);
+                    bizSignedPoint.setPlanId(planId);
                     signedPointRepository.save(bizSignedPoint);
                 }
             }
@@ -290,7 +289,8 @@ public class SignPointServiceImpl {
         List<HashMap<String, Object>> list = new ArrayList<>();
         if(map != null){
             signPointQuery = JSONObject.parseObject(JSONObject.toJSONString(map.get("form")), SignPointQuery.class);
-                RespBean respBean = inspectService.getTaskIds(signPointQuery.getTaskStart1(), signPointQuery.getTaskEnd1(), signPointQuery.getTaskStart2(), signPointQuery.getTaskEnd2(),signPointQuery.getCheckMan());
+            //openFeign获取task_id列表
+            RespBean respBean = inspectService.getTaskIds(signPointQuery.getTaskStart1(), signPointQuery.getTaskEnd1(), signPointQuery.getTaskStart2(), signPointQuery.getTaskEnd2(),signPointQuery.getCheckMan());
                 list = (List<HashMap<String, Object>>) respBean.getObj();
                 if(list.size()>0){
                     for (int i = 0; i < list.size(); i++) {
@@ -304,10 +304,16 @@ public class SignPointServiceImpl {
                 //根据查询结果查出巡查人
                 if(!maps.isEmpty()){
                     for (int i = 0; i < maps.size(); i++) {
+                        Map pointInspectionTypeEnum = (Map) EnumMenu.findEnum((String)maps.get(i).get("point_inspection_type")).getObj();
+                        Map routeTypeEnum = (Map) EnumMenu.findEnum((String)maps.get(i).get("route_type")).getObj();
+                        Map waterManagementOfficeEnum = (Map) EnumMenu.findEnum((String)maps.get(i).get("water_management_office")).getObj();
                         //获取报建文件列表
                         RespBean res = fileService.selectOneByPid(maps.get(i).get("sign_point_id").toString(), "qddfj");
                         List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) res.getObj();
                         maps.get(i).put("fileList",fileList);
+                        maps.get(i).put("pointInspectionTypeEnum",pointInspectionTypeEnum);
+                        maps.get(i).put("routeTypeEnum",routeTypeEnum);
+                        maps.get(i).put("waterManagementOfficeEnum",waterManagementOfficeEnum);
                         String s1 = (String) maps.get(i).get("task_id");
                         for (int j = 0; j < list.size(); j++) {
                             String s2 = (String) list.get(j).get("inspect_task_id");

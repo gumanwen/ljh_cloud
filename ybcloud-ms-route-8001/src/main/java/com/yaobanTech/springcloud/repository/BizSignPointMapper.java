@@ -126,7 +126,7 @@ public interface BizSignPointMapper {
             "ORDER BY a.commit_Date DESC")
     List<BizHiddenDangerPointEntity> hiddenDangerPointQuery(HiddenDangerPointQuery hiddenDangerPointQuery);
 
-    @Select(value="SELECT a.*,b.plan_name,c.* " +
+    @Select(value="SELECT  a.*,b.plan_name,c.* " +
             "FROM `ybcloud-ms-route-8001`.`biz_route` a " +
             "JOIN `ybcloud-ms-plan-8002`.`biz_plan` b ON a.id = b.route_id " +
             "JOIN `ybcloud-ms-route-8001`.`biz_signed_point` c ON a.id = c.route_id " +
@@ -147,8 +147,8 @@ public interface BizSignPointMapper {
 
     @Select(value="SELECT a.*,b.plan_name,c.*,c.id as sign_point_id " +
             "FROM `ybcloud-ms-route-8001`.`biz_route` a " +
-            "JOIN `ybcloud-ms-plan-8002`.`biz_plan` b ON a.id = b.route_id " +
-            "JOIN `ybcloud-ms-route-8001`.`biz_signed_point` c ON a.id = c.route_id " +
+            "right JOIN `ybcloud-ms-route-8001`.`biz_signed_point` c ON a.id = c.route_id " +
+            "JOIN `ybcloud-ms-plan-8002`.`biz_plan` b on b.id = c.plan_id "+
             "WHERE a.enabled = 1 and b.enabled = 1 and c.enabled = 1 " +
             "AND IF(#{waterUserOffice} is not null,  a.water_management_office = #{waterUserOffice},1=1) " +
             "AND IF(#{routeName} is not null, a.route_name = #{routeName},1=1 ) " +
