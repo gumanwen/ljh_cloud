@@ -207,6 +207,18 @@ public class BizSignedPoint implements Serializable {
     @Transient
 	private List<HashMap<String, Object>> fileList;
 
+	/**
+	 * 是否到位
+	 */
+	@Column(name = "in_place" )
+	private String inPlace;
+
+	/**
+	 * 是否到位
+	 */
+	@Column(name = "not_in_place_reason" )
+	private String notInPlaceReason;
+
 
 	public BizSignedPoint() {
 	}
@@ -236,6 +248,22 @@ public class BizSignedPoint implements Serializable {
 		this.pointInspectionType = pointInspectionType;
 		this.signPointStatus = signPointStatus;
 		this.modifyTime = modifyTime;
+	}
+
+	public String getNotInPlaceReason() {
+		return notInPlaceReason;
+	}
+
+	public void setNotInPlaceReason(String notInPlaceReason) {
+		this.notInPlaceReason = notInPlaceReason;
+	}
+
+	public String getInPlace() {
+		return inPlace;
+	}
+
+	public void setInPlace(String inPlace) {
+		this.inPlace = inPlace;
 	}
 
 	public String getSignedTime() {

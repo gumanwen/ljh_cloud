@@ -108,8 +108,9 @@ public class PlanController {
 
     @ApiOperation("计划审核")
     @GetMapping("examine")
-    public RespBean examinePlan(@RequestParam Integer id,@RequestParam String status) {
-        return planService.examinePlan(id,status);
+    public RespBean examinePlan(@RequestParam Integer id,@RequestParam String status,
+            @RequestParam String examineDate,@RequestParam String examineAdvice) {
+        return planService.examinePlan(id,status,examineDate,examineAdvice);
     }
 
 }

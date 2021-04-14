@@ -72,8 +72,8 @@ public class HiddenDangerPointController {
 
     @ApiOperation("条件查询隐患点列表")
     @PostMapping("findCondition")
-    public RespBean findCondition(@RequestBody HiddenDangerPointQuery hiddenDangerPointQuery, HttpServletRequest request) throws UnsupportedEncodingException {
-        return hiddenDangerPointService.findCondition(hiddenDangerPointQuery,request);
+    public RespBean findCondition(@RequestBody HashMap<String,Object> hashMap, HttpServletRequest request) throws UnsupportedEncodingException {
+        return hiddenDangerPointService.findCondition(hashMap,request);
     }
 
     @ApiOperation("条件查询隐患安全记录")

@@ -232,6 +232,18 @@ public class BizHiddenDangerPointEntity {
 	@Transient
 	private List<HashMap<String,Object>> fileList;
 
+	/**
+	 * 施工方式数组
+	 */
+	@Transient
+	private String[] sgfs;
+
+	/**
+	 * 工地类型数组
+	 */
+	@Transient
+	private String[] gdlx;
+
 
 
 	public BizHiddenDangerPointEntity() {
@@ -268,6 +280,22 @@ public class BizHiddenDangerPointEntity {
 		this.projectTypeEnum = projectTypeEnum;
 		this.riskLevelEnum = riskLevelEnum;
 		this.constructionTypeEnum = constructionTypeEnum;
+	}
+
+	public String[] getSgfs() {
+		return sgfs;
+	}
+
+	public void setSgfs(String[] sgfs) {
+		this.sgfs = sgfs;
+	}
+
+	public String[] getGdlx() {
+		return gdlx;
+	}
+
+	public void setGdlx(String[] gdlx) {
+		this.gdlx = gdlx;
 	}
 
 	public String getConstructionStartDate() {

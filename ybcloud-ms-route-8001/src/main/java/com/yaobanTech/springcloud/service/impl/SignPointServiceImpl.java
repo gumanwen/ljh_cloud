@@ -302,10 +302,16 @@ public class SignPointServiceImpl {
                 signPointQuery.setTaskidList(StringUtils.strip(taskids.toString(),"[]").replace(" ",""));
                 maps = bizSignPointMapper.findConditionElse(signPointQuery);
                 //根据查询结果查出巡查人
-                if(maps.size()>0){
+                if(!maps.isEmpty()){
                     for (int i = 0; i < maps.size(); i++) {
+                        //获取报建文件列表
+                        RespBean res = fileService.selectOneByPid(maps.get(i).get("sign_point_id").toString(), "qddfj");
+                        List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) res.getObj();
+                        maps.get(i).put("fileList",fileList);
+                        String s1 = (String) maps.get(i).get("task_id");
                         for (int j = 0; j < list.size(); j++) {
-                            if(maps.get(i).get("task_id").equals(list.get(j).get("inspect_task_id"))){
+                            String s2 = (String) list.get(j).get("inspect_task_id");
+                            if(s2.equals(s1)){
                                 maps.get(i).put("inspect_person",list.get(j).get("inspect_person"));
                                 maps.get(i).put("begin_time",list.get(j).get("begin_time"));
                                 maps.get(i).put("dead_time",list.get(j).get("dead_time"));

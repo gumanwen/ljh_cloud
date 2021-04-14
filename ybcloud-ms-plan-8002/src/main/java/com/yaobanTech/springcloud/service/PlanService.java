@@ -369,10 +369,10 @@ public class PlanService {
 
     @GlobalTransactional
     @Transactional
-    public RespBean examinePlan(Integer id,String status) {
-        if(id != null && status != null) {
+    public RespBean examinePlan(Integer id,String status,String examineDate,String examineAdvice) {
+        if(id != null && status != null&& status != examineDate&& status != examineAdvice) {
             try {
-                bizPlanRepository.examinePlan(id, status);
+                bizPlanRepository.examinePlan(id, status,examineDate,examineAdvice);
                 BizPlan bizPlan = bizPlanRepository.findDetail(id);
                 HashMap<String, Object> hashMap = (HashMap<String, Object>) routeService.findDetail(bizPlan.getRouteId()).getObj();
                 String waterManagementOffice = (String) hashMap.get("waterManagementOffice");
