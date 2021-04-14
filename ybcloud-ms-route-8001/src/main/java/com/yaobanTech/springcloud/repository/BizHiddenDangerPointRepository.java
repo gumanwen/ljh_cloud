@@ -19,11 +19,11 @@ public interface BizHiddenDangerPointRepository extends JpaRepository<BizHiddenD
     void synchronization(String code,String handle);
 
     @Modifying
-    @Query("update BizHiddenDangerPointEntity t set t.hiddenDangerStatus = 54,t.opration = ?2 where t.hiddenDangerPointCode = ?1")
+    @Query("update BizHiddenDangerPointEntity t set t.hiddenDangerPointStatus = 54,t.opration = ?2 where t.hiddenDangerPointCode = ?1")
     void updateHiddenDangerPoint(String hiddenDangerPointCode,String opration);
 
     @Modifying
-    @Query("update BizHiddenDangerPointEntity t set t.hiddenDangerStatus = 55 where t.hiddenDangerPointCode = ?1")
+    @Query("update BizHiddenDangerPointEntity t set t.hiddenDangerPointStatus = 55 where t.hiddenDangerPointCode = ?1")
     void updateHiddenDangerPointStatus(String hiddenDangerPointCode);
 
     @Query(value = " from BizHiddenDangerPointEntity t where t.enabled = 1 and t.id = ?1")

@@ -88,7 +88,7 @@ public class HiddenDangerPointServiceImpl {
                 }*/
                 bizHiddenDangerPointEntity.setCommitDate(DateFormatUtils.DateToStr(new Date()));
                 bizHiddenDangerPointEntity.setEnabled(1);
-                bizHiddenDangerPointEntity.setHiddenDangerStatus("53");
+                bizHiddenDangerPointEntity.setHiddenDangerPointStatus("53");
                 bizHiddenDangerPointEntity.setCommitBy(user);
                 bizHiddenDangerPointEntity.setHiddenDangerPointCode(hiddenDangerPointCode);
                 hiddenDangerPointRepository.save(bizHiddenDangerPointEntity);
@@ -164,7 +164,7 @@ public class HiddenDangerPointServiceImpl {
                 List<BizSuggestionEntity> suggestionEntityList = suggestionRepository.findList(bdpe.getHiddenDangerPointCode());
                 String user = bdpe.getCommitBy();
                 String chineseName = (String)oauthService.getChineseName(user).getObj();
-                HashMap<String,Object> hiddenDangerStatusEnum = (HashMap)routeService.findEnum(bdpe.getHiddenDangerStatus()).getObj();
+                HashMap<String,Object> hiddenDangerStatusEnum = (HashMap)routeService.findEnum(bdpe.getHiddenDangerPointStatus()).getObj();
                 HashMap<String,Object> projectTypeEnum = (HashMap)routeService.findEnum(bdpe.getProjectType()).getObj();
                 HashMap<String,Object> riskLevelEnum = (HashMap)routeService.findEnum(bdpe.getRiskLevel()).getObj();
                 HashMap<String,Object> constructionTypeEnum = (HashMap)routeService.findEnum(bdpe.getConstructionType()).getObj();
@@ -199,7 +199,7 @@ public class HiddenDangerPointServiceImpl {
                 List<BizSuggestionEntity> suggestionEntityList = suggestionRepository.findList(bdpe.getHiddenDangerPointCode());
                 String user = bdpe.getCommitBy();
                 String chineseName = (String)oauthService.getChineseName(user).getObj();
-                HashMap<String,Object> hiddenDangerStatusEnum = (HashMap)routeService.findEnum(bdpe.getHiddenDangerStatus()).getObj();
+                HashMap<String,Object> hiddenDangerStatusEnum = (HashMap)routeService.findEnum(bdpe.getHiddenDangerPointStatus()).getObj();
                 HashMap<String,Object> projectTypeEnum = (HashMap)routeService.findEnum(bdpe.getProjectType()).getObj();
                 HashMap<String,Object> riskLevelEnum = (HashMap)routeService.findEnum(bdpe.getRiskLevel()).getObj();
                 HashMap<String,Object> constructionTypeEnum = (HashMap)routeService.findEnum(bdpe.getConstructionType()).getObj();
@@ -242,7 +242,7 @@ public class HiddenDangerPointServiceImpl {
                 BizHiddenDangerPointEntity bizHiddenDangerPointEntity = list.get(i);
                 bizHiddenDangerPointEntity.setCommitByCN(chineseName);;
                 List<BizSuggestionEntity> suggestionEntityList = suggestionRepository.findList(bizHiddenDangerPointEntity.getHiddenDangerPointCode());
-                HashMap<String,Object> hiddenDangerStatusEnum = (HashMap)routeService.findEnum(bizHiddenDangerPointEntity.getHiddenDangerStatus()).getObj();
+                HashMap<String,Object> hiddenDangerStatusEnum = (HashMap)routeService.findEnum(bizHiddenDangerPointEntity.getHiddenDangerPointStatus()).getObj();
                 HashMap<String,Object> projectTypeEnum = (HashMap)routeService.findEnum(bizHiddenDangerPointEntity.getProjectType()).getObj();
                 HashMap<String,Object> riskLevelEnum = (HashMap)routeService.findEnum(bizHiddenDangerPointEntity.getRiskLevel()).getObj();
                 HashMap<String,Object> constructionTypeEnum = (HashMap)routeService.findEnum(bizHiddenDangerPointEntity.getConstructionType()).getObj();
@@ -291,16 +291,16 @@ public class HiddenDangerPointServiceImpl {
             if(!list.isEmpty()){
                 for (int i = 0; i < list.size(); i++) {
                     BizHiddenDangerPointEntity hiddenDangerPointEntity = list.get(i);
-                    HashMap<String,Object> hiddenDangerStatusEnum = (HashMap)routeService.findEnum(hiddenDangerPointEntity.getHiddenDangerStatus()).getObj();
-                    HashMap<String,Object> projectTypeEnum = (HashMap)routeService.findEnum(hiddenDangerPointEntity.getProjectType()).getObj();
-                    HashMap<String,Object> riskLevelEnum = (HashMap)routeService.findEnum(hiddenDangerPointEntity.getRiskLevel()).getObj();
-                    HashMap<String,Object> constructionTypeEnum = (HashMap)routeService.findEnum(hiddenDangerPointEntity.getConstructionType()).getObj();
+                    HashMap<String,Object> hiddenDangerStatusEnum = (HashMap)routeService.findEnum(hiddenDangerPointEntity.getHiddenDangerPointStatus()).getObj();
+//                    HashMap<String,Object> projectTypeEnum = (HashMap)routeService.findEnum(hiddenDangerPointEntity.getProjectType()).getObj();
+//                    HashMap<String,Object> riskLevelEnum = (HashMap)routeService.findEnum(hiddenDangerPointEntity.getRiskLevel()).getObj();
+//                    HashMap<String,Object> constructionTypeEnum = (HashMap)routeService.findEnum(hiddenDangerPointEntity.getConstructionType()).getObj();
                     hiddenDangerPointEntity.setHiddenDangerPointStatusEnum(hiddenDangerStatusEnum);
-                    hiddenDangerPointEntity.setProjectTypeEnum(projectTypeEnum);
+//                    hiddenDangerPointEntity.setProjectTypeEnum(projectTypeEnum);
+//                    hiddenDangerPointEntity.setRiskLevelEnum(riskLevelEnum);
+//                    hiddenDangerPointEntity.setConstructionTypeEnum(constructionTypeEnum);
                     hiddenDangerPointEntity.setSgfs(hiddenDangerPointEntity.getConstructionType().split(","));
                     hiddenDangerPointEntity.setGdlx(hiddenDangerPointEntity.getProjectType().split(","));
-                    hiddenDangerPointEntity.setRiskLevelEnum(riskLevelEnum);
-                    hiddenDangerPointEntity.setConstructionTypeEnum(constructionTypeEnum);
                     hiddenDangerPointEntity.setCommitByCN(chineseName);
                     codeList.add(hiddenDangerPointEntity.getHiddenDangerPointCode());
                     //获取报建文件列表
