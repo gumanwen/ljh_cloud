@@ -5,6 +5,7 @@ import com.yaobanTech.springcloud.mapper.UserMapper;
 import com.yaobanTech.springcloud.pojos.LoginUser;
 import com.yaobanTech.springcloud.pojos.RespBean;
 import com.yaobanTech.springcloud.pojos.User;
+import com.yaobanTech.springcloud.pojos.UserInfo;
 import com.yaobanTech.springcloud.utils.FieldUtils;
 import com.yaobanTech.springcloud.utils.UrlUtils;
 import io.jsonwebtoken.Jwts;
@@ -461,7 +462,8 @@ public class UserRightsService {
 
     public RespBean getAll(String token, Integer type) {
         //type 1 : ybtoken 2 : qytoken
-        LoginUser u = new LoginUser();
+        LoginUser loginuser =new LoginUser();
+        UserInfo u = new UserInfo();
         if(type == 1){
             Map map= Jwts.parser()
                     .setSigningKey("ybcloud".getBytes(StandardCharsets.UTF_8))
@@ -473,11 +475,20 @@ public class UserRightsService {
                 object = iterator.next();
                 //这里的Object就是你专的集合里的数据类型，不知道可以属object.getClass看看
             }
-            u.setLoginname((String) map.get("user_name"));
-            u.setRoleLists(String.valueOf(object));
-        }else {
-            u = urlUtils.getMsg(token);
+            String username = (String) map.get("user_name");
+            //查询
+            if(FieldUtils.isStringNotEmpty(username)){
+                User user = userMapper.loadUserByUsername(username);
+                u.setName(user.getName());
+                loginuser.setName(user.getName());
+            }
+            loginuser.setLoginname(username);
+            loginuser.setRoleLists(String.valueOf(object));
+            u.setLoginname(username);
+            u.setRoleslist(String.valueOf(object));
+        }else{
+            loginuser = urlUtils.getMsg(token);
         }
-        return RespBean.ok("").setObj(u);
+        return RespBean.ok("").setObj(loginuser);
     }
 }

@@ -1,6 +1,6 @@
 spring:
     datasource:
-        url: jdbc:sqlserver://47.92.144.224:1433;DatabaseName=ybcloud-cs-auth-6002
+        url: jdbc:sqlserver://192.168.10.3:1433;DatabaseName=ybcloud-cs-auth-6002
         username: sa
         password: yaoban #yaobanTech3131
         driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
@@ -22,10 +22,10 @@ spring:
     cloud:
         nacos:
             discovery:
-                server-addr: 192.168.50.91:8848
-                ip: 192.168.50.168
+                server-addr: 192.168.10.3:8848
+                ip: 192.168.10.3
             config:
-                server-addr: 192.168.50.91:8848
+                server-addr: 192.168.10.3:8848
                 file-extension: properties
                 namespace: 8740fef6-e5cd-4bee-aa59-1982b454323e
                 group: DEFAULT_GROUP
@@ -52,7 +52,7 @@ mybatis-plus:
         call-setters-on-nulls: true
 server:
     port: 6003
-    ip: 192.168.50.168
+    ip: 192.168.10.3
 management:
     endpoint:
         health:
@@ -62,4 +62,3 @@ ribbon:
     ReadTimeout: 7000
 qyserver:
     ipAdd: http://119.135.180.178:8850/api/auth/user/get
-#http://218.17.45.99:8850/api/auth/user/get

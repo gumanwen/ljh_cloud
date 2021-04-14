@@ -6,6 +6,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.netflix.ribbon.proxy.annotation.Http;
 import com.yaobanTech.springcloud.entity.Inspect;
 import com.yaobanTech.springcloud.entity.LoginUser;
 import com.yaobanTech.springcloud.entity.Test;
@@ -22,10 +23,6 @@ import com.yaobanTech.springcloud.utils.DateUtils;
 import com.yaobanTech.springcloud.utils.FieldUtils;
 import com.yaobanTech.springcloud.utils.UrlUtils;
 import io.jsonwebtoken.Jwts;
-import io.micrometer.core.instrument.util.JsonUtils;
-import io.swagger.models.auth.In;
-import org.apache.commons.lang.StringUtils;
-import org.bouncycastle.util.io.TeeInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -116,6 +112,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         String status =null;
         //创建对象
         QueryWrapper<Inspect> queryWrapper = new QueryWrapper<>();
+        queryWrapper.orderByDesc("create_time");
         if(FieldUtils.isObjectNotEmpty(map)){
             type = String.valueOf(map.get("status"));
             if(FieldUtils.isObjectNotEmpty(map.get("modifyBy"))){queryWrapper.eq("modify_by",map.get("modifyBy"));}
@@ -151,8 +148,9 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                 queryWrapper.eq("plan_id","");
             }
         }*/
-
-        //queryWrapper.eq("task_type","计划任务");
+        if(FieldUtils.isObjectNotEmpty(map.get("tasktype"))){
+            queryWrapper.eq("task_type",map.get("tasktype"));
+        }
         if(feignMap.size()>0){
             queryWrapper.and(wrapper -> {
                 for(HashMap<String,Object> info: feignMap){
@@ -172,49 +170,56 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         logger.info("该用户的角色="+roles);
         if(FieldUtils.isStringNotEmpty(roles)){
             if(roles.indexOf("BZZ")== -1){//班组长
-                //queryWrapper.eq("inspect_person",username);
+                queryWrapper.eq("inspect_person",username);
             }
         }else{
-            //queryWrapper.eq("inspect_person",username);
+            queryWrapper.eq("inspect_person",username);
         }
         IPage<Inspect> page = new Page<Inspect>(pageNo,pageSize);
         page =inspectMapper.selectPage(page,queryWrapper);
         //type  0:未处理 1：处理中 2：已完成 3：已延期 4：未派发 5：已派发 6：已终止
         if("0".equals(type)){
             //获取未处理的列表
-            queryWrapper.apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),begin_time,20) > convert(varchar(20),'"+date+"',20)");
-            list= inspectMapper.selectPage(page,queryWrapper).getRecords();
-            status = "未处理";
+            //queryWrapper.apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),begin_time,20) > convert(varchar(20),'"+date+"',20)");
+            queryWrapper.eq("status","未处理");
             respBean.setMsg("未处理列表");
         }else if("1".equals(type)){
             //获取处理中的列表
-            queryWrapper.lt("complete_rate", "100").apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),begin_time,20) <= convert(varchar(20),'"+date+"',20)");
-            list= inspectMapper.selectPage(page,queryWrapper).getRecords();
-            status = "处理中";
+            //queryWrapper.lt("complete_rate", "100").apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),begin_time,20) <= convert(varchar(20),'"+date+"',20)");
+            queryWrapper.eq("status","处理中").lt("complete_rate", "100");
             respBean.setMsg("处理中列表");
         }else if("2".equals(type)){
-            //获取已处理的列表
-            queryWrapper.eq("complete_rate","100");
-            list= inspectMapper.selectPage(page,queryWrapper).getRecords();
-            status = "已完成";
+            //获取已完成的列表
+            //queryWrapper.eq("complete_rate","100");
+            queryWrapper.eq("status","已完成");
             respBean.setMsg("已完成列表");
         }else if("3".equals(type)){
             //获取已延期的列表
             queryWrapper.apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),dead_time,20) < convert(varchar(20),'"+date+"',20)");
-            list= inspectMapper.selectPage(page,queryWrapper).getRecords();
-            status = "已延期";
+            queryWrapper.lt("complete_rate", "100");
             respBean.setMsg("已延期列表");
+        }else if("4".equals(type)){
+            queryWrapper.eq("status","未派发");
+            respBean.setMsg("未派发列表");
+        }else if("5".equals(type)){
+            queryWrapper.and(wrapper ->wrapper.eq("status","未处理").or().eq("status","处理中").or().eq("status","已完成").or().eq("status","已延期"));
+            respBean.setMsg("已派发列表");
+        }else if("6".equals(type)){
+            queryWrapper.eq("status","已终止");
+            respBean.setMsg("已终止列表");
         }else{
-            list= inspectMapper.selectPage(page,queryWrapper).getRecords();
             respBean.setMsg("全部列表");
         }
+        list= inspectMapper.selectPage(page,queryWrapper).getRecords();
+        //获取中文名
+        list= getlistName(list);
+        //list= inspectMapper.selectdiyPage(page,queryWrapper).getRecords();
         if(list.size()>0){
             for(int i = 0;i<list.size();i++){
                 Map<String, Object> map1 = new HashMap<String, Object>();
                 Map<String, Object> map2 = new HashMap<String, Object>();
                 Map<String, Object> map3 = new HashMap<String, Object>();
                 Inspect inspect = list.get(i);
-                inspect.setStatus(status);
                 //创建对象
                 if(FieldUtils.isObjectNotEmpty(inspect.getRouteId())){
                     map2 = (Map<String, Object>) routeService.findDetail(inspect.getRouteId()).getObj();
@@ -273,6 +278,24 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         result.put("total",page.getTotal());
         result.put("list",resultList);
         return RespBean.ok("").setObj(result);
+    }
+
+    private List<Inspect> getlistName(List<Inspect> list) {
+        //获取人员名称列表
+        RespBean respBean = authService.selectUserByRole("ROLE_BZY");
+        List<HashMap<String,String>> userlist = (List<HashMap<String, String>>) respBean.getObj();
+        if(list.size()>0){
+            for (int i = 0; i < list.size(); i++) {
+                if(userlist.size()>0){
+                    for (int j = 0; j < userlist.size(); j++) {
+                        if(userlist.get(j).get("username").equals(list.get(i).getInspectPerson())){
+                            list.get(i).setInspectPerson(userlist.get(j).get("name"));
+                        }
+                    }
+                }
+            }
+        }
+        return list;
     }
 
     @Override
@@ -400,7 +423,9 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                         cycleStr = (String) enumMap.get("desc");
                     }
                 }
-                return createTask(start,end,cycleStr,routeId,planId,waterManagementOffice);
+                createTask(start,end,cycleStr,routeId,planId,waterManagementOffice,"");
+                return RespBean.ok("参数为空！");
+
             }else{
                 return RespBean.error("计划开始时间，计划结束时间或计划周期不完整，创建不了任务！map="+map+",re="+re);
             }
@@ -419,6 +444,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                 String waterManagementOffice = (String) params.get("waterManagementOffice");
                 Integer planId = (Integer) params.get("planId");
                 Integer routeId = (Integer) params.get("routeId");
+                String  diameter = (String) params.get("diameter");
                 int period = Integer.valueOf((String) params.get("period"));
                 Date start = daydateFormat.parse((String) params.get("startTime"));
                 Date end = daydateFormat.parse((String) params.get("endTime"));
@@ -429,7 +455,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                         cycleStr = (String) enumMap.get("desc");
                     }
                 }
-                return createTask(start,end,cycleStr,routeId,planId,waterManagementOffice);
+                return createTask(start,end,cycleStr,routeId,planId,waterManagementOffice,diameter);
             }else{
                 return RespBean.error("计划开始时间，计划结束时间或计划周期不完整，无法创建计划任务！");
             }
@@ -438,17 +464,18 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         }
     }
 
-    public RespBean createTask(Date start,Date end,String cycleStr,Integer routeId,Integer planId,String waterManagementOffice) throws ParseException {
+    public RespBean createTask(Date start,Date end,String cycleStr,Integer routeId,Integer planId,String waterManagementOffice,String diameter) throws ParseException {
         List<String> list = new ArrayList<>();
         int days = DateUtils.daysBetween(start,end)+1;
         Integer cycle = Integer.valueOf(cycleStr.substring(0,1));
         int nums = (int) Math.floor(days/cycle);
+        String date = dateFormat.format(new Date());
         if(nums>0){
             for(int i=0;i<nums;i++){
                 Inspect inspect = new Inspect();
                 String inspect_task_id = "";
                 inspect_task_id = redisGeneratorCode.createGenerateCode("计划任务","JH",true,4);
-                logger.info("生成的任务编号："+inspect_task_id +"           ------------------------");
+                logger.info("生成的任务编号："+inspect_task_id +"------------------------");
                 inspect.setInspectTaskId(inspect_task_id);
                 inspect.setBeginTime(daydateFormat.format(DateUtils.daysAdd(start,cycle*i)));
                 inspect.setDeadTime(daydateFormat.format(DateUtils.daysAdd(start,cycle*(i+1)-1)));
@@ -456,13 +483,17 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                 inspect.setRouteId(routeId);
                 inspect.setTaskType("计划任务");
                 inspect.setCompleteRate("0");
-                inspect.setStatus("未处理");
+                inspect.setStatus("未派发");
                 inspect.setWaterManagementOffice(waterManagementOffice);
+                inspect.setDiameter(diameter);
+                inspect.setCycle(cycleStr);
+                inspect.setCreateTime(date);
                 list.add(inspect_task_id);
                 inspectMapper.insert(inspect);
             }
         }
         //feign接口 routeService
+        System.out.println("生成任务数量="+list.size()+"---------------");
         routeService.taskPoint(list,routeId);
         return RespBean.ok("生成任务完成！");
     }
@@ -506,9 +537,21 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                 List<HashMap<String,Object>> ywcList = (List<HashMap<String, Object>>) routeService.findSignedList(routeId,inspectTaskId).getObj();
                 if(allList.size()>0  && allList.size()>= ywcList.size()){
                     String complete_rate =  String.valueOf((int) Math.floor(ywcList.size()*100/allList.size()));
-                    Inspect inspect = new Inspect();
+                    QueryWrapper<Inspect> queryWrapper = new QueryWrapper<>();
+                    Inspect inspect = inspectMapper.selectOne(queryWrapper.eq("inspect_task_id",inspectTaskId));
                     inspect.setInspectTaskId(inspectTaskId);
                     inspect.setCompleteRate(complete_rate);
+                    String siteConditionsDesc ="";
+                    if("null".equals(map.get("siteConditionsDesc")) || !FieldUtils.isObjectNotEmpty(map.get("siteConditionsDesc"))){
+                        siteConditionsDesc="";
+                    }else{
+                        siteConditionsDesc = (String) map.get("siteConditionsDesc");
+                    }
+                    String resultStr = inspect.getResult()+siteConditionsDesc+";";
+                    inspect.setResult(resultStr);
+                    if("100".equals(complete_rate)){
+                        inspect.setStatus("已完成");
+                    }
                     inspectMapper.updateById(inspect);
                     return RespBean.ok("修改成功！").setObj(result);
                 }
@@ -570,6 +613,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                             inspect.setInspectTaskId(list.get(i).getInspectTaskId());
                             inspect.setInspectPerson(inspector);
                             inspect.setSender(name);
+                            inspect.setStatus("未处理");
                             inspect.setSendTime(dateFormat.format(new Date()));
                             inspectMapper.updateById(inspect);
                         }
@@ -638,15 +682,29 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         if(FieldUtils.isObjectNotEmpty(dead_time2)){
             queryWrapper.apply(FieldUtils.isStringNotEmpty(dateFormat.format(dead_time2)),"convert(varchar(20),dead_time,20) <= convert(varchar(20),'"+dead_time2+"',20)");
         }
-         queryWrapper.eq("inspect_person",checkMan);
+        if(FieldUtils.isStringNotEmpty(checkMan)){
+            queryWrapper.eq("inspect_person",checkMan);
+        }
         List<Inspect> list = inspectMapper.selectList(queryWrapper);
+        list = getlistName(list);
         List<HashMap<String,Object>> result = new ArrayList<>();
         Iterator <Inspect> t = list.iterator();
         while(t.hasNext()){
+            Map<String, Object> map3= new HashMap<>();
             Inspect inspect = t.next();
+            if(FieldUtils.isObjectNotEmpty(inspect.getPlanId())){
+                map3 = (Map<String, Object>) planService.findById(inspect.getPlanId()).getObj();
+            }
             HashMap<String,Object> map = new HashMap<>();
             map.put("inspect_task_id",inspect.getInspectTaskId());
             map.put("inspect_person",inspect.getInspectPerson());
+            map.put("begin_time",inspect.getBeginTime());
+            map.put("dead_time",inspect.getDeadTime());
+            if(FieldUtils.isObjectNotEmpty(map3)){
+                map.put("plan_name",map3.get("planName"));
+            }else{
+                map.put("plan_name","");
+            }
             result.add(map);
         }
         return RespBean.ok("").setObj(result);
@@ -654,13 +712,16 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
 
     @Override
     public RespBean inspectStatistics(String waterManagementOffice,String unit,String beginTime,String deadTime) throws ParseException {
+        unit = "日";
         HashMap resultMap = new HashMap();
         String searchTime = null;
         //判断时间段是否为空
         if("null".equals(waterManagementOffice)){
             waterManagementOffice = "";
         }
-        List<HashMap<String,Object>> result = new ArrayList<>();
+        List<HashMap<String,Object>> sumresult = new ArrayList<>();
+        List<HashMap<String,Object>> rateresult = new ArrayList<>();
+        List<HashMap<String,Object>> logresult = new ArrayList<>();
         if(FieldUtils.isStringNotEmpty(unit)){
             if(FieldUtils.isStringNotEmpty(beginTime) & FieldUtils.isStringNotEmpty(deadTime) & !"null".equals(beginTime) & !"null".equals(deadTime)){
                 SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd yyyy HH:mm:ss 'GMT'", Locale.US);
@@ -668,20 +729,22 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                 if("年".equals(unit)){
                     beginTime = yeardateFormat.format(dateFormat.parse(beginTime));
                     deadTime = yeardateFormat.format(dateFormat.parse(deadTime));
-                    searchTime = yeardateFormat.format(DateUtils.yearsAdd(dateFormat.parse(deadTime),1));
-                    result = inspectMapper.selectTasksByYears(waterManagementOffice,beginTime,searchTime);
+                    searchTime = yeardateFormat.format(DateUtils.yearsAdd(yeardateFormat.parse(deadTime),1));
+                    sumresult = inspectMapper.selectTasksByYears(waterManagementOffice,beginTime,searchTime);
                 }
                 if("月".equals(unit)){
                     beginTime = monthdateFormat.format(dateFormat.parse(beginTime));
                     deadTime = monthdateFormat.format(dateFormat.parse(deadTime));
-                    searchTime = monthdateFormat.format(DateUtils.monthsAdd(dateFormat.parse(deadTime),1));
-                    result = inspectMapper.selectTasksByMonths(waterManagementOffice,beginTime,searchTime);
+                    searchTime = monthdateFormat.format(DateUtils.monthsAdd(monthdateFormat.parse(deadTime),1));
+                    sumresult = inspectMapper.selectTasksByMonths(waterManagementOffice,beginTime,searchTime);
                 }
                 if("日".equals(unit)){
                     beginTime = daydateFormat.format(dateFormat.parse(beginTime));
                     deadTime = daydateFormat.format(dateFormat.parse(deadTime));
-                    searchTime = daydateFormat.format(DateUtils.daysAdd(dateFormat.parse(deadTime),1));
-                    result = inspectMapper.selectTasksByDays(waterManagementOffice,beginTime,searchTime);
+                    searchTime = daydateFormat.format(DateUtils.daysAdd(daydateFormat.parse(deadTime),1));
+                    sumresult = inspectMapper.selectTasksByDays(waterManagementOffice,beginTime,searchTime);
+                    rateresult = inspectMapper.selectTasksRateByDays(waterManagementOffice,beginTime,searchTime);
+                    logresult = inspectMapper.selectTaskslogByDays(waterManagementOffice,beginTime,searchTime);
                 }
             }else{
                 //根据管理所和单位查出近12单位的数据
@@ -691,28 +754,54 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                     deadTime  = yeardateFormat.format(currnetDate);
                     searchTime =  yeardateFormat.format(DateUtils.yearsAdd(currnetDate,1));
                     beginTime = yeardateFormat.format(DateUtils.yearsAdd(yeardateFormat.parse(deadTime),-11));
-                    result = inspectMapper.selectTasksByYears(waterManagementOffice,beginTime,searchTime);
+                    sumresult = inspectMapper.selectTasksByYears(waterManagementOffice,beginTime,searchTime);
                 }
                 if("月".equals(unit)){
                     deadTime = monthdateFormat.format(currnetDate);
                     searchTime = monthdateFormat.format(DateUtils.monthsAdd(currnetDate,1));
                     beginTime = monthdateFormat.format(DateUtils.monthsAdd(monthdateFormat.parse(deadTime),-11));
-                    result = inspectMapper.selectTasksByMonths(waterManagementOffice,beginTime,searchTime);
+                    sumresult = inspectMapper.selectTasksByMonths(waterManagementOffice,beginTime,searchTime);
                 }
                 if("日".equals(unit)){
                     deadTime = daydateFormat.format(currnetDate);
                     searchTime = daydateFormat.format(DateUtils.daysAdd(currnetDate,1));
                     beginTime = daydateFormat.format(DateUtils.daysAdd(daydateFormat.parse(deadTime),-11));
-                    result = inspectMapper.selectTasksByDays(waterManagementOffice,beginTime,searchTime);
+                    sumresult = inspectMapper.selectTasksByDays(waterManagementOffice,beginTime,searchTime);
+                    rateresult = inspectMapper.selectTasksRateByDays(waterManagementOffice,beginTime,searchTime);
+                    logresult = inspectMapper.selectTaskslogByDays(waterManagementOffice,beginTime,searchTime);
                 }
             }
         }else{
             //默认查出近12天的数据
         }
         //补全空数据
-        result = supplement(result,unit,beginTime,deadTime);
-        resultMap.put("numsList",result);
-        return RespBean.ok("").setObj(resultMap);
+        sumresult = supplement(sumresult,unit,beginTime,deadTime);
+        rateresult = supplement(rateresult,unit,beginTime,deadTime);
+        resultMap.put("numsList",sumresult);
+        resultMap.put("rateresult",rateresult);
+        resultMap.put("logresult",logresult);
+        return RespBean.ok("logresult:巡查日志表，rateresult：完成率，numsList：数量统计").setObj(resultMap);
+    }
+
+    @Override
+    public RespBean appInspectStatistics(HttpServletRequest request) throws UnsupportedEncodingException {
+        LoginUser u = urlUtils.getAll(request);
+        String username = u.getLoginname();
+        QueryWrapper<Inspect> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("inspect_person",username);
+        HashMap<String,Object> result = new HashMap<>();
+        List<Inspect> total = inspectMapper.selectList(queryWrapper);
+        List<Inspect> done = inspectMapper.selectList(queryWrapper.eq("status","已完成"));
+        if(total.size()>0){
+            result.put("total",total.size());
+            result.put("done",done.size());
+            result.put("undone",total.size()-done.size());
+        }else{
+            result.put("total",0);
+            result.put("done",0);
+            result.put("undone",0);
+        }
+        return RespBean.ok("").setObj(result);
     }
 
     public List<HashMap<String,Object>> supplement(List<HashMap<String,Object>> result,String unit,String beginTime,String deadTIme) throws ParseException {
@@ -821,98 +910,17 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         }
     }
 
-    //传入alllist,然后递归算出一共生成几段网络
-    public Integer createGeo(HashSet<Test> alllist,int n){
-        HashSet<Test> oalllist = new HashSet<>();
-        List<Test> newlist = new ArrayList<>();
-        boolean flag = false;
-        if(!alllist.isEmpty()){
-            n+=1;
-            HashSet<Test> allnewlist = new HashSet<>();
-            HashSet<Test> list = new HashSet<>();
-            HashSet<Test> result = new HashSet<>();
-            Iterator <Test> t = alllist.iterator();
-            Test test = (Test) alllist.toArray()[0];
-            while(t.hasNext()){
-                Test tests = t.next();
-                if(!test.getGid().equals(tests.getGid())){
-                    allnewlist.add(tests);
-                }
-                oalllist.add(tests);
-            }
-            allnewlist.remove(test);
-            list.add(test);
-            result = func(allnewlist,list,list);
-            //更新数据库 update
-            Iterator <Test> te = result.iterator();
-            while(te.hasNext()){
-                Test tt = te.next();
-                tt.setSid(n);
-                newlist.add(tt);
-            }
-            if(newlist.size()<=1000){
-                testMapper.updateAll(newlist,n);
-            }else{
-                int m= (int) Math.floor(newlist.size()/1000);
-                for (int j = 0; j < m+1; j++) {
-                    List<Test>  temp = new ArrayList<>();
-                    for(int i =j*1000;i<(j+1)*1000 && i<newlist.size();i++ ){
-                        temp.add(newlist.get(i));
-                    }
-                    testMapper.updateAll(temp,n);
-                }
-            }
-            oalllist.removeAll(result);
-            flag =true;
+    @Override
+    public RespBean isModifiable(Integer routeId) {
+        List<Inspect> alllist = new ArrayList<>();
+        QueryWrapper<Inspect> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("route_id",routeId);
+        alllist = inspectMapper.selectList(queryWrapper);
+        if(alllist.size()>0){
+            return RespBean.ok("").setObj(false);
+        }else{
+            return RespBean.ok("").setObj(true);
         }
-        if(flag){
-            createGeo(oalllist,n);
-        }
-        return 1;
-    }
-
-    //数组递归方法
-    public HashSet<Test> func(HashSet<Test> alllist,HashSet<Test> list,HashSet<Test> olist) {
-        HashSet<Test> newlist = new HashSet<>();
-        boolean flag = false;
-        Iterator <Test> s = list.iterator();
-        Test tests = new Test();
-        Test test = new Test();
-        while(s.hasNext()){
-            tests = s.next();
-            Iterator <Test> t = alllist.iterator();
-            while(t.hasNext()){
-                test = t.next();
-                if(tests.getSource().equals(test.getTarget()) || tests.getTarget().equals(test.getSource())
-                        ||tests.getTarget().equals(test.getTarget()) || tests.getSource().equals(test.getSource())){
-                    flag = true;
-                    olist.add(test);
-                    newlist.add(test);
-                }
-            }
-            alllist.removeAll(newlist);
-        }
-        if(flag){
-            func(alllist,newlist,olist);
-        }
-        return olist;
-    }
-
-    //数据库递归方法
-    public List<Test> func1(List<Test> alllist,List<Test> list,List<Test> olist) {
-        List<Test> newlist = new ArrayList<>();
-        boolean flag = false;
-        for (int i = 0; i < list.size(); i++) {
-            //第一次 ： list s:154 t:367
-            //
-            flag = true;
-            alllist.removeAll(newlist);
-        }
-        newlist.removeAll(olist);
-        if(flag){
-            //func(alllist,newlist,olist);
-        }
-        return olist;
     }
 
 
@@ -968,6 +976,101 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         }
         return RespBean.ok("分析成功，一共生成"+createGeo(oalllist,0)+"条");
     }
+
+    //传入alllist,然后递归算出一共生成几段网络
+    public Integer createGeo(HashSet<Test> alllist,int n){
+        HashSet<Test> oalllist = new HashSet<>();
+        List<Test> newlist = new ArrayList<>();
+        boolean flag = false;
+        if(!alllist.isEmpty()){
+            n+=1;
+            HashSet<Test> allnewlist = new HashSet<>();
+            HashSet<Test> list = new HashSet<>();
+            HashSet<Test> result = new HashSet<>();
+            Iterator <Test> t = alllist.iterator();
+            Test test = (Test) alllist.toArray()[0];
+            while(t.hasNext()){
+                Test tests = t.next();
+                if(!test.getGid().equals(tests.getGid())){
+                    allnewlist.add(tests);
+                }
+                oalllist.add(tests);
+            }
+            allnewlist.remove(test);
+            list.add(test);
+            result = func(allnewlist,list,list);
+            //更新数据库 update
+            Iterator <Test> te = result.iterator();
+            while(te.hasNext()){
+                Test tt = te.next();
+                tt.setSid(n);
+                newlist.add(tt);
+            }
+            if(newlist.size()<=1000){
+                testMapper.updateAll(newlist,n);
+            }else{
+                int m= (int) Math.floor(newlist.size()/1000);
+                for (int j = 0; j < m+1; j++) {
+                    List<Test>  temp = new ArrayList<>();
+                    for(int i =j*1000;i<(j+1)*1000 && i<newlist.size();i++ ){
+                        temp.add(newlist.get(i));
+                    }
+                    testMapper.updateAll(temp,n);
+                }
+            }
+            oalllist.removeAll(result);
+            flag =true;
+        }
+        if(flag){
+            createGeo(oalllist,n);
+        }
+        return 1;
+    }
+    //数组递归方法
+    public HashSet<Test> func(HashSet<Test> alllist,HashSet<Test> list,HashSet<Test> olist) {
+        HashSet<Test> newlist = new HashSet<>();
+        boolean flag = false;
+        Iterator <Test> s = list.iterator();
+        Test tests = new Test();
+        Test test = new Test();
+        while(s.hasNext()){
+            tests = s.next();
+            Iterator <Test> t = alllist.iterator();
+            while(t.hasNext()){
+                test = t.next();
+                if(tests.getSource().equals(test.getTarget()) || tests.getTarget().equals(test.getSource())
+                        ||tests.getTarget().equals(test.getTarget()) || tests.getSource().equals(test.getSource())){
+                    flag = true;
+                    olist.add(test);
+                    newlist.add(test);
+                }
+            }
+            alllist.removeAll(newlist);
+        }
+        if(flag){
+            func(alllist,newlist,olist);
+        }
+        return olist;
+    }
+
+    //数据库递归方法
+    public List<Test> func1(List<Test> alllist,List<Test> list,List<Test> olist) {
+        List<Test> newlist = new ArrayList<>();
+        boolean flag = false;
+        for (int i = 0; i < list.size(); i++) {
+            //第一次 ： list s:154 t:367
+            //
+            flag = true;
+            alllist.removeAll(newlist);
+        }
+        newlist.removeAll(olist);
+        if(flag){
+            //func(alllist,newlist,olist);
+        }
+        return olist;
+    }
+
+
     //关阀分析
     public RespBean getcloseValues(String gid){
         //0：根据gid查询出联通的节点
@@ -981,6 +1084,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         //5：关闭上游阀门
         return RespBean.ok("");
     }
+
     public RespBean findAllValves(Test test){
         List<Test> alllist = new ArrayList<>();
         HashSet<Test> oalllist = new HashSet<>();
@@ -1015,5 +1119,4 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
     public Boolean isvalve(){
         return true;
     }
-
 }

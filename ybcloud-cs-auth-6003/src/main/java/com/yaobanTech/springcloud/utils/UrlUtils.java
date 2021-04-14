@@ -3,12 +3,15 @@ package com.yaobanTech.springcloud.utils;
 import com.alibaba.fastjson.JSON;
 import com.yaobanTech.springcloud.pojos.LoginUser;
 import com.yaobanTech.springcloud.pojos.QyRespBean;
+import com.yaobanTech.springcloud.pojos.Role;
+import com.yaobanTech.springcloud.pojos.UserInfo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 
 @Service
 public class UrlUtils {
@@ -57,7 +60,8 @@ public class UrlUtils {
     }
 
     public LoginUser getMsg(String token){
-        LoginUser u = new LoginUser();
+        UserInfo u = new UserInfo();
+        LoginUser loginUser =new LoginUser();
                 try {
                     // 1. 得到访问地址的URL
                     URL url = new URL(String.valueOf(qyIP));
@@ -100,15 +104,26 @@ public class UrlUtils {
 
                     QyRespBean resp =  JSON.parseObject(msg,QyRespBean.class);
                     if(FieldUtils.isObjectNotEmpty(resp)){
-                        u = JSON.parseObject(String.valueOf(resp.getData()),LoginUser.class);
-                        if(FieldUtils.isObjectNotEmpty(u)){
-                            return u;
+                        u = JSON.parseObject(String.valueOf(resp.getData()),UserInfo.class);
+                        List<Role> roles = u.getRoles();
+                        String role = null;
+                        if(roles.size()>0){
+                            for (int i = 0; i < roles.size(); i++) {
+                                role =role+ roles.get(i).toString()+",";
+                            }
+                        }
+                        loginUser.setRoleLists(role);
+                        loginUser.setName(u.getName());
+                        loginUser.setLoginname(u.getLoginname());
+                        u.setRoleslist(role);
+                        if(FieldUtils.isObjectNotEmpty(loginUser)){
+                            return loginUser;
                         }
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                return u;
+                return loginUser;
         }
 
 
