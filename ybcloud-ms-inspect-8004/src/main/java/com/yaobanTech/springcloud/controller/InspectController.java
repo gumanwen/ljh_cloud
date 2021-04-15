@@ -180,20 +180,6 @@ public class InspectController {
         return iInspectService.delete(inspectTaskId);
     }
 
-    @ApiOperation("gis：测试递归")
-    @GetMapping("/digui")
-    /*@Cacheable("cache1")*/
-    public RespBean digui(Integer gid){
-        return iInspectService.digui(gid);
-    }
-
-    @ApiOperation("gis：生成网络")
-    @GetMapping("/create")
-    /*@Cacheable("cache1")*/
-    public RespBean create(){
-        return iInspectService.create();
-    }
-
     @ApiOperation("opnefeign:根据任务开始时间过滤任务编号")
     @GetMapping("/getTaskListByTime")
     public RespBean getTaskListByTime(Date  taskStart1,Date taskEnd1,Date taskStart2,Date taskEnd2,String checkMan){
@@ -218,6 +204,20 @@ public class InspectController {
         return iInspectService.appInspectStatistics(request);
     }
 
+    @ApiOperation("gis：测试递归")
+    @GetMapping("/digui")
+    /*@Cacheable("cache1")*/
+    public RespBean digui(Integer gid){
+        return iInspectService.digui(gid);
+    }
+
+    @ApiOperation("gis：生成网络")
+    @GetMapping("/create")
+    /*@Cacheable("cache1")*/
+    public RespBean create(){
+        return iInspectService.create();
+    }
+
     @ApiOperation("/上传GPS坐标")
     @PostMapping("/uploadGPS")
     public RespBean uploadGPS(@RequestBody Map<String, Object> params){
@@ -227,8 +227,7 @@ public class InspectController {
     @ApiOperation("/关阀分析")
     @GetMapping("/getcloseValues")
     public RespBean getcloseValues(String gid){
-        return iInspectService.getcloseValues(gid);
-    }
+        return iInspectService.getcloseValues(gid); }
 
     @ApiOperation("openfeign: 路线是否可修改")
     @GetMapping("/isModifiable")

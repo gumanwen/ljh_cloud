@@ -152,10 +152,19 @@ public class Inspect implements Serializable {
      */
     private String endReason;
 
+    /**
+     * 终止时间
+     */
+    private String endTime;
+    /**
+     * 未到位时间
+     */
+    private String notinplace;
+
     public Inspect() {
     }
 
-    public Inspect(String inspectTaskId, String waterManagementOffice, String diameter, String beginTime, String deadTime, String actBeginTime, String actEndTime, String status, String inspectPerson, String name, String sender, String completeRate, String arrivalRate, String liveSitustion, String checkInPointSituation, String gisMap, String taskType, String sendTime, String overReason, String modifyBy, String completeTime, Integer planId, Integer routeId, String cycle, String result, String createTime, String endReason) {
+    public Inspect(String inspectTaskId, String waterManagementOffice, String diameter, String beginTime, String deadTime, String actBeginTime, String actEndTime, String status, String inspectPerson, String name, String sender, String completeRate, String arrivalRate, String liveSitustion, String checkInPointSituation, String gisMap, String taskType, String sendTime, String overReason, String modifyBy, String completeTime, Integer planId, Integer routeId, String cycle, String result, String createTime, String endReason, String endTime, String notinplace) {
         this.inspectTaskId = inspectTaskId;
         this.waterManagementOffice = waterManagementOffice;
         this.diameter = diameter;
@@ -183,6 +192,8 @@ public class Inspect implements Serializable {
         this.result = result;
         this.createTime = createTime;
         this.endReason = endReason;
+        this.endTime = endTime;
+        this.notinplace = notinplace;
     }
 
     public String getInspectTaskId() {
@@ -399,5 +410,21 @@ public class Inspect implements Serializable {
 
     public void setEndReason(String endReason) {
         this.endReason = endReason;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
+
+    public String getNotinplace() {
+        return notinplace;
+    }
+
+    public void setNotinplace(String notinplace) {
+        this.notinplace = notinplace;
     }
 }

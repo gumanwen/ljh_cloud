@@ -249,7 +249,7 @@ public class RouteServiceImpl {
         String role = u.getRoleLists();
         List<BizRoute> list = null;
         if(!"".equals(role) && role !=null && role.contains("BZZ")){
-                list = bizRouteRepository.findAll();
+            list = bizRouteRepository.findAll();
         }
           else{
             list = bizRouteRepository.findList(user);

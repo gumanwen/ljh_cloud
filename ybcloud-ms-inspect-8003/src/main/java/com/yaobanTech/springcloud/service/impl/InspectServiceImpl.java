@@ -107,7 +107,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         LoginUser u = urlUtils.getAll(request);
         username = u.getLoginname();
         roles = u.getRoleLists();
-        //根据当前登陆人:班组员 bzy
+        //根据当前登陆人
         String date = dateFormat.format(new Date());
         String status =null;
         //创建对象
@@ -186,7 +186,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         }else if("1".equals(type)){
             //获取处理中的列表
             //queryWrapper.lt("complete_rate", "100").apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),begin_time,20) <= convert(varchar(20),'"+date+"',20)");
-            queryWrapper.eq("status","处理中").lt("complete_rate", "100");
+            queryWrapper.eq("status","处理中");
             respBean.setMsg("处理中列表");
         }else if("2".equals(type)){
             //获取已完成的列表
@@ -201,6 +201,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         }else if("4".equals(type)){
             queryWrapper.eq("status","未派发");
             respBean.setMsg("未派发列表");
+
         }else if("5".equals(type)){
             queryWrapper.and(wrapper ->wrapper.eq("status","未处理").or().eq("status","处理中").or().eq("status","已完成").or().eq("status","已延期"));
             respBean.setMsg("已派发列表");
@@ -212,7 +213,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         }
         list= inspectMapper.selectPage(page,queryWrapper).getRecords();
         //获取中文名
-        list= getlistName(list);
+        //list= getlistName(list);
         //list= inspectMapper.selectdiyPage(page,queryWrapper).getRecords();
         if(list.size()>0){
             for(int i = 0;i<list.size();i++){
@@ -353,9 +354,14 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                 if(FieldUtils.isObjectNotEmpty(map1)){
                     combineResultMap.putAll(map1);
                 }
+                //查出作业前和作业后的附件
+                List<HashMap<String,Object>> qfilelist = (List<HashMap<String, Object>>) fileService.selectOneByPid(inspect_task_id,"作业前").getObj();
+                List<HashMap<String,Object>> hfilelist = (List<HashMap<String, Object>>) fileService.selectOneByPid(inspect_task_id,"作业后").getObj();
                 //根据任务编号查出gps轨迹
                 List<Track> tracklist = trackMapper.selectList(query);
                 combineResultMap.put("tracklist",tracklist);
+                combineResultMap.put("qfilelist",qfilelist);
+                combineResultMap.put("hfilelist",hfilelist);
                 return RespBean.ok("").setObj(combineResultMap);
             }
             return RespBean.ok("数据信息有误！").setObj("");
@@ -494,7 +500,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         }
         //feign接口 routeService
         System.out.println("生成任务数量="+list.size()+"---------------");
-        routeService.taskPoint(list,routeId);
+        routeService.taskPoint(list,routeId,planId);
         return RespBean.ok("生成任务完成！");
     }
 
@@ -549,9 +555,9 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                     }
                     String resultStr = inspect.getResult()+siteConditionsDesc+";";
                     inspect.setResult(resultStr);
-                    if("100".equals(complete_rate)){
+                    /*if("100".equals(complete_rate)){
                         inspect.setStatus("已完成");
-                    }
+                    }*/
                     inspectMapper.updateById(inspect);
                     return RespBean.ok("修改成功！").setObj(result);
                 }
@@ -590,6 +596,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
             String inspector = null;
             if (FieldUtils.isObjectNotEmpty(map.get("inspector"))) {
                 inspector = (String) map.get("inspector");
+                String chname =  (String) map.get("name");
                 if (FieldUtils.isObjectNotEmpty(map.get("inspect_task_id"))) {
                     List<Inspect> list = new ArrayList<>();
                     List<HashMap<String,Object>> tasklist= (ArrayList) map.get("inspect_task_id");
@@ -613,6 +620,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                             inspect.setInspectTaskId(list.get(i).getInspectTaskId());
                             inspect.setInspectPerson(inspector);
                             inspect.setSender(name);
+                            inspect.setName(chname);
                             inspect.setStatus("未处理");
                             inspect.setSendTime(dateFormat.format(new Date()));
                             inspectMapper.updateById(inspect);
@@ -785,6 +793,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
 
     @Override
     public RespBean appInspectStatistics(HttpServletRequest request) throws UnsupportedEncodingException {
+        String date = dateFormat.format(new Date());
         LoginUser u = urlUtils.getAll(request);
         String username = u.getLoginname();
         QueryWrapper<Inspect> queryWrapper = new QueryWrapper<>();
@@ -792,14 +801,30 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         HashMap<String,Object> result = new HashMap<>();
         List<Inspect> total = inspectMapper.selectList(queryWrapper);
         List<Inspect> done = inspectMapper.selectList(queryWrapper.eq("status","已完成"));
+        queryWrapper = new QueryWrapper<>();
+        List<Inspect> undone = inspectMapper.selectList(queryWrapper.eq("status","未处理"));
+        queryWrapper = new QueryWrapper<>();
+        List<Inspect> doing = inspectMapper.selectList(queryWrapper.eq("status","处理中"));
+        queryWrapper = new QueryWrapper<>();
+        queryWrapper.apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),dead_time,20) < convert(varchar(20),'"+date+"',20)");
+        queryWrapper.lt("complete_rate", "100");
+        List<Inspect> over = inspectMapper.selectList(queryWrapper.eq("status","已超时"));
+        queryWrapper = new QueryWrapper<>();
+        List<Inspect> end = inspectMapper.selectList(queryWrapper.eq("status","已终止"));
         if(total.size()>0){
             result.put("total",total.size());
             result.put("done",done.size());
-            result.put("undone",total.size()-done.size());
+            result.put("undone",undone.size());
+            result.put("doing",doing.size());
+            result.put("over",over.size());
+            result.put("end",end.size());
         }else{
             result.put("total",0);
             result.put("done",0);
             result.put("undone",0);
+            result.put("doing",0);
+            result.put("over",0);
+            result.put("end",0);
         }
         return RespBean.ok("").setObj(result);
     }
@@ -1078,43 +1103,269 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         QueryWrapper<Test> queryWrapper = new QueryWrapper<>();
         Test test = testMapper.selectOne(queryWrapper.eq("gid",gid));
         //2：拿到s，t做深度遍历找到节点
-        findAllValves(test);
         //3：判断每个节点是不是阀门，找出所有阀门
         //4：跟水厂做联通分析
         //5：关闭上游阀门
-        return RespBean.ok("");
+        return findAllValves(test);
     }
 
     public RespBean findAllValves(Test test){
+        //阀门列表
+        HashMap<String,Object> map = new HashMap<>();
+        List<Integer> svids = new ArrayList<>();
+        List<Integer> xvids = new ArrayList<>();
         List<Test> alllist = new ArrayList<>();
         HashSet<Test> oalllist = new HashSet<>();
-        HashSet<Test> allnewlist = new HashSet<>();
         QueryWrapper<Test> queryWrapper = new QueryWrapper<>();
         alllist = testMapper.selectList(queryWrapper);
+        //将自身置位无效
         for (int i = 0; i < alllist.size(); i++) {
             if(alllist.get(i).getGid().equals(test.getGid())){
                 alllist.get(i).setStatus(0);
+                alllist.get(i).setPid(0);
                 oalllist.add(alllist.get(i));
             }else{
                 oalllist.add(alllist.get(i));
             }
         }
-        //深度遍历
         int s = test.getSource();
         int t = test.getTarget();
-        findValves(s,oalllist);
-        //分别拿s/t去遍历
-        return RespBean.ok("");
+        test.setPid(test.getPid());
+        //判断s、t是不是阀门
+        if(FieldUtils.isObjectNotEmpty(test.getSvid())){
+            //第一个阀门就是该 svid
+            map.put("上游阀门",test.getSvid());
+        }else{
+            map.put("上游阀门",findValves(test.getGid(),test,oalllist,"0",0,svids));
+        }
+        if(FieldUtils.isObjectNotEmpty(test.getTvid())){
+            //第一个阀门就是该 tvid
+            map.put("下游阀门",test.getTvid());
+        }else{
+            map.put("下游阀门",findtValves(test.getGid(),test,oalllist,"0",0,xvids));
+        }
+        //分别拿s/t去深度遍历
+        return RespBean.ok("").setObj(map);
     }
-    public RespBean findValves(int node,HashSet<Test> list){
-        if(list.size()>0){
-            Iterator <Test> s = list.iterator();
-            Test test = new Test();
-            while(s.hasNext()){
-                test = s.next();
+    //深度遍历
+    public List<Integer> findValves(int ogid,Test ct,HashSet<Test> list,String flag,int n,List<Integer> vids){
+        n+=1;
+        Test pt = new Test();
+        Test nt = new Test();
+        if(String.valueOf(ct.getGid())!="null"){
+            System.out.println("n:"+n);
+            System.out.println("当前gid:"+ct.getGid());
+            List<Test> clist =new ArrayList<>();
+                int gid = ct.getGid();
+                int node = ct.getTarget();
+                int pid = ct.getPid();
+                //塞入子节点
+                if(list.size()>0){
+                    Iterator <Test> s = list.iterator();
+                    Test test = new Test();
+                    while(s.hasNext()){
+                        test = s.next();
+                        if(test.getGid().equals(pid)){
+                            pt = test;
+                        }
+                        if("1".equals(flag)){
+                            if(test.getGid().equals(gid)){
+                                clist = test.getList();
+                            }
+                        }else{
+                            if(!test.getGid().equals(ogid) && !test.getGid().equals(gid) ){
+                                if(test.getSource().equals(node)){
+                                    clist.add(test);
+                                }
+                                if(test.getTarget().equals(node)){
+                                    Integer s1 = test.getSource();
+                                    Integer s2 = test.getTarget();
+                                    Integer s3 = test.getSvid();
+                                    Integer s4 = test.getTvid();
+                                    test.setSource(s2);
+                                    test.setTarget(s1);
+                                    test.setSvid(s4);
+                                    test.setTvid(s3);
+                                    clist.add(test);
+                                }
+                            }
+                        }
+                    }
+                    //flag = 0
+                    if("0".equals(flag)){
+                        Iterator <Test> s1 = list.iterator();
+                        while (s1.hasNext()){
+                            test = s1.next();
+                            if(test.getGid().equals(gid)){
+                                test.setList(clist);
+                            }
+                        }
+                    }
+                }
+                int open =0;
+                if(clist.size()>0){
+                    for (int i = 0; i < clist.size(); i++) {
+                        if(clist.get(i).getStatus().equals(1)){
+                            open +=1;
+                        }
+                    }
+                    for (int i = 0; i < clist.size(); i++) {
+                        if(clist.get(i).getStatus().equals(1)){
+                            clist.get(i).setStatus(0);
+                            nt = clist.get(i);
+                            break;
+                        }else{
+                            //说明是没有子节点可以走了，返回父节点递归
+                            if(n==1){
+                                System.out.println("没有子节点可以走了，返回父节点递归：" + ct.getGid());
+                                findValves(ogid,ct, list, "1", n, vids);
+                            }else{
+                                System.out.println("没有子节点可以走了，返回父节点递归：" + pt.getGid());
+                                findValves(ogid,pt, list, "1", n, vids);
+                            }
+                        }
+                    }
+                }else{
+                    //说明是末梢点，返回父节点递归
+                    System.out.println("是末梢点，返回父节点递归："+pt.getGid());
+                    findValves(ogid,pt,list,"1",n,vids);
+                }
+                nt.setPid(gid);
+                System.out.println(nt.getGid()+","+nt.getStatus()+","+nt.getSvid()+","+nt.getTvid());
+                if(FieldUtils.isObjectNotEmpty(nt.getTvid())){
+                    //该下一个节点是阀门，先判断自身还有没有路径，如果没有，则返回父节点递归
+                    vids.add(nt.getTvid());
+                    if(open>1){
+                        findValves(ogid,ct,list,"1",n,vids);
+                    }else {
+                        findValves(ogid,pt,list,"1",n,vids);
+                    }
+                    /*if(n==1){
+                        System.out.println("下一个节点是阀门:"+nt.getTvid()+"||"+nt.getSvid()+",返回父节点递归："+ct.getGid());
+                        findValves(ogid,ct,list,"1",n,vids);
+                    }else{
+                        System.out.println("下一个节点是阀门:"+nt.getTvid()+"||"+nt.getSvid()+",返回父节点递归："+pt.getGid());
+                        findValves(ogid,pt,list,"1",n,vids);
+                    }*/
+                }else{
+                    //下一个节点不是阀门，到下一个节点继续递归
+                    System.out.println("下一个节点不是阀门，到下一个节点："+nt.getGid());
+                    findValves(ogid,nt,list,"0",n,vids);
+                }
+            }
+        return vids;
+    }
+
+    //深度遍历
+    public List<Integer> findtValves(int ogid,Test ct,HashSet<Test> list,String flag,int n,List<Integer> vids){
+        n+=1;
+        Test pt = new Test();
+        Test nt = new Test();
+        if(String.valueOf(ct.getGid())!="null"){
+            System.out.println("n:"+n);
+            System.out.println("当前gid:"+ct.getGid());
+            List<Test> clist =new ArrayList<>();
+            int gid = ct.getGid();
+            int node = ct.getSource();
+            int pid = ct.getPid();
+            //塞入子节点
+            if(list.size()>0){
+                Iterator <Test> s = list.iterator();
+                Test test = new Test();
+                while(s.hasNext()){
+                    test = s.next();
+                    if(test.getGid().equals(pid)){
+                        pt = test;
+                    }
+                    if("1".equals(flag)){
+                        if(test.getGid().equals(gid)){
+                            clist = test.getList();
+                        }
+                    }else{
+                        if(!test.getGid().equals(ogid) && !test.getGid().equals(gid) ){
+                            if(test.getTarget().equals(node)){
+                                clist.add(test);
+                            }
+                            if(test.getSource().equals(node)){
+                                Integer s1 = test.getSource();
+                                Integer s2 = test.getTarget();
+                                Integer s3 = test.getSvid();
+                                Integer s4 = test.getTvid();
+                                test.setSource(s2);
+                                test.setTarget(s1);
+                                test.setSvid(s4);
+                                test.setTvid(s3);
+                                clist.add(test);
+                            }
+                        }
+                    }
+                }
+                //flag = 0
+                if("0".equals(flag)){
+                    Iterator <Test> s1 = list.iterator();
+                    while (s1.hasNext()){
+                        test = s1.next();
+                        if(test.getGid().equals(gid)){
+                            test.setList(clist);
+                        }
+                    }
+                }
+            }
+            int open =0;
+            if(clist.size()>0){
+                for (int i = 0; i < clist.size(); i++) {
+                    if(clist.get(i).getStatus().equals(1)){
+                        open +=1;
+                    }
+                }
+                for (int i = 0; i < clist.size(); i++) {
+                    if(clist.get(i).getStatus().equals(1)){
+                        clist.get(i).setStatus(0);
+                        nt = clist.get(i);
+                        break;
+                    }else{
+                        //说明是没有子节点可以走了，返回父节点递归
+                        if(n==1){
+                            System.out.println("没有子节点可以走了，返回父节点递归：" + ct.getGid());
+                            findtValves(ogid,ct, list, "1", n, vids);
+                        }else{
+                            System.out.println("没有子节点可以走了，返回父节点递归：" + pt.getGid());
+                            findtValves(ogid,pt, list, "1", n, vids);
+                        }
+                    }
+                }
+            }else{
+                //说明是末梢点，返回父节点递归
+                System.out.println("是末梢点，返回父节点递归：" + pt.getGid());
+                findtValves(ogid,pt,list,"1",n,vids);
+            }
+            nt.setPid(gid);
+            System.out.println("当前水管:"+ct.getGid()+","+ct.getStatus()+","+ct.getSvid()+","+ct.getTvid());
+            System.out.println("下一个水管:"+nt.getGid()+","+nt.getStatus()+","+nt.getSvid()+","+nt.getTvid());
+            if(FieldUtils.isObjectNotEmpty(nt.getSvid())){
+                //该下一个节点是阀门，先判断自身还有没有路径，如果没有，则返回父节点递归
+                vids.add(nt.getSvid());
+                if(open>1){
+                    System.out.println("节点是阀门，自身还有节点：" + ct.getGid());
+                    findtValves(ogid,ct,list,"1",n,vids);
+                }else {
+                    System.out.println("节点是阀门，自身没有节点，返回父节点：" + ct.getGid());
+                    findtValves(ogid,pt,list,"1",n,vids);
+                }
+                    /*if(n==1){
+                        System.out.println("下一个节点是阀门:"+nt.getSvid()+"||"+nt.getTvid()+",返回父节点递归："+ct.getGid());
+                        findtValves(ogid,ct,list,"1",n,vids);
+                    }else{
+                        System.out.println("下一个节点是阀门:"+nt.getSvid()+"||"+nt.getTvid()+",返回父节点递归："+pt.getGid());
+                        findtValves(ogid,pt,list,"1",n,vids);
+                    }*/
+            }else{
+                //下一个节点不是阀门，到下一个节点继续递归
+                System.out.println("下一个节点不是阀门，到下一个节点："+nt.getGid());
+                findtValves(ogid,nt,list,"0",n,vids);
             }
         }
-        return RespBean.ok("");
+        return vids;
     }
     public Boolean isvalve(){
         return true;
