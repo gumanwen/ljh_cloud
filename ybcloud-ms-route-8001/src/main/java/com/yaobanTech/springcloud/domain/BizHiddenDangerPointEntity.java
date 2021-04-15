@@ -1,6 +1,7 @@
 package com.yaobanTech.springcloud.domain;
 
 import javax.persistence.*;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -147,7 +148,7 @@ public class BizHiddenDangerPointEntity {
 	 * 隐患状态
 	 */
 	@Column(name = "hidden_danger_point_status" )
-	private String hiddenDangerStatus;
+	private String hiddenDangerPointStatus;
 
 	/**
 	 * 结束时间
@@ -232,12 +233,24 @@ public class BizHiddenDangerPointEntity {
 	@Transient
 	private List<HashMap<String,Object>> fileList;
 
+	/**
+	 * 施工方式数组
+	 */
+	@Transient
+	private String[] sgfs;
+
+	/**
+	 * 工地类型数组
+	 */
+	@Transient
+	private String[] gdlx;
+
 
 
 	public BizHiddenDangerPointEntity() {
 	}
 
-	public BizHiddenDangerPointEntity(Integer id, String hiddenDangerPointCode, Integer routeId, String waterUseOffice, String projectName, String constructionPosition, String buildCompany, String buildCompanyAgent, String buildCompanyAgentPhone, String constructionCompany, String constructionCompanyAgentPhone, String networkSize, String projectType, String constructionType, String riskLevel, String networkNotification, String memo, String commitBy, String opration, String commitDate, Integer enabled, String hiddenDangerStatus, String endDate, String hiddenLast, List<BizSuggestionEntity> handleAdvice, String commitByCN, HashMap<String, Object> hiddenDangerPointStatusEnum, HashMap<String, Object> projectTypeEnum, HashMap<String, Object> riskLevelEnum, HashMap<String, Object> constructionTypeEnum) {
+	public BizHiddenDangerPointEntity(Integer id, String hiddenDangerPointCode, Integer routeId, String waterUseOffice, String projectName, String constructionPosition, String buildCompany, String buildCompanyAgent, String buildCompanyAgentPhone, String constructionCompany, String constructionCompanyAgentPhone, String networkSize, String projectType, String constructionType, String riskLevel, String networkNotification, String memo, String commitBy, String opration, String commitDate, Integer enabled, String hiddenDangerPointStatus, String endDate, String reason, String constructionStartDate, String constructionEndDate, String x, String y, String hiddenLast, List<BizSuggestionEntity> handleAdvice, String commitByCN, HashMap<String, Object> hiddenDangerPointStatusEnum, HashMap<String, Object> projectTypeEnum, HashMap<String, Object> riskLevelEnum, HashMap<String, Object> constructionTypeEnum, List<HashMap<String, Object>> fileList, String[] sgfs, String[] gdlx) {
 		this.id = id;
 		this.hiddenDangerPointCode = hiddenDangerPointCode;
 		this.routeId = routeId;
@@ -259,8 +272,13 @@ public class BizHiddenDangerPointEntity {
 		this.opration = opration;
 		this.commitDate = commitDate;
 		this.enabled = enabled;
-		this.hiddenDangerStatus = hiddenDangerStatus;
+		this.hiddenDangerPointStatus = hiddenDangerPointStatus;
 		this.endDate = endDate;
+		this.reason = reason;
+		this.constructionStartDate = constructionStartDate;
+		this.constructionEndDate = constructionEndDate;
+		this.x = x;
+		this.y = y;
 		this.hiddenLast = hiddenLast;
 		this.handleAdvice = handleAdvice;
 		this.commitByCN = commitByCN;
@@ -268,6 +286,33 @@ public class BizHiddenDangerPointEntity {
 		this.projectTypeEnum = projectTypeEnum;
 		this.riskLevelEnum = riskLevelEnum;
 		this.constructionTypeEnum = constructionTypeEnum;
+		this.fileList = fileList;
+		this.sgfs = sgfs;
+		this.gdlx = gdlx;
+	}
+
+	public String getHiddenDangerPointStatus() {
+		return hiddenDangerPointStatus;
+	}
+
+	public void setHiddenDangerPointStatus(String hiddenDangerPointStatus) {
+		this.hiddenDangerPointStatus = hiddenDangerPointStatus;
+	}
+
+	public String[] getSgfs() {
+		return sgfs;
+	}
+
+	public void setSgfs(String[] sgfs) {
+		this.sgfs = sgfs;
+	}
+
+	public String[] getGdlx() {
+		return gdlx;
+	}
+
+	public void setGdlx(String[] gdlx) {
+		this.gdlx = gdlx;
 	}
 
 	public String getConstructionStartDate() {
@@ -486,14 +531,6 @@ public class BizHiddenDangerPointEntity {
 		this.enabled = enabled;
 	}
 
-	public String getHiddenDangerStatus() {
-		return hiddenDangerStatus;
-	}
-
-	public void setHiddenDangerStatus(String hiddenDangerStatus) {
-		this.hiddenDangerStatus = hiddenDangerStatus;
-	}
-
 	public String getEndDate() {
 		return endDate;
 	}
@@ -582,8 +619,13 @@ public class BizHiddenDangerPointEntity {
 				", opration='" + opration + '\'' +
 				", commitDate='" + commitDate + '\'' +
 				", enabled=" + enabled +
-				", hiddenDangerStatus='" + hiddenDangerStatus + '\'' +
+				", hiddenDangerPointStatus='" + hiddenDangerPointStatus + '\'' +
 				", endDate='" + endDate + '\'' +
+				", reason='" + reason + '\'' +
+				", constructionStartDate='" + constructionStartDate + '\'' +
+				", constructionEndDate='" + constructionEndDate + '\'' +
+				", x='" + x + '\'' +
+				", y='" + y + '\'' +
 				", hiddenLast='" + hiddenLast + '\'' +
 				", handleAdvice=" + handleAdvice +
 				", commitByCN='" + commitByCN + '\'' +
@@ -591,6 +633,9 @@ public class BizHiddenDangerPointEntity {
 				", projectTypeEnum=" + projectTypeEnum +
 				", riskLevelEnum=" + riskLevelEnum +
 				", constructionTypeEnum=" + constructionTypeEnum +
+				", fileList=" + fileList +
+				", sgfs=" + Arrays.toString(sgfs) +
+				", gdlx=" + Arrays.toString(gdlx) +
 				'}';
 	}
 }

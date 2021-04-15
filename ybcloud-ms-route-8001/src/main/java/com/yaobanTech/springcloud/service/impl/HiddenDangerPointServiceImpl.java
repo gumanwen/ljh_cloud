@@ -88,7 +88,7 @@ public class HiddenDangerPointServiceImpl {
                 }*/
                 bizHiddenDangerPointEntity.setCommitDate(DateFormatUtils.DateToStr(new Date()));
                 bizHiddenDangerPointEntity.setEnabled(1);
-                bizHiddenDangerPointEntity.setHiddenDangerStatus("53");
+                bizHiddenDangerPointEntity.setHiddenDangerPointStatus("53");
                 bizHiddenDangerPointEntity.setCommitBy(user);
                 bizHiddenDangerPointEntity.setHiddenDangerPointCode(hiddenDangerPointCode);
                 hiddenDangerPointRepository.save(bizHiddenDangerPointEntity);
@@ -164,10 +164,12 @@ public class HiddenDangerPointServiceImpl {
                 List<BizSuggestionEntity> suggestionEntityList = suggestionRepository.findList(bdpe.getHiddenDangerPointCode());
                 String user = bdpe.getCommitBy();
                 String chineseName = (String)oauthService.getChineseName(user).getObj();
-                HashMap<String,Object> hiddenDangerStatusEnum = (HashMap)routeService.findEnum(bdpe.getHiddenDangerStatus()).getObj();
+                HashMap<String,Object> hiddenDangerStatusEnum = (HashMap)routeService.findEnum(bdpe.getHiddenDangerPointStatus()).getObj();
                 HashMap<String,Object> projectTypeEnum = (HashMap)routeService.findEnum(bdpe.getProjectType()).getObj();
                 HashMap<String,Object> riskLevelEnum = (HashMap)routeService.findEnum(bdpe.getRiskLevel()).getObj();
                 HashMap<String,Object> constructionTypeEnum = (HashMap)routeService.findEnum(bdpe.getConstructionType()).getObj();
+                bdpe.setSgfs(bdpe.getConstructionType().split(","));
+                bdpe.setGdlx(bdpe.getProjectType().split(","));
                 bdpe.setHiddenDangerPointStatusEnum(hiddenDangerStatusEnum);
                 bdpe.setProjectTypeEnum(projectTypeEnum);
                 bdpe.setRiskLevelEnum(riskLevelEnum);
@@ -197,10 +199,12 @@ public class HiddenDangerPointServiceImpl {
                 List<BizSuggestionEntity> suggestionEntityList = suggestionRepository.findList(bdpe.getHiddenDangerPointCode());
                 String user = bdpe.getCommitBy();
                 String chineseName = (String)oauthService.getChineseName(user).getObj();
-                HashMap<String,Object> hiddenDangerStatusEnum = (HashMap)routeService.findEnum(bdpe.getHiddenDangerStatus()).getObj();
+                HashMap<String,Object> hiddenDangerStatusEnum = (HashMap)routeService.findEnum(bdpe.getHiddenDangerPointStatus()).getObj();
                 HashMap<String,Object> projectTypeEnum = (HashMap)routeService.findEnum(bdpe.getProjectType()).getObj();
                 HashMap<String,Object> riskLevelEnum = (HashMap)routeService.findEnum(bdpe.getRiskLevel()).getObj();
                 HashMap<String,Object> constructionTypeEnum = (HashMap)routeService.findEnum(bdpe.getConstructionType()).getObj();
+                bdpe.setSgfs(bdpe.getConstructionType().split(","));
+                bdpe.setGdlx(bdpe.getProjectType().split(","));
                 bdpe.setHiddenDangerPointStatusEnum(hiddenDangerStatusEnum);
                 bdpe.setProjectTypeEnum(projectTypeEnum);
                 bdpe.setRiskLevelEnum(riskLevelEnum);
@@ -238,13 +242,15 @@ public class HiddenDangerPointServiceImpl {
                 BizHiddenDangerPointEntity bizHiddenDangerPointEntity = list.get(i);
                 bizHiddenDangerPointEntity.setCommitByCN(chineseName);;
                 List<BizSuggestionEntity> suggestionEntityList = suggestionRepository.findList(bizHiddenDangerPointEntity.getHiddenDangerPointCode());
-                HashMap<String,Object> hiddenDangerStatusEnum = (HashMap)routeService.findEnum(bizHiddenDangerPointEntity.getHiddenDangerStatus()).getObj();
+                HashMap<String,Object> hiddenDangerStatusEnum = (HashMap)routeService.findEnum(bizHiddenDangerPointEntity.getHiddenDangerPointStatus()).getObj();
                 HashMap<String,Object> projectTypeEnum = (HashMap)routeService.findEnum(bizHiddenDangerPointEntity.getProjectType()).getObj();
                 HashMap<String,Object> riskLevelEnum = (HashMap)routeService.findEnum(bizHiddenDangerPointEntity.getRiskLevel()).getObj();
                 HashMap<String,Object> constructionTypeEnum = (HashMap)routeService.findEnum(bizHiddenDangerPointEntity.getConstructionType()).getObj();
                 bizHiddenDangerPointEntity.setHiddenDangerPointStatusEnum(hiddenDangerStatusEnum);
                 bizHiddenDangerPointEntity.setProjectTypeEnum(projectTypeEnum);
                 bizHiddenDangerPointEntity.setRiskLevelEnum(riskLevelEnum);
+                bizHiddenDangerPointEntity.setSgfs(bizHiddenDangerPointEntity.getConstructionType().split(","));
+                bizHiddenDangerPointEntity.setGdlx(bizHiddenDangerPointEntity.getProjectType().split(","));
                 bizHiddenDangerPointEntity.setConstructionTypeEnum(constructionTypeEnum);
                 bizHiddenDangerPointEntity.setHandleAdvice(suggestionEntityList);
 
@@ -272,7 +278,8 @@ public class HiddenDangerPointServiceImpl {
     }
 
     @Transactional(propagation= Propagation.NOT_SUPPORTED)
-    public RespBean findCondition(HiddenDangerPointQuery hiddenDangerPointQuery, HttpServletRequest request) throws UnsupportedEncodingException {
+    public RespBean findCondition(HashMap<String,Object> param, HttpServletRequest request) throws UnsupportedEncodingException {
+        HiddenDangerPointQuery hiddenDangerPointQuery = JSONObject.parseObject(JSONObject.toJSONString(param), HiddenDangerPointQuery.class);
         HashMap<String,Object> hashMap = new HashMap<>();
         List<String> codeList = new ArrayList<>();
         List<BizHiddenDangerPointEntity> list = null;
@@ -284,34 +291,22 @@ public class HiddenDangerPointServiceImpl {
             if(!list.isEmpty()){
                 for (int i = 0; i < list.size(); i++) {
                     BizHiddenDangerPointEntity hiddenDangerPointEntity = list.get(i);
-                    HashMap<String,Object> hiddenDangerStatusEnum = (HashMap)routeService.findEnum(hiddenDangerPointEntity.getHiddenDangerStatus()).getObj();
-                    HashMap<String,Object> projectTypeEnum = (HashMap)routeService.findEnum(hiddenDangerPointEntity.getProjectType()).getObj();
-                    HashMap<String,Object> riskLevelEnum = (HashMap)routeService.findEnum(hiddenDangerPointEntity.getRiskLevel()).getObj();
-                    HashMap<String,Object> constructionTypeEnum = (HashMap)routeService.findEnum(hiddenDangerPointEntity.getConstructionType()).getObj();
+                    HashMap<String,Object> hiddenDangerStatusEnum = (HashMap)routeService.findEnum(hiddenDangerPointEntity.getHiddenDangerPointStatus()).getObj();
+//                    HashMap<String,Object> projectTypeEnum = (HashMap)routeService.findEnum(hiddenDangerPointEntity.getProjectType()).getObj();
+//                    HashMap<String,Object> riskLevelEnum = (HashMap)routeService.findEnum(hiddenDangerPointEntity.getRiskLevel()).getObj();
+//                    HashMap<String,Object> constructionTypeEnum = (HashMap)routeService.findEnum(hiddenDangerPointEntity.getConstructionType()).getObj();
                     hiddenDangerPointEntity.setHiddenDangerPointStatusEnum(hiddenDangerStatusEnum);
-                    hiddenDangerPointEntity.setProjectTypeEnum(projectTypeEnum);
-                    hiddenDangerPointEntity.setRiskLevelEnum(riskLevelEnum);
-                    hiddenDangerPointEntity.setConstructionTypeEnum(constructionTypeEnum);
+//                    hiddenDangerPointEntity.setProjectTypeEnum(projectTypeEnum);
+//                    hiddenDangerPointEntity.setRiskLevelEnum(riskLevelEnum);
+//                    hiddenDangerPointEntity.setConstructionTypeEnum(constructionTypeEnum);
+                    hiddenDangerPointEntity.setSgfs(hiddenDangerPointEntity.getConstructionType().split(","));
+                    hiddenDangerPointEntity.setGdlx(hiddenDangerPointEntity.getProjectType().split(","));
                     hiddenDangerPointEntity.setCommitByCN(chineseName);
                     codeList.add(hiddenDangerPointEntity.getHiddenDangerPointCode());
-//                if(points.size()>0){
-//                    for(int j =0; j<points.size();j++){
-//                        //获取报建文件列表
-//                        if(FieldUtils.isObjectNotEmpty(points.get(j).getFileType())) {
-//                            RespBean respBean = fileService.selectOneByPid(String.valueOf((Integer) points.get(j).getId()), (String) points.get(j).getFileType());
-//                            List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) respBean.getObj();
-//                            if(respBean.getStatus() == 500){
-//                                throw new RuntimeException("Feign调用文件服务失败");
-//                            }
-//                            Map signPointTypeEnum = (Map) EnumMenu.findEnum(points.get(j).getSignPointType()).getObj();
-//                            points.get(j).setFileList(fileList);
-//                            points.get(j).setWaterUseOfficeEnum(waterManagementOfficeEnum);
-//                            points.get(j).setSignPointTypeEnum(pointInspectionTypeEnum);
-//                            points.get(j).setRouteTypeEnum(routeTypeEnum);
-//                        }
-//                        list.add(points.get(j));
-//                    }
-//                }
+                    //获取报建文件列表
+                    RespBean respBean = fileService.selectOneByPid(hiddenDangerPointEntity.getHiddenDangerPointCode(), "yhdfj");
+                    List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) respBean.getObj();
+                    hiddenDangerPointEntity.setFileList(fileList);
                 }
                 hashMap.put("HiddenDangerPointList",list);
                 hashMap.put("CodeList",codeList);
