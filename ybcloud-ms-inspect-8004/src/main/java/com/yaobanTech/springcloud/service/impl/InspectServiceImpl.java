@@ -1092,7 +1092,6 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         List<Integer> ids = new ArrayList<>();
         HashSet<Test> resultids = new HashSet<>();
         HashSet<Integer> resultvids = new HashSet<>();
-        HashSet<Test> idset = new HashSet<>();
         //0：根据gid查询出联通的节点
         //1：根据gid获取s，t
         QueryWrapper<Test> queryWrapper = new QueryWrapper<>();
@@ -1116,6 +1115,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
             }
         }*/
         for (int i = 0; i < tids.size(); i++) {
+            HashSet<Test> idset = new HashSet<>();
             idset.add((Test) tids.get(i).get("test"));
             if(findUpvalues(list,idset, (Integer) tids.get(i).get("id"),0)){
                 //说明是上游阀门
@@ -1142,6 +1142,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                 Iterator <Test> t = alllist.iterator();
                 while(t.hasNext()){
                     test = t.next();
+                    //System.out.println(test.getStatus()+","+test.getTarget()+"-"+test.getSource()+","+tests.getTarget()+"-"+tests.getSource());
                     if(n==1){
                         //说明是第一次进来，判断条件为三个
                         if((id.equals(test.getTarget()) || id.equals(test.getSource()))&& test.getStatus()==1){
@@ -1158,7 +1159,6 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                                 ||tests.getTarget().equals(test.getTarget()) || tests.getSource().equals(test.getSource()))&& test.getStatus()==1){
                             flag = true;
                             newlist.add(test);
-                            System.out.println(test.getGid());
                             if(FieldUtils.isObjectNotEmpty(test.getSvid())){
                                 if("-1".equals(String.valueOf(test.getSvid()))){
                                     up =true;
@@ -1525,7 +1525,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                 //该下一个节点是阀门，先判断自身还有没有路径，如果没有，则返回父节点递归
                 vids.add(nt);
                 ids.add(nt.getSvid());
-                id.put("id",nt.getTarget());
+                id.put("id",nt.getSource());
                 id.put("vid",nt.getSvid());
                 id.put("test",nt);
                 tids.add(id);
