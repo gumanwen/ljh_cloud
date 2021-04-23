@@ -34,7 +34,7 @@ public interface RouteService {
     RespBean findEnum(@RequestParam("code")String code);
     /*新增任务签到点*/
     @GetMapping("/api/route/signPoint/taskPoint")
-    RespBean taskPoint(@RequestParam("taskIds") List<String> taskIds, @RequestParam("routeId") Integer routeId, @RequestParam("planId") Integer planId);
+    RespBean taskPoint(@RequestParam("taskIds") List<String> taskIds, @RequestParam("routeId") Integer routeId);
     @GetMapping("/api/route/way/findRouteIds")
     RespBean findRouteIds(@RequestParam("waterManagementOffice") String waterManagementOffice,@RequestParam("routeId") Integer routeId,@RequestParam("pointInspectionType") String pointInspectionType,
                           @RequestParam("planId") Integer planId ,@RequestParam("planPorid") String planPorid,@RequestParam("planType") String planType);

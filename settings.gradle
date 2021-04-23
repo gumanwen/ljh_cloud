@@ -9,4 +9,5 @@ include 'ybcloud-cs-auth-6003'
 include 'ybcloud-cs-file-6005'
 include 'ybcloud-bs-eureka-9002'
 /*include 'ybcloud-bs-eureka-client-9003'*/
+include 'ybcloud-ms-inspect-8004'
 

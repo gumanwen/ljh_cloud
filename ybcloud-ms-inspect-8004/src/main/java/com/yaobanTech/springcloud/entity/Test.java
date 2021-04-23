@@ -22,6 +22,7 @@ public class Test implements Serializable {
     private Integer svid;
     private Integer tvid;
     private Integer status;
+    @TableField(exist = false)
     private int pid;
     @TableField(exist = false)
     private List<Test> list;
