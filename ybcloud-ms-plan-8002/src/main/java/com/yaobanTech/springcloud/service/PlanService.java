@@ -184,7 +184,8 @@ public class PlanService {
     public RespBean findAll(HttpServletRequest request) throws UnsupportedEncodingException {
         LoginUser u = urlUtils.getAll(request);
         String user = u.getLoginname();
-        String chineseName = (String)oauthService.getChineseName(u.getLoginname()).getObj();
+
+        String chineseName = urlUtils.getNameByUsername(u.getLoginname(),request);
         String role = u.getRoleLists();
         List<BizPlan> list = null;
         if(!"".equals(role) && role !=null && role.contains("BZZ")){
@@ -223,11 +224,11 @@ public class PlanService {
     }
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public RespBean findById(Integer id) throws UnsupportedEncodingException {
+    public RespBean findById(Integer id,HttpServletRequest request) throws UnsupportedEncodingException {
         BizPlan bp = bizPlanRepository.findDetail(id);
         if(bp != null) {
             String user = bp.getPlanCreatedBy();
-            String chineseName = (String)oauthService.getChineseName(user).getObj();
+            String chineseName = urlUtils.getNameByUsername(user,request);
             RespBean respBean = routeService.findDetail(bp.getRouteId());
             Object o = respBean.getObj();
             Map map = (Map) findEnum(bp.getPlanType()).getObj();
@@ -312,7 +313,7 @@ public class PlanService {
         //获取当前用户
         LoginUser u = urlUtils.getAll(request);
         String user = u.getLoginname();
-        String chineseName = (String)oauthService.getChineseName(user).getObj();
+        String chineseName = urlUtils.getNameByUsername(user,request);
         if("null".equals(routeName)){
             routeName = null;
         }

@@ -33,7 +33,7 @@ public class BizSignedPoint implements Serializable {
 	 * 签到点编号
 	 */
 	@Column(name = "sign_point_code" )
-	private String signPointCode;
+	private Integer signPointCode;
 
 	/**
 	 * 当前所选地址
@@ -134,13 +134,8 @@ public class BizSignedPoint implements Serializable {
 	/**
 	 * 排放时间
 	 */
-	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(
-			pattern = "yyyy-MM-dd HH:mm:ss",
-			timezone = "GMT+8"
-	)
 	@Column(name = "discharge_time" )
-	private Date dischargeTime;
+	private String dischargeTime;
 
 	/**
 	 * 估算排水量
@@ -226,11 +221,17 @@ public class BizSignedPoint implements Serializable {
 	@Column(name = "plan_id" )
 	private Integer planId;
 
+	/**
+	 * 操作人员
+	 */
+	@Column(name = "opration_by" )
+	private String oprationBy;
+
 
 	public BizSignedPoint() {
 	}
 
-	public BizSignedPoint(Integer id, String signPointCode, String currentChoosedAddress, String troubleCode, String troubleReason, String hiddenDangerType, String handleSuggestion, Integer enabled, Integer routeId, String location, String pipeDiameter, String memo, String siteConditions, String siteConditionsDesc, String hiddenDangerAddress, String hiddenDangerReason, String dischargeAddress, String dischargeTimeLast, Date dischargeTime, String estimatedDischarge, String routeType, String pointInspectionType, String signPointStatus, Date modifyTime, String signedTime, String taskId, String fileType, String signPointType, List<HashMap<String, Object>> fileList, String inPlace, String notInPlaceReason, Integer planId) {
+	public BizSignedPoint(Integer id, Integer signPointCode, String currentChoosedAddress, String troubleCode, String troubleReason, String hiddenDangerType, String handleSuggestion, Integer enabled, Integer routeId, String location, String pipeDiameter, String memo, String siteConditions, String siteConditionsDesc, String hiddenDangerAddress, String hiddenDangerReason, String dischargeAddress, String dischargeTimeLast, String dischargeTime, String estimatedDischarge, String routeType, String pointInspectionType, String signPointStatus, Date modifyTime, String signedTime, String taskId, String fileType, String signPointType, List<HashMap<String, Object>> fileList, String inPlace, String notInPlaceReason, Integer planId, String oprationBy) {
 		this.id = id;
 		this.signPointCode = signPointCode;
 		this.currentChoosedAddress = currentChoosedAddress;
@@ -263,6 +264,23 @@ public class BizSignedPoint implements Serializable {
 		this.inPlace = inPlace;
 		this.notInPlaceReason = notInPlaceReason;
 		this.planId = planId;
+		this.oprationBy = oprationBy;
+	}
+
+	public String getDischargeTime() {
+		return dischargeTime;
+	}
+
+	public void setDischargeTime(String dischargeTime) {
+		this.dischargeTime = dischargeTime;
+	}
+
+	public String getOprationBy() {
+		return oprationBy;
+	}
+
+	public void setOprationBy(String oprationBy) {
+		this.oprationBy = oprationBy;
 	}
 
 	public Integer getPlanId() {
@@ -341,11 +359,11 @@ public class BizSignedPoint implements Serializable {
 		this.id = id;
 	}
 
-	public String getSignPointCode() {
+	public Integer getSignPointCode() {
 		return signPointCode;
 	}
 
-	public void setSignPointCode(String signPointCode) {
+	public void setSignPointCode(Integer signPointCode) {
 		this.signPointCode = signPointCode;
 	}
 
@@ -475,14 +493,6 @@ public class BizSignedPoint implements Serializable {
 
 	public void setDischargeTimeLast(String dischargeTimeLast) {
 		this.dischargeTimeLast = dischargeTimeLast;
-	}
-
-	public Date getDischargeTime() {
-		return dischargeTime;
-	}
-
-	public void setDischargeTime(Date dischargeTime) {
-		this.dischargeTime = dischargeTime;
 	}
 
 	public String getEstimatedDischarge() {

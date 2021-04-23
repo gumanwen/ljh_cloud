@@ -113,6 +113,7 @@ public class HiddenDangerPointServiceImpl {
             if(bizHiddenDangerPointEntity.getId() != null){
             try {
                 String s = DateFormatUtils.DateToStr(new Date());
+                bizHiddenDangerPointEntity.setModifyTime(s);
                 bizHiddenDangerPointEntity.setEndDate(s);
                 hiddenDangerPointRepository.save(bizHiddenDangerPointEntity);
             } catch (Exception e) {
@@ -163,7 +164,7 @@ public class HiddenDangerPointServiceImpl {
                 bdpe = hiddenDangerPointRepository.findHiddenDangerPoint(id);
                 List<BizSuggestionEntity> suggestionEntityList = suggestionRepository.findList(bdpe.getHiddenDangerPointCode());
                 String user = bdpe.getCommitBy();
-                String chineseName = (String)oauthService.getChineseName(user).getObj();
+                String chineseName = urlUtils.getNameByUsername(user,request);
                 HashMap<String,Object> hiddenDangerStatusEnum = (HashMap)routeService.findEnum(bdpe.getHiddenDangerPointStatus()).getObj();
                 HashMap<String,Object> projectTypeEnum = (HashMap)routeService.findEnum(bdpe.getProjectType()).getObj();
                 HashMap<String,Object> riskLevelEnum = (HashMap)routeService.findEnum(bdpe.getRiskLevel()).getObj();
@@ -198,7 +199,7 @@ public class HiddenDangerPointServiceImpl {
                 bdpe = hiddenDangerPointRepository.findHiddenDangerPoint(code);
                 List<BizSuggestionEntity> suggestionEntityList = suggestionRepository.findList(bdpe.getHiddenDangerPointCode());
                 String user = bdpe.getCommitBy();
-                String chineseName = (String)oauthService.getChineseName(user).getObj();
+                String chineseName = urlUtils.getNameByUsername(user,request);;
                 HashMap<String,Object> hiddenDangerStatusEnum = (HashMap)routeService.findEnum(bdpe.getHiddenDangerPointStatus()).getObj();
                 HashMap<String,Object> projectTypeEnum = (HashMap)routeService.findEnum(bdpe.getProjectType()).getObj();
                 HashMap<String,Object> riskLevelEnum = (HashMap)routeService.findEnum(bdpe.getRiskLevel()).getObj();
@@ -315,6 +316,19 @@ public class HiddenDangerPointServiceImpl {
             return RespBean.error("查询条件为空！");
         }
         return RespBean.ok("查询成功！",hashMap);
+    }
+
+    public RespBean top() {
+        List<BizHiddenDangerPointEntity> res = null;
+        List<BizHiddenDangerPointEntity> list = hiddenDangerPointRepository.top();
+        if(!list.isEmpty()){
+           res = list.stream().map(a -> {
+                HashMap<String, Object> risk = (HashMap) routeService.findEnum(a.getRiskLevel()).getObj();
+                a.setRiskLevelEnum(risk);
+               return a;
+           }).collect(Collectors.toList());
+        }
+        return RespBean.ok("查询成功！",list);
     }
 
     public RespBean conditionRecord(HashMap<String,Object> map) {

@@ -161,7 +161,7 @@ public class RouteServiceImpl {
     public RespBean findCondition(HashMap<String,Object> hashMap,HttpServletRequest request) throws UnsupportedEncodingException {
         //获取当前用户
         LoginUser u = urlUtils.getAll(request);
-        String chineseName = (String)oauthService.getChineseName(u.getLoginname()).getObj();
+        String chineseName = urlUtils.getNameByUsername(u.getLoginname(),request);
         RouteCondition routeCondition = JSONObject.parseObject(JSONObject.toJSONString(hashMap.get("form")), RouteCondition.class);
         Specification<BizRoute> spec = new Specification<BizRoute>() {
             @Override
@@ -245,7 +245,7 @@ public class RouteServiceImpl {
     public RespBean findAll(HttpServletRequest request) throws UnsupportedEncodingException {
         LoginUser u = urlUtils.getAll(request);
         String user = u.getLoginname();
-        String chineseName = (String)oauthService.getChineseName(u.getLoginname()).getObj();
+        String chineseName = urlUtils.getNameByUsername(user,request);
         String role = u.getRoleLists();
         List<BizRoute> list = null;
         if(!"".equals(role) && role !=null && role.contains("BZZ")){
@@ -290,7 +290,7 @@ public class RouteServiceImpl {
     public RespBean findExitAll(HttpServletRequest request) throws UnsupportedEncodingException {
         LoginUser u = urlUtils.getAll(request);
         String user = u.getLoginname();
-        String chineseName = (String)oauthService.getChineseName(u.getLoginname()).getObj();
+        String chineseName = urlUtils.getNameByUsername(user,request);
         List<BizRoute> list = bizRouteRepository.findExitList(user);
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
@@ -328,12 +328,12 @@ public class RouteServiceImpl {
     }
 
     @Transactional(propagation= Propagation.NOT_SUPPORTED)
-    public RespBean findDetail(Integer id) throws UnsupportedEncodingException {
+    public RespBean findDetail(Integer id,HttpServletRequest request) throws UnsupportedEncodingException {
         BizRoute br = bizRouteRepository.findDetail(id);
         if(br != null) {
             List<BizSignPoint> pointList = (List<BizSignPoint>) signPointService.findList(br.getId()).getObj();
             List<BizSignPoint> list = br.getBizSignPoints();
-            String chineseName = (String)oauthService.getChineseName(br.getRouteCreator()).getObj();
+            String chineseName = (String)urlUtils.getNameByUsername(br.getRouteCreator(),request);
             //获取报建文件列表
             if(list.size()>0){
                 for(int i =0; i<list.size(); i++){

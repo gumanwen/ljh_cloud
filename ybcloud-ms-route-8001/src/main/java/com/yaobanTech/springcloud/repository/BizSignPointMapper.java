@@ -2,6 +2,7 @@ package com.yaobanTech.springcloud.repository;
 
 import com.yaobanTech.springcloud.domain.*;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Component;
@@ -145,12 +146,12 @@ public interface BizSignPointMapper {
             "ORDER BY c.modify_time DESC")
     List<HashMap<String,Object>> findCondition(SignPointQuery signPointQuery);
 
-    @Select(value="SELECT a.*,b.plan_name,c.*,c.id as sign_point_id " +
+    @Select(value="SELECT a.*,b.plan_name,c.*,c.id as sign_point_id,c.signed_time " +
             "FROM `ybcloud-ms-route-8001`.`biz_route` a " +
             "right JOIN `ybcloud-ms-route-8001`.`biz_signed_point` c ON a.id = c.route_id " +
             "JOIN `ybcloud-ms-plan-8002`.`biz_plan` b on b.id = c.plan_id "+
             "WHERE a.enabled = 1 and b.enabled = 1 and c.enabled = 1 " +
-            "AND IF(#{waterUserOffice} is not null,  a.water_management_office = #{waterUserOffice},1=1) " +
+            "AND IF(#{waterUserOffice} is not null,a.water_management_office = #{waterUserOffice},1=1) " +
             "AND IF(#{routeName} is not null, a.route_name = #{routeName},1=1 ) " +
             "AND IF(#{routeType} is not null, a.route_type = #{routeType},1=1 ) " +
             "AND IF(#{pointInspectionType} is not null, a.point_inspection_type = #{pointInspectionType},1=1 ) " +
@@ -165,6 +166,7 @@ public interface BizSignPointMapper {
             "ORDER BY c.modify_time DESC")
     List<HashMap<String,Object>> findConditionElse(SignPointQuery signPointQuery);
 
+
     @Select(value = "SELECT * FROM `biz_hidden_danger_point` WHERE 1 = 1 " +
             "AND IF( #{waterUseOffice} not like '', water_use_office = #{waterUseOffice}, 1 = 1 ) " +
 //            "and end_date is null " +
@@ -173,8 +175,18 @@ public interface BizSignPointMapper {
 //            "AND IF ( #{start} IS NOT NULL, commit_date >#{start}, commit_date > ( SELECT DATE_SUB( CURDATE( ), INTERVAL 12 DAY ) ) ) " +
 //            "and IF ( #{end} IS NOT NULL, commit_date <= #{end}, commit_date <= ( SELECT DATE_SUB( now( ), INTERVAL 1 SECOND ) ) ) ")
             "AND IF ( #{start} not like '', commit_date >#{start}, 1 = 1 ) " +
-            "and IF ( #{end} IS not like '', commit_date <= #{end}, 1 = 1 ) ")
-            List<BizHiddenDangerPointEntity> countDangerPointList(String waterUseOffice ,  String start ,  String end);
+            "and IF ( #{end} not like '', commit_date <= #{end}, 1 = 1 ) ")
+    List<BizHiddenDangerPointEntity> countDangerPointList(@Param("waterUseOffice") String waterUseOffice ,  @Param("start") String start ,  @Param("end")String end);
+
+    @Select(value="SELECT a.*,c.*,(@i :=@i+1) AS rowid " +
+            "FROM `ybcloud-ms-route-8001`.`biz_route` a " +
+            "right JOIN `ybcloud-ms-route-8001`.`biz_signed_point` c ON a.id = c.route_id, " +
+            "(SELECT @i :=0) AS it WHERE a.enabled = 1 and c.enabled = 1 " +
+            "AND IF(#{waterUseOffice}  not like '',a.water_management_office = #{waterUseOffice},1=1) " +
+            "AND IF(#{start}  not like '',c.signed_time >= #{start},1=1) " +
+            "AND IF(#{end}  not like '',c.signed_time < #{end},1=1) " +
+            "ORDER BY a.created_time DESC")
+    List<HashMap<String,Object>> findConditionByEndPoint(@Param("waterUseOffice") String waterUseOffice , @Param("start")String start , @Param("end")String end);
 
     @Select(value = "SELECT a.sum + b.sum FROM ( " +
             "SELECT count( * ) AS sum FROM `biz_hidden_danger_point` WHERE 1 = 1 " +

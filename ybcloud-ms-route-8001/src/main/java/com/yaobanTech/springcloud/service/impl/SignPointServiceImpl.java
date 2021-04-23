@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
@@ -90,11 +91,15 @@ public class SignPointServiceImpl {
                 bizSignedPoint.setSignedTime(DateFormatUtils.DateToStr(new Date()));
                 BizSignedPoint signedPoint = signedPointRepository.save(bizSignedPoint);
                 id = signedPoint.getId();
+                Integer code = signedPoint.getSignPointCode();
+//                signPointRepository.syncStatus(code);
                 if( bizSignedPoint.getTroubleCode() != null && bizSignedPoint.getTroubleCode().contains("Y")){
                   hiddenDangerPointService.synchronization(bizSignedPoint.getTroubleCode(),bizSignedPoint.getHandleSuggestion());
                 }
+
             } catch (Exception e) {
                 e.printStackTrace();
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return RespBean.error("修改失败！");
             }
         }else{
@@ -133,6 +138,11 @@ public class SignPointServiceImpl {
             return RespBean.error("id为空！");
         }
         return RespBean.ok("查询成功！",byId);
+    }
+
+    public RespBean findEndPointList(String waterUseOffice,String start,String end){
+        List<HashMap<String, Object>> endPoint = bizSignPointMapper.findConditionByEndPoint(waterUseOffice, start, end);
+        return RespBean.ok("查询成功",endPoint);
     }
 
     public RespBean findSignPoint(Integer id) {
@@ -272,6 +282,7 @@ public class SignPointServiceImpl {
                     BizSignedPoint bizSignedPoint = JSONObject.parseObject(JSONObject.toJSONString(hashMap), BizSignedPoint.class);
                     bizSignedPoint.setId(null);
                     bizSignedPoint.setSignPointStatus("不合格");
+                    bizSignedPoint.setNotInPlaceReason("未到位");
                     bizSignedPoint.setEnabled(1);
                     bizSignedPoint.setPlanId(planId);
                     signedPointRepository.save(bizSignedPoint);
@@ -330,6 +341,11 @@ public class SignPointServiceImpl {
             return RespBean.error("查询参数对象为空！");
         }
         return RespBean.ok("查询成功",maps);
+    }
+
+    public  RespBean top10(){
+        List<BizSignedPoint> list = signedPointRepository.top10();
+        return RespBean.ok("查询成功！", list);
     }
 
     public  RespBean findEnum(String code){

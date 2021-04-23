@@ -43,8 +43,8 @@ public class RouteController {
 
     @ApiOperation("查询路线详情")
     @GetMapping("findDetail")
-    public RespBean findDetail(@RequestParam Integer id) throws UnsupportedEncodingException {
-        return routeService.findDetail(id);
+    public RespBean findDetail(@RequestParam Integer id,HttpServletRequest request) throws UnsupportedEncodingException {
+        return routeService.findDetail(id,request);
     }
 
     @ApiOperation("查询路线列表")

@@ -43,6 +43,24 @@ public class UrlUtils {
         loginUser = JSON.parseObject(JSON.toJSONString(feignRespBean.getObj()),LoginUser.class);
         return  loginUser;
     }
+    public String getNameByUsername(String username,HttpServletRequest request) throws UnsupportedEncodingException {
+        Integer ttype = null;
+        //String tokenT = request.getHeader("TW-AUTH-HEADER");
+        String tokenT = request.getHeader("TW-Authorization");
+        String token = null;
+        String name = null;
+        if(FieldUtils.isStringNotEmpty(tokenT)){
+            token = URLDecoder.decode(tokenT,"UTF-8");
+            ttype = 2;
+        }else{
+            ttype = 1;
+            String header = request.getHeader("Authorization");
+            token =  StringUtils.substringAfter(header, "Bearer ");
+        }
+        RespBean feignRespBean = authService.getChineseName(username,ttype);
+        name = feignRespBean.getObj().toString();
+        return  name;
+    }
     /*
     * 获取清远平台当前登录人信息
     */

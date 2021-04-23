@@ -76,6 +76,12 @@ public class HiddenDangerPointController {
         return hiddenDangerPointService.findCondition(hashMap,request);
     }
 
+    @ApiOperation("查询最新10条隐患点列表")
+    @GetMapping("top")
+    public RespBean top() {
+        return hiddenDangerPointService.top();
+    }
+
     @ApiOperation("条件查询隐患安全记录")
     @PostMapping("conditionRecord")
     public RespBean conditionRecord(@RequestBody HashMap<String,Object> hashMap) {

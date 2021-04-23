@@ -141,7 +141,7 @@ public class LeakPointServiceImpl {
             try {
                 blpe = leakPointRepository.findBizLeakPointEntity(id);
                 String user = blpe.getCommitBy();
-                String chineseName = (String)oauthService.getChineseName(user).getObj();
+                String chineseName = (String)urlUtils.getNameByUsername(user,request);
                 HashMap<String,Object> leakPointStatusEnum = (HashMap)routeService.findEnum(blpe.getLeakPointStatus()).getObj();
                 HashMap<String,Object> abnormalPhenomenaEnum = (HashMap)routeService.findEnum(blpe.getAbnormalPhenomena()).getObj();
                 blpe.setCommitByCN(chineseName);

@@ -25,4 +25,7 @@ public interface BizSignPointRepository extends JpaRepository<BizSignPoint,Integ
     @Query(value = "SELECT a.*,b.route_type,b.point_inspection_type from biz_sign_point a LEFT JOIN biz_route b on a.route_id = b.id where b.id = ?1 and a.sign_point_status = '合格' and a.enabled = 1",nativeQuery = true)
     List<BizSignPoint> findSignedList(Integer routeId);
 
+//    @Query(value = "update biz_sign_point t set t.sign_point_status = '合格' where t.sign_point_code = ?1",nativeQuery = true)
+//    @Modifying
+//    void syncStatus(Integer id);
 }
