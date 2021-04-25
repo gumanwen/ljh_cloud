@@ -419,4 +419,45 @@ public class RouteServiceImpl {
         return RespBean.ok("查询成功！",ids);
     }
 
+
+    @Transactional(propagation= Propagation.NOT_SUPPORTED)
+    public RespBean openFindDetail(Integer id,String token,Integer type,HttpServletRequest request) throws UnsupportedEncodingException {
+        BizRoute br = bizRouteRepository.findDetail(id);
+        if(type == 1){
+            request.setAttribute("Authorization",token);
+        }else{
+            request.setAttribute("TW-Authorization",token);
+        }
+        if(br != null) {
+            List<BizSignPoint> pointList = (List<BizSignPoint>) signPointService.findList(br.getId()).getObj();
+            List<BizSignPoint> list = br.getBizSignPoints();
+            String chineseName = (String)urlUtils.getNameByUsername(br.getRouteCreator(),request);
+            //获取报建文件列表
+            if(list.size()>0){
+                for(int i =0; i<list.size(); i++){
+                    //获取报建文件列表
+                    if(FieldUtils.isObjectNotEmpty(list.get(i).getFileType())) {
+                        RespBean respBean = fileService.selectOneByPid(String.valueOf((Integer) list.get(i).getId()), (String) list.get(i).getFileType());
+                        Object o = respBean.getObj();
+                        List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>)o ;
+                        if(respBean.getStatus() == 500){
+                            throw new RuntimeException("Feign调用文件服务失败");
+                        }
+                        list.get(i).setFileList(fileList);
+                    }
+                }
+            }
+
+            Map waterOfficeMenu = (Map) findEnum(br.getWaterManagementOffice()).getObj();
+            Map routeTypeMenu = (Map) findEnum(br.getRouteType()).getObj();
+            Map pointInspectionTypeMenu = (Map) findEnum(br.getPointInspectionType()).getObj();
+            br.setRouteTypeMenu(routeTypeMenu);
+            br.setWaterOfficeMenu(waterOfficeMenu);
+            br.setBizSignPoints(pointList);
+            br.setPointInspectionTypeMenu(pointInspectionTypeMenu);
+            br.setBizSignPoints(list);
+            br.setRouteCreatorCN(chineseName);
+        }
+        return RespBean.ok("查询成功！",br);
+    }
 }

@@ -56,7 +56,7 @@ public class UrlUtils {
             String header = request.getHeader("Authorization");
             token =  StringUtils.substringAfter(header, "Bearer ");
         }
-        RespBean feignRespBean = authService.getChineseName(username,ttype);
+        RespBean feignRespBean = authService.getChineseName(username,ttype,token);
         name = feignRespBean.getObj().toString();
         return  name;
     }

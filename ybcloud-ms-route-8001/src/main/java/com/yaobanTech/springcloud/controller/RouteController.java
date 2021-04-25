@@ -47,6 +47,12 @@ public class RouteController {
         return routeService.findDetail(id,request);
     }
 
+    @ApiOperation("查询路线详情")
+    @GetMapping("openFindDetail")
+    public RespBean openFindDetail(@RequestParam Integer id,@RequestParam String token,@RequestParam Integer type,HttpServletRequest request) throws UnsupportedEncodingException {
+        return routeService.openFindDetail(id,token,type,request);
+    }
+
     @ApiOperation("查询路线列表")
     @GetMapping("findList")
     public RespBean findList(HttpServletRequest request) throws UnsupportedEncodingException {
