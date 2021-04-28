@@ -1,18 +1,10 @@
 #druid监控台配置信息，主要用作sql监控，还能用来监控url等
-druid:
-  allow:
-    ip: 127.0.0.1
-  login:
-    user_name: root
-    password: root
 spring:
-  main:
-    allow-bean-definition-overriding: true
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://47.92.144.224:3306/ybcloud-ms-plan-8002?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/ybcloud-ms-plan-8002?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
     username: root
-    password: 123456
+    password: yaoban
     type: com.alibaba.druid.pool.DruidDataSource
     initial-size: 1
     min-idle: 1
@@ -33,9 +25,12 @@ spring:
     name: planService
   cloud:
     nacos:
+      discovery:
+        server-addr: 192.168.10.3:8848 #Nacos作为服务中心地址
+        ip: 192.168.10.3
       config:
         server-addr: 192.168.10.3:8848
-        file-extension: yml
+        file-extension: properties
         namespace: 8740fef6-e5cd-4bee-aa59-1982b454323e
         group: DEFAULT_GROUP
 mybatis:
@@ -44,6 +39,13 @@ mybatis:
   configuration:
     call-setters-on-nulls: true
     map-underscore-to-camel-case: true
+jpa:
+  show-sql: true
+  database-platform: org.hibernate.dialect.SQLServerDialect
+  hibernate:
+    ddl-auto: none
+    naming:
+      physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 
 server:
   port: 8002
