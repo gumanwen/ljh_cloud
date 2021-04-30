@@ -403,6 +403,7 @@ public class RouteServiceImpl {
     }
 
     public RespBean findRouteIds(String waterManagementOffice,Integer routeId,String pointInspectionType,Integer planId ,String planPorid,String planType){
+        List<HashMap<String, Object>> list  = null;
         if("".equals(waterManagementOffice)){
             waterManagementOffice = null;
         }
@@ -416,7 +417,24 @@ public class RouteServiceImpl {
             planType = null;
         }
         List<HashMap<String, Object>> ids = bizSignPointMapper.findRouteIds(waterManagementOffice, routeId, pointInspectionType, planId, planPorid, planType);
-        return RespBean.ok("查询成功！",ids);
+        if(!ids.isEmpty()){
+          list = ids.stream().map(o -> {
+                        Map waterOfficeMenu = (Map) findEnum((String) o.get("water_management_office")).getObj();
+                        Map routeTypeMenu = (Map) findEnum((String) o.get("route_type")).getObj();
+                        Map pointInspectionTypeMenu = (Map) findEnum((String) o.get("point_inspection_type")).getObj();
+                        Map planPoridMenu = (Map) findEnum((String) o.get("plan_porid")).getObj();
+                        Map planTypeMenu = (Map) findEnum((String) o.get("plan_type")).getObj();
+                        o.put("water_office_menu", waterOfficeMenu);
+                        o.put("route_type_menu", routeTypeMenu);
+                        o.put("point_inspection_type_menu", pointInspectionTypeMenu);
+                        o.put("plan_porid_menu", planPoridMenu);
+                        o.put("plan_type_menu", planTypeMenu);
+                        return o;
+                    }
+            ).collect(Collectors.toList());
+
+        }
+        return RespBean.ok("查询成功！",list);
     }
 
 

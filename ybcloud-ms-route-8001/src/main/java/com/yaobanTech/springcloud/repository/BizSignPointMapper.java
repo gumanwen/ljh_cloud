@@ -85,7 +85,7 @@ public interface BizSignPointMapper {
             "</script>"})
     void update(BizSignPoint bizSignPoint);
 
-    @Select(value="SELECT b.route_id as routeIds,b.id as planIds " +
+    @Select(value="SELECT a.*,b.*,b.id as plan_id " +
             "FROM `ybcloud-ms-plan-8002`.`biz_plan` b " +
             "JOIN `ybcloud-ms-route-8001`.`biz_route` a ON a.id = b.route_id " +
             "WHERE 1=1 " +
