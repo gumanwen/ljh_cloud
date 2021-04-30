@@ -245,7 +245,6 @@ public class RouteServiceImpl {
     public RespBean findAll(HttpServletRequest request) throws UnsupportedEncodingException {
         LoginUser u = urlUtils.getAll(request);
         String user = u.getLoginname();
-        String chineseName = urlUtils.getNameByUsername(user,request);
         String role = u.getRoleLists();
         List<BizRoute> list = null;
         if(!"".equals(role) && role !=null && role.contains("BZZ")){
@@ -257,6 +256,7 @@ public class RouteServiceImpl {
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
                 BizRoute route = list.get(i);
+                String chineseName = urlUtils.getNameByUsername(route.getRouteCreator(),request);
                 List<BizSignPoint> points = route.getBizSignPoints();
                 if(points.size()>0){
                     for(int j =0; j<points.size();j++){

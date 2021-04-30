@@ -236,7 +236,7 @@ public class PlanService {
             Map pp = (Map) findEnum(bp.getPlanPorid()).getObj();
             HashMap<String, Object> hashMap = (HashMap<String, Object>) o;
             String office = (String) hashMap.get("waterManagementOffice");
-            HashMap<String, Object> waterUseOffice = (HashMap<String, Object>) findEnum(office).getObj();
+            HashMap<String, Object> waterUseOffice = (HashMap<String, Object>) routeService.findEnum(office).getObj();
             bp.setPlanTypeMenu(map);
             bp.setPlanStatusMenu(ps);
             bp.setPlanPoridMenu(pp);

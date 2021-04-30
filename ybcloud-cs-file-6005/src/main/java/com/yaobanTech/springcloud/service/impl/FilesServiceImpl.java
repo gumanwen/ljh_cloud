@@ -56,6 +56,9 @@ public class FilesServiceImpl extends ServiceImpl<FilesMapper, Files> implements
     @Value("${server.port}")
     private String port;
 
+    @Value("${url}")
+    private String url;
+
     @Override
     @Transactional
     public RespBean importFiles(MultipartFile[] fileList, String pid, String type) throws IOException {
@@ -125,7 +128,7 @@ public class FilesServiceImpl extends ServiceImpl<FilesMapper, Files> implements
             if (result.size() > 0) {
                 for (int j = 0; j < result.size(); j++) {
                     result.get(j).put("show", "");
-                    result.get(j).put("fullpath", "http://" + ip + ":" + "8888" + result.get(j).get("url"));
+                    result.get(j).put("fullpath", url + result.get(j).get("url"));
                 }
             }
             return RespBean.ok("文件列表").setObj(result);
