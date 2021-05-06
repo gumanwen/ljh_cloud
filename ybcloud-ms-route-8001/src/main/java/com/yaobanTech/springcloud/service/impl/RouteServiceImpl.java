@@ -138,18 +138,16 @@ public class RouteServiceImpl {
     public RespBean deleteRoute(Integer id) {
         Integer i = null;
         if(id != null) {
+            Boolean bool = null;
             try {
-                BizRoute detail = bizRouteRepository.findDetail(id);
-                List<BizSignPoint> signPoints = detail.getBizSignPoints();
-                List<Object> list = (List<Object>) planService.findByRouteId(id).getObj();
-                if(signPoints.isEmpty() && list.isEmpty()) {
-                    i = bizRouteRepository.deleteRoute(id);
+                bool = inspectService.deleteRoute(id);
+                if(bool){
+                    Integer integer = bizRouteRepository.deleteRoute(id);
                 }else{
-                    return RespBean.error("删除失败！该路线包含计划或签到点,无法进行删除操作！");
+                    return RespBean.error("该路线下任务状态不允许删除！");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                return RespBean.error("删除失败！");
             }
         }else{
             return RespBean.error("id为空！");
@@ -402,7 +400,7 @@ public class RouteServiceImpl {
         return RespBean.ok("查询成功！", map);
     }
 
-    public RespBean findRouteIds(String waterManagementOffice,Integer routeId,String pointInspectionType,Integer planId ,String planPorid,String planType){
+    public RespBean findRouteIds(String waterManagementOffice,Integer routeId,String pointInspectionType,Integer planId ,String planPorid,String planType,String routeType){
         List<HashMap<String, Object>> list  = null;
         if("".equals(waterManagementOffice)){
             waterManagementOffice = null;
@@ -416,7 +414,10 @@ public class RouteServiceImpl {
         if("".equals(planType)){
             planType = null;
         }
-        List<HashMap<String, Object>> ids = bizSignPointMapper.findRouteIds(waterManagementOffice, routeId, pointInspectionType, planId, planPorid, planType);
+        if("".equals(routeType)){
+            routeType = null;
+        }
+        List<HashMap<String, Object>> ids = bizSignPointMapper.findRouteIds(waterManagementOffice, routeId, pointInspectionType, planId, planPorid, planType,routeType);
         if(!ids.isEmpty()){
           list = ids.stream().map(o -> {
                         Map waterOfficeMenu = (Map) findEnum((String) o.get("water_management_office")).getObj();

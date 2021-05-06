@@ -89,14 +89,15 @@ public interface BizSignPointMapper {
             "FROM `ybcloud-ms-plan-8002`.`biz_plan` b " +
             "JOIN `ybcloud-ms-route-8001`.`biz_route` a ON a.id = b.route_id " +
             "WHERE 1=1 " +
-            "AND IF(#{waterManagementOffice} is not null,water_management_office = #{waterManagementOffice},1=1) " +
+            "AND IF(#{waterManagementOffice} is not null,a.water_management_office = #{waterManagementOffice},1=1) " +
             "AND IF(#{routeId} is not null,a.id = #{routeId},1=1) " +
-            "AND IF(#{pointInspectionType} is not null,point_inspection_type = #{pointInspectionType},1=1) " +
+            "AND IF(#{pointInspectionType} is not null,a.point_inspection_type = #{pointInspectionType},1=1) " +
             "AND IF(#{planId} is not null,b.id = #{planId},1=1) " +
-            "AND IF(#{planPorid} is not null,plan_porid = #{planPorid},1=1) " +
-            "AND IF(#{planType} is not null,plan_type = #{planType},1=1) ")
+            "AND IF(#{planPorid} is not null,b.plan_porid = #{planPorid},1=1) " +
+            "AND IF(#{routeType} is not null,a.route_type = #{routeType},1=1) " +
+            "AND IF(#{planType} is not null,b.plan_type = #{planType},1=1) ")
 
-    List<HashMap<String,Object>> findRouteIds(@Param("waterManagementOffice") String waterManagementOffice,@Param("routeId") Integer routeId, @Param("pointInspectionType")String pointInspectionType,@Param("planId") Integer planId , @Param("planPorid")String planPorid,@Param("planType") String planType);
+    List<HashMap<String,Object>> findRouteIds(@Param("waterManagementOffice") String waterManagementOffice,@Param("routeId") Integer routeId, @Param("pointInspectionType")String pointInspectionType,@Param("planId") Integer planId , @Param("planPorid")String planPorid,@Param("planType") String planType,@Param("routeType") String routeType);
 
     @Select(value="SELECT a.* " +
             "FROM `ybcloud-ms-route-8001`.`biz_leak_point` a " +
