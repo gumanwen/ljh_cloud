@@ -202,11 +202,11 @@ public class PlanService {
         }).collect(Collectors.toList());
         RespBean r1 = oauthService.getNameList(nameList);
         List<HashMap<String, String>> names = (List<HashMap<String, String>>) r1.getObj();
-//        RespBean r2 = routeService.getListByIds(routeIds);
+        RespBean r2 = routeService.getListByIds(routeIds);
+        List<HashMap<String, Object>> routes = (List<HashMap<String, Object>>) r2.getObj();
         if(!list.isEmpty()){
                 for (int i = 0; i < list.size(); i++) {
                     BizPlan plan = list.get(i);
-                    RespBean respBean = routeService.findDetail(plan.getRouteId());
                     Map map = (Map) findEnum(plan.getPlanType()).getObj();
                     Map ps = (Map) findEnum(plan.getPlanStatus()).getObj();
                     Map pp = (Map) findEnum(plan.getPlanPorid()).getObj();
@@ -214,10 +214,15 @@ public class PlanService {
                     plan.setPlanStatusMenu(ps);
                     plan.setPlanPoridMenu(pp);
                     names.stream().forEach(a -> {
-                        plan.setPlanCreatedByCN(a.get(plan.getPlanCreatedBy()));
+                        if(plan.getPlanCreatedBy().equals(a.get("username"))){
+                            plan.setPlanCreatedByCN(a.get("name"));
+                        }
                     });
-                    Object o = respBean.getObj();
-                    plan.setRouteObj(o);
+                    routes.stream().forEach(b -> {
+                        if(plan.getRouteId().equals(b.get("route_id"))){
+                            plan.setRouteObj(b);
+                        }
+                    });
                 }
             }
         List<BizPlan> planList = list.stream().sorted(Comparator.comparing(BizPlan::getEnabled).reversed().thenComparing(BizPlan::getPlanCreatedTime).reversed()).

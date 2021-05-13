@@ -32,6 +32,7 @@ public enum EnumMenu {
 
 	INSONE("104", "一天一巡","计划周期"),
 	INSTWO("17", "两天一巡","计划周期"),
+	INSTHREE("105", "三天一巡","计划周期"),
 	INSTRREE("18", "四天一巡","计划周期"),
 	INSSEVEN("19", "七天一巡","计划周期"),
 

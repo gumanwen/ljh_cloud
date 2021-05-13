@@ -104,6 +104,43 @@ public class HiddenDangerPointServiceImpl {
     }
 
     @Transactional
+    public RespBean saveHiddenDangerPointWeb(BizHiddenDangerPointEntity bizHiddenDangerPointEntity,HttpServletRequest request) {
+        String type = "yhdfj";
+        if(bizHiddenDangerPointEntity != null) {
+            try {
+                String hiddenDangerPointCode = null;
+                LoginUser u = urlUtils.getAll(request);
+                String user = u.getLoginname();
+                String deptName = u.getDeptName();
+                if(deptName.contains("城南")){
+                    hiddenDangerPointCode =redisService.createGenerateCode("隐患点","CNYH",true,6);
+                }
+                else if(deptName.contains("城北")){
+                    hiddenDangerPointCode =redisService.createGenerateCode("隐患点","CBYH",true,6);
+                }
+                else if(deptName.contains("石角")){
+                    hiddenDangerPointCode =redisService.createGenerateCode("隐患点","SJYH",true,6);
+                }else{
+                    return RespBean.error("用水管理所参数不符合系统约定，生成编号异常！");
+                }
+                bizHiddenDangerPointEntity.setCommitDate(DateFormatUtils.DateToStr(new Date()));
+                bizHiddenDangerPointEntity.setEnabled(1);
+                bizHiddenDangerPointEntity.setHiddenDangerPointStatus("53");
+                bizHiddenDangerPointEntity.setCommitBy(user);
+                bizHiddenDangerPointEntity.setHiddenDangerPointCode(hiddenDangerPointCode);
+                hiddenDangerPointRepository.save(bizHiddenDangerPointEntity);
+            } catch (Exception e) {
+                e.printStackTrace();
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return RespBean.error("保存失败！");
+            }
+        }else{
+            return RespBean.error("数据为空！");
+        }
+        return RespBean.ok("保存成功！",bizHiddenDangerPointEntity.getHiddenDangerPointCode());
+    }
+
+    @Transactional
     public RespBean updateHiddenDangerPoint(HashMap<String,Object> param) {
         BizHiddenDangerPointEntity bizHiddenDangerPointEntity = null;
         if(!param.isEmpty() && param.get("form") != null) {

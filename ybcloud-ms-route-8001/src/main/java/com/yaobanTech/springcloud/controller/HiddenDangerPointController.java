@@ -1,5 +1,6 @@
 package com.yaobanTech.springcloud.controller;
 
+import com.yaobanTech.springcloud.domain.BizHiddenDangerPointEntity;
 import com.yaobanTech.springcloud.domain.HiddenDangerPointQuery;
 import com.yaobanTech.springcloud.domain.LeakPointQuery;
 import com.yaobanTech.springcloud.domain.RespBean;
@@ -28,10 +29,16 @@ public class HiddenDangerPointController {
     @Lazy
     private HiddenDangerPointServiceImpl hiddenDangerPointService;
 
-    @ApiOperation("保存隐患点")
+    @ApiOperation("app保存隐患点")
     @RequestMapping ("add")
     public RespBean saveHiddenDangerPoint( @RequestParam String param,@RequestPart MultipartFile[] fileList, HttpServletRequest request){
         return hiddenDangerPointService.saveHiddenDangerPoint(param,fileList,request);
+    }
+
+    @ApiOperation("web保存隐患点")
+    @RequestMapping ("addWeb")
+    public RespBean saveHiddenDangerPointWeb(@RequestBody BizHiddenDangerPointEntity hiddenDangerPointEntity, HttpServletRequest request){
+        return hiddenDangerPointService.saveHiddenDangerPointWeb(hiddenDangerPointEntity,request);
     }
 
     @ApiOperation("修改隐患点")
