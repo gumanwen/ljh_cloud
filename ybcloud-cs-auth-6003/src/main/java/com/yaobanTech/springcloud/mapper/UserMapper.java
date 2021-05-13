@@ -78,6 +78,7 @@ public interface UserMapper {
 
  List<HashMap<Object, Object>> getMenuList(String grade);
 
- List<HashMap<String,String>> selectUserByRole(String role);
+ List<User> selectUserByRole(String role);
 
+ List<HashMap<String, String>> loadAllUserByUsername(@Param("list") List<String> namelist);
 }

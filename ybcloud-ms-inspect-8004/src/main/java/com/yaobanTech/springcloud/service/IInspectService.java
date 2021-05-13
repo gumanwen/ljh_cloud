@@ -70,6 +70,5 @@ public interface IInspectService extends IService<Inspect> {
     RespBean getcloseValues(String gid);
 
     RespBean isModifiable(Integer routeId);
-
-
+    RespBean updateIsUp();
 }

@@ -32,10 +32,12 @@ public interface RouteService {
     /*枚举值*/
     @GetMapping("/api/route/way/findEnum")
     RespBean findEnum(@RequestParam("code")String code);
+    @GetMapping("/api/route/way/findEnumMenu")
+    RespBean findEnumMenu(@RequestParam("mode")String mode);
     /*新增任务签到点*/
     @GetMapping("/api/route/signPoint/taskPoint")
     RespBean taskPoint(@RequestParam("taskIds") List<String> taskIds, @RequestParam("routeId") Integer routeId, @RequestParam("planId") Integer planId);
     @GetMapping("/api/route/way/findRouteIds")
     RespBean findRouteIds(@RequestParam("waterManagementOffice") String waterManagementOffice,@RequestParam("routeId") Integer routeId,@RequestParam("pointInspectionType") String pointInspectionType,
-                          @RequestParam("planId") Integer planId ,@RequestParam("planPorid") String planPorid,@RequestParam("planType") String planType);
+                          @RequestParam("planId") Integer planId ,@RequestParam("planPorid") String planPorid,@RequestParam("planType") String planType,@RequestParam("routeType") String routeType);
 }

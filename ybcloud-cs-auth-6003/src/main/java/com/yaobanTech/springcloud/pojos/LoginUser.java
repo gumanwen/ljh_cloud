@@ -7,17 +7,18 @@ public class LoginUser {
     public LoginUser() {
     }
 
-    public LoginUser(Integer id, String name, String loginname, String password, String sex, Integer deptid, String remark, Boolean isAnalyst, Boolean isEnable, Date createTime, Date updateTime) {
-        this(id, name, loginname, password, sex, deptid, remark, isAnalyst, isEnable, createTime, updateTime, ClientTypeEnum.WEB);
+    public LoginUser(Integer id, String name, String loginname, String password, String sex, Integer deptid,String deptName, String remark, Boolean isAnalyst, Boolean isEnable, Date createTime, Date updateTime) {
+        this(id, name, loginname, password, sex, deptid,deptName, remark, isAnalyst, isEnable, createTime, updateTime, ClientTypeEnum.WEB);
     }
 
-    public LoginUser(Integer id, String name, String loginname, String password, String sex, Integer deptid, String remark, Boolean isAnalyst, Boolean isEnable, Date createTime, Date updateTime, ClientTypeEnum clientType) {
+    public LoginUser(Integer id, String name, String loginname, String password, String sex, Integer deptid,String deptName, String remark, Boolean isAnalyst, Boolean isEnable, Date createTime, Date updateTime, ClientTypeEnum clientType) {
         this.id = id;
         this.name = name;
         this.loginname = loginname;
         this.password = password;
         this.sex = sex;
         this.deptid = deptid;
+        this.deptName = deptName;
         this.remark = remark;
         this.isAnalyst = isAnalyst;
         this.isEnable = isEnable;
@@ -53,6 +54,11 @@ public class LoginUser {
      * 部门ID
      */
     private Integer deptid;
+
+    /**
+     * 部门ID
+     */
+    private String deptName;
 
     /**
      * 备注
@@ -95,6 +101,14 @@ public class LoginUser {
      * 是否超级管理员
      */
     private  Boolean isSuperAdmin;
+
+    public String getDeptName() {
+        return deptName;
+    }
+
+    public void setDeptName(String deptName) {
+        this.deptName = deptName;
+    }
 
     public Integer getId() {
         return id;

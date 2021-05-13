@@ -93,6 +93,22 @@
         GROUP BY
         begin_time
     </select>
+    <select id="selectTaskDwlByDays" resultType="java.util.HashMap">
+        SELECT
+        begin_time AS time,
+        sum(inplacepoint)*100/sum(allpoint) as sum
+        FROM
+        BIZ_INSPECT
+        WHERE
+        <if test = "waterManagementOffice != null and waterManagementOffice !='' ">
+            water_management_office = #{waterManagementOffice} and
+        </if>
+        CONVERT (VARCHAR ( 20 ), begin_time, 20)  <![CDATA[ >= ]]>  CONVERT (VARCHAR ( 20 ), #{beginTime}, 20)
+        AND CONVERT (VARCHAR ( 20 ), begin_time, 20) <![CDATA[ <= ]]>   CONVERT (VARCHAR ( 20 ), #{deadTime}, 20)
+        and allpoint !=0
+        GROUP BY
+        begin_time
+    </select>
     <select id="selectTaskslogByDays" resultType="java.util.HashMap">
         SELECT
         row_number () OVER ( ORDER BY begin_time desc) id,
@@ -110,5 +126,41 @@
         </if>
         CONVERT (VARCHAR ( 20 ), begin_time, 20)  <![CDATA[ >= ]]>  CONVERT (VARCHAR ( 20 ), #{beginTime}, 20)
         AND CONVERT (VARCHAR ( 20 ), begin_time, 20) <![CDATA[ <= ]]>   CONVERT (VARCHAR ( 20 ), #{deadTime}, 20)
+    </select>
+    <!--统计完成率和到位率-->
+    <select id="selectwclAnddwlByyear" resultType="java.util.HashMap">
+        select inspect_person,sum(donepoint)*100/sum(allpoint) as wcl,sum(inplacepoint)*100/sum(allpoint) as dwl from BIZ_INSPECT
+        WHERE
+            inspect_person IS NOT NULL and allpoint !=0
+          AND CONVERT ( VARCHAR ( 20 ), datepart( yy, begin_time ), 20 ) = CONVERT ( VARCHAR ( 20 ), #{time}, 20 )
+        group by inspect_person
+    </select>
+    <select id="selectInspectMileByyear" resultType="java.util.HashMap">
+        select inspect_person,longitude,latitude from BIZ_TRACK
+        where inspect_person=#{username} and  CONVERT ( VARCHAR ( 20 ), datepart( yy, gps_time ), 20 ) = CONVERT ( VARCHAR ( 20 ), #{time}, 20 )
+        order by inspect_person, gps_time
+    </select>
+    <!--统计完成率和到位率-->
+    <select id="selectwclAnddwlBymonth" resultType="java.util.HashMap">
+        select inspect_person,sum(donepoint)*100/sum(allpoint) as wcl,sum(inplacepoint)*100/sum(allpoint) as dwl from BIZ_INSPECT
+        WHERE
+            inspect_person IS NOT NULL and allpoint !=0
+          AND CONVERT ( VARCHAR ( 20 ),  CAST( datepart( yy, begin_time ) AS VARCHAR )+'-'+CAST ( RIGHT('00'+ Datename(mm,begin_time),2) AS VARCHAR ), 20 ) = CONVERT ( VARCHAR ( 20 ), #{time}, 20 )
+        group by inspect_person
+    </select>
+    <select id="selectInspectMileBymonth" resultType="java.util.HashMap">
+        select inspect_person,longitude,latitude from BIZ_TRACK
+        where inspect_person=#{username} and  CONVERT ( VARCHAR ( 20 ),  CAST( datepart( yy, gps_time ) AS VARCHAR )+'-'+CAST ( RIGHT('00'+ Datename(mm,gps_time),2) AS VARCHAR ), 20 ) = CONVERT ( VARCHAR ( 20 ),  #{time}, 20 )
+        order by inspect_person, gps_time
+    </select>
+    <select id="selectOfficeInfoByYear" resultType="java.util.HashMap">
+        select water_management_office,sum(donepoint)*100/sum(allpoint) as wcl,sum(inplacepoint)*100/sum(allpoint) as dwl from BIZ_INSPECT
+        where CONVERT ( VARCHAR ( 20 ), datepart( yy, begin_time ), 20 ) = CONVERT ( VARCHAR ( 20 ), #{time}, 20 ) and allpoint !=0
+        group by water_management_office
+    </select>
+    <select id="selectOfficeInfoByMonth" resultType="java.util.HashMap">
+        select water_management_office,sum(donepoint)*100/sum(allpoint) as wcl,sum(inplacepoint)*100/sum(allpoint) as dwl from BIZ_INSPECT
+        where CONVERT ( VARCHAR ( 20 ),  CAST( datepart( yy, begin_time ) AS VARCHAR )+'-'+CAST ( RIGHT('00'+ Datename(mm,begin_time),2) AS VARCHAR ), 20 ) = CONVERT ( VARCHAR ( 20 ), #{time}, 20 ) and allpoint !=0
+        group by water_management_office
     </select>
 </mapper>

@@ -1,6 +1,6 @@
 spring:
     datasource:
-        url: jdbc:sqlserver://47.92.144.224:1433;DatabaseName=ybcloud-cs-activiti-6001;autoReconnect=true
+        url: jdbc:sqlserver://47.92.144.224:1433;DatabaseName=ybcloud-cs-activiti-6001
         username: sa
         password: yaoban #yaobanTech3131
         driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
@@ -8,7 +8,7 @@ spring:
         hikari:
             minimum-idle: 10 # 最小空闲连接数量
             maximum-pool-size: 60 # 连接池最大连接数，默认是10
-            auto-commit: true # 此属性控制从池返回的连接的默认自动提交行为,默认值：true
+            auto-commit: false # 此属性控制从池返回的连接的默认自动提交行为,默认值：true
             idle-timeout: 600000 # 空闲连接在池中存活最大时间，默认600000（10分钟）
             pool-name: HikariCP # 连接池的名称
             max-lifetime: 1800000 # 此属性控制池中连接的最长生命周期，值0表示无限生命周期，默认1800000即30分钟
@@ -23,7 +23,7 @@ spring:
         nacos:
             discovery:
                 server-addr: 192.168.50.91:8848
-                ip: 192.168.50.168
+                ip: 192.168.50.167
             config:
                 server-addr: 192.168.50.91:8848
                 file-extension: properties

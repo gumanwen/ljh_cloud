@@ -161,10 +161,24 @@ public class Inspect implements Serializable {
      */
     private String notinplace;
 
+    /**
+     * 任务总数
+     */
+    private int allpoint;
+    /**
+     * 已完成签到点
+     */
+    private int donepoint;
+    /**
+     * 已到位签到点
+     */
+    private int inplacepoint;
+
+
     public Inspect() {
     }
 
-    public Inspect(String inspectTaskId, String waterManagementOffice, String diameter, String beginTime, String deadTime, String actBeginTime, String actEndTime, String status, String inspectPerson, String name, String sender, String completeRate, String arrivalRate, String liveSitustion, String checkInPointSituation, String gisMap, String taskType, String sendTime, String overReason, String modifyBy, String completeTime, Integer planId, Integer routeId, String cycle, String result, String createTime, String endReason, String endTime, String notinplace) {
+    public Inspect(String inspectTaskId, String waterManagementOffice, String diameter, String beginTime, String deadTime, String actBeginTime, String actEndTime, String status, String inspectPerson, String name, String sender, String completeRate, String arrivalRate, String liveSitustion, String checkInPointSituation, String gisMap, String taskType, String sendTime, String overReason, String modifyBy, String completeTime, Integer planId, Integer routeId, String cycle, String result, String createTime, String endReason, String endTime, String notinplace, int allpoint, int donepoint, int inplacepoint) {
         this.inspectTaskId = inspectTaskId;
         this.waterManagementOffice = waterManagementOffice;
         this.diameter = diameter;
@@ -194,6 +208,33 @@ public class Inspect implements Serializable {
         this.endReason = endReason;
         this.endTime = endTime;
         this.notinplace = notinplace;
+        this.allpoint = allpoint;
+        this.donepoint = donepoint;
+        this.inplacepoint = inplacepoint;
+    }
+
+    public int getInplacepoint() {
+        return inplacepoint;
+    }
+
+    public void setInplacepoint(int inplacepoint) {
+        this.inplacepoint = inplacepoint;
+    }
+
+    public int getAllpoint() {
+        return allpoint;
+    }
+
+    public void setAllpoint(int allpoint) {
+        this.allpoint = allpoint;
+    }
+
+    public int getDonepoint() {
+        return donepoint;
+    }
+
+    public void setDonepoint(int donepoint) {
+        this.donepoint = donepoint;
     }
 
     public String getInspectTaskId() {

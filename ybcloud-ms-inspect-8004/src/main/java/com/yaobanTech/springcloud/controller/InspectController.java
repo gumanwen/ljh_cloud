@@ -229,6 +229,11 @@ public class InspectController {
     public RespBean getcloseValues(String gid){
         return iInspectService.getcloseValues(gid); }
 
+    @ApiOperation("/阀门和水厂连通性")
+    @GetMapping("/updateIsUp")
+    public RespBean updateIsUp(){
+        return iInspectService.updateIsUp(); }
+
     @ApiOperation("openfeign: 路线是否可修改")
     @GetMapping("/isModifiable")
     public Object isModifiable(Integer routeId) {

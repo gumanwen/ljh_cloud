@@ -1127,6 +1127,11 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         //5：关闭上游阀门
         return RespBean.ok("").setObj(result);
     }
+    //提前生成好阀门流向水厂关系表
+    public RespBean updateIsUp(){
+
+        return RespBean.ok("生成成功，请查看数据更新情况！");
+    }
     //关阀分析中阀门判断与水厂的连通性
     public Boolean findUpvalues(HashSet<Test> alllist,HashSet<Test> list,Integer id,int n) {
         n+=1;
@@ -1244,7 +1249,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         }
         int s = test.getSource();
         int t = test.getTarget();
-        test.setPid(test.getPid());
+        test.setPid(0);
         //判断s、t是不是阀门
         if(FieldUtils.isObjectNotEmpty(test.getTvid())){
             //第一个阀门就是该 svid

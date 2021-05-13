@@ -9,6 +9,7 @@ import com.yaobanTech.springcloud.pojos.UserInfo;
 import com.yaobanTech.springcloud.utils.FieldUtils;
 import com.yaobanTech.springcloud.utils.UrlUtils;
 import io.jsonwebtoken.Jwts;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,7 +20,11 @@ import org.springframework.security.oauth2.provider.endpoint.TokenEndpoint;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.servlet.resource.HttpResource;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.*;
@@ -415,26 +420,87 @@ public class UserRightsService {
         }
     }
 
-    public RespBean selectUserByRole(String role) {
+    public RespBean selectUserByRole(String role, Integer type,String token) {
         if(FieldUtils.isStringNotEmpty(role)){
-            List<HashMap<String,String>> list = userMapper.selectUserByRole(role);
-            return RespBean.ok("").setObj(list);
+            if(type == 1){
+                List<User> list = userMapper.selectUserByRole(role);
+                return RespBean.ok("").setObj(list);
+            }else{
+                List<User> list  = urlUtils.selectUserByRole(role,"",token);
+                return RespBean.ok("").setObj(list);
+            }
         }else{
             return RespBean.error("缺少角色代码！");
         }
     }
 
-    public RespBean getNameByUsername(String username) {
-        if(FieldUtils.isStringNotEmpty(username)){
-            User user = userMapper.loadUserByUsername(username);
-            if(FieldUtils.isObjectNotEmpty(user)){
-                return RespBean.ok("").setObj(user.getName());
+    public RespBean selectUserByRoleAndDept(String role, String dept, Integer type, String token) {
+        if(FieldUtils.isStringNotEmpty(role)){
+            if(type == 1){
+                List<User> list = userMapper.selectUserByRole(role);
+                return RespBean.ok("").setObj(list);
+            }else{
+                //翻译用水管理所到表里的字段
+                if("3".equals(dept)){
+                    dept = "2";
+                }else if("4".equals(dept)){
+                    dept = "3";
+                }else{
+                    dept = "4";
+                }
+                List<User> list  = urlUtils.selectUserByRole(role,dept,token);
+                return RespBean.ok("").setObj(list);
             }
-            return RespBean.error("数据库不存在该账号！");
+        }else{
+            return RespBean.error("缺少角色代码！");
+        }
+    }
+
+    public RespBean getNameByUsername(String username, Integer type,String token) {
+        if(FieldUtils.isStringNotEmpty(username)){
+            if(type == 1){
+                User user = userMapper.loadUserByUsername(username);
+                if(FieldUtils.isObjectNotEmpty(user)){
+                    return RespBean.ok("").setObj(user.getName());
+                }
+                return RespBean.error("数据库不存在该账号！");
+            }else{
+                String name = urlUtils.getNameByuser(username,token);
+                return RespBean.ok("").setObj(name);
+            }
         }
         return RespBean.error("参数账号为空！");
     }
 
+    public RespBean getAllNameByUsername(List<String> namelist, HttpServletRequest request) throws UnsupportedEncodingException {
+        List<HashMap<String,String>> result = new ArrayList<>();
+        Integer ttype = null;
+        //String tokenT = request.getHeader("TW-AUTH-HEADER");
+        String tokenT = request.getHeader("TW-Authorization");
+        String token = null;
+        LoginUser loginUser = null;
+        if(FieldUtils.isStringNotEmpty(tokenT)){
+            token = URLDecoder.decode(tokenT,"UTF-8");
+            ttype = 2;
+        }else{
+            ttype = 1;
+            String header = request.getHeader("Authorization");
+            token =  StringUtils.substringAfter(header, "Bearer ");
+        }
+        if(ttype == 1){
+            result = userMapper.loadAllUserByUsername(namelist);
+        }else{
+            if(namelist.size()>0){
+                for (int i = 0; i < namelist.size(); i++) {
+                    HashMap<String,String> temp =new HashMap<>();
+                    temp.put("username",namelist.get(i));
+                    temp.put("name",urlUtils.getNameByuser(namelist.get(i),token));
+                    result.add(temp);
+                }
+            }
+        }
+        return RespBean.ok("").setObj(result);
+    }
     public RespBean getCurrentUser(String token) {
         Map map= Jwts.parser()
                 .setSigningKey("ybcloud".getBytes(StandardCharsets.UTF_8))
@@ -481,6 +547,7 @@ public class UserRightsService {
                 User user = userMapper.loadUserByUsername(username);
                 u.setName(user.getName());
                 loginuser.setName(user.getName());
+                loginuser.setDeptName(user.getDepartment());
             }
             loginuser.setLoginname(username);
             loginuser.setRoleLists(String.valueOf(object));
@@ -491,4 +558,5 @@ public class UserRightsService {
         }
         return RespBean.ok("").setObj(loginuser);
     }
+
 }

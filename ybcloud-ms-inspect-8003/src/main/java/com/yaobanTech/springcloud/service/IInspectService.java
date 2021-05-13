@@ -23,13 +23,13 @@ public interface IInspectService extends IService<Inspect> {
 
     RespBean getTempInspect(String type);
 
-    RespBean getInspectDetailById(String inspect_task_id) throws IllegalAccessException;
+    RespBean getInspectDetailById(String inspect_task_id,HttpServletRequest request) throws IllegalAccessException, UnsupportedEncodingException, ParseException;
 
     RespBean updateInspectDetailById(Map<String,Object> params);
 
     RespBean addTempTask(String waterManagementOffice,Integer routeId,String  routeName ,String inspector,String beginTime,String endTime) throws ParseException;
 
-    RespBean addPlanTask(String waterManagementOffice,Integer routeId,String  routeName ,Integer planId,String planName) throws ParseException;
+    RespBean addPlanTask(String waterManagementOffice,Integer routeId,String  routeName ,Integer planId,String planName,HttpServletRequest request) throws ParseException, UnsupportedEncodingException;
 
     RespBean getCheckInPoints(Integer routeId,String inspectTaskId);
 
@@ -39,7 +39,7 @@ public interface IInspectService extends IService<Inspect> {
 
     RespBean getAllInspectByPlanId(Integer planId);
 
-    RespBean autoCreate(Map<String, Object> params) throws ParseException;
+    RespBean autoCreate(Map<String, Object> params,HttpServletRequest request) throws ParseException, UnsupportedEncodingException;
 
     RespBean send(Map<String, Object> params,HttpServletRequest request) throws UnsupportedEncodingException;
 
@@ -49,7 +49,7 @@ public interface IInspectService extends IService<Inspect> {
 
     RespBean findSignedList(Integer routeId, String inspectTaskId);
 
-    RespBean getTaskListByTime(Date begin_time1, Date begin_time2, Date dead_time1, Date dead_time2,String checkMan);
+    RespBean getTaskListByTime(Date begin_time1, Date begin_time2, Date dead_time1, Date dead_time2,String checkMan,HttpServletRequest request) throws UnsupportedEncodingException;
 
     RespBean stop(String inspectTaskId);
 
@@ -71,5 +71,13 @@ public interface IInspectService extends IService<Inspect> {
 
     RespBean isModifiable(Integer routeId);
 
+    RespBean uploadDeviceGPS(Map<String, Object> params);
 
+    RespBean getDeviceInfo(HttpServletRequest request) throws ParseException, UnsupportedEncodingException;
+
+    RespBean getMapOverviewInfo(String t,String unit,HttpServletRequest request) throws UnsupportedEncodingException;
+
+    RespBean selectUserByRole(String role,HttpServletRequest request) throws UnsupportedEncodingException;
+
+    RespBean selectUserByRoleAndDept(String role, String waterManagementOffice, HttpServletRequest request) throws UnsupportedEncodingException;
 }

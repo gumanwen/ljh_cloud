@@ -23,7 +23,7 @@ spring:
         nacos:
             discovery:
                 server-addr: 192.168.50.91:8848
-                ip: 192.168.50.168
+                ip: 192.168.50.167
             config:
                 server-addr: 192.168.50.91:8848
                 file-extension: properties
@@ -52,7 +52,7 @@ mybatis-plus:
         call-setters-on-nulls: true
 server:
     port: 6003
-    ip: 192.168.50.168
+    ip: 192.168.50.167
 management:
     endpoint:
         health:
@@ -62,4 +62,6 @@ ribbon:
     ReadTimeout: 7000
 qyserver:
     ipAdd: http://119.135.180.178:8850/api/auth/user/get
+    userAdd: http://119.135.180.178:8850/api/auth/user
+    roleAdd: http://119.135.180.178:8850/api/auth/user/sub/list
 #http://218.17.45.99:8850/api/auth/user/get

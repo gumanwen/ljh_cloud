@@ -62,3 +62,7 @@ ribbon:
     ReadTimeout: 7000
 qyserver:
     ipAdd: http://119.135.180.178:8850/api/auth/user/get
+    userAdd: http://119.135.180.178:8850/api/auth/user
+    roleAdd: http://119.135.180.178:8850/api/auth/user/sub/list
+    allroleAdd: http://119.135.180.178:8850/api/auth/role/all
+    alldeptAdd: http://119.135.180.178:8850/api/auth/dept/all

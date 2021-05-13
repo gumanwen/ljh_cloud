@@ -7,12 +7,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.netflix.ribbon.proxy.annotation.Http;
-import com.yaobanTech.springcloud.entity.Inspect;
-import com.yaobanTech.springcloud.entity.LoginUser;
-import com.yaobanTech.springcloud.entity.Test;
-import com.yaobanTech.springcloud.entity.Track;
+import com.yaobanTech.springcloud.entity.*;
 import com.yaobanTech.springcloud.entity.utils.RedisGeneratorCode;
 import com.yaobanTech.springcloud.entity.utils.RespBean;
+import com.yaobanTech.springcloud.mapper.DeviceMapper;
 import com.yaobanTech.springcloud.mapper.InspectMapper;
 import com.yaobanTech.springcloud.mapper.TestMapper;
 import com.yaobanTech.springcloud.mapper.TrackMapper;
@@ -21,6 +19,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yaobanTech.springcloud.service.feign.*;
 import com.yaobanTech.springcloud.utils.DateUtils;
 import com.yaobanTech.springcloud.utils.FieldUtils;
+import com.yaobanTech.springcloud.utils.NumberUtils;
 import com.yaobanTech.springcloud.utils.UrlUtils;
 import io.jsonwebtoken.Jwts;
 import org.slf4j.Logger;
@@ -56,6 +55,9 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
     private TrackMapper trackMapper;
 
     @Autowired
+    private DeviceMapper deviceMapper;
+
+    @Autowired
     private TestMapper testMapper;
 
     @Autowired
@@ -85,8 +87,10 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
 
     SimpleDateFormat yeardateFormat= new SimpleDateFormat("yyyy");
 
-
     private static final Logger logger = LoggerFactory.getLogger(InspectServiceImpl.class);
+
+    // 计算两点距离
+    private final double EARTH_RADIUS = 6378137.0;
 
     @Value("${server.ip}")
     private String ip;
@@ -105,10 +109,12 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         String username = null;
         String roles = null;
         LoginUser u = urlUtils.getAll(request);
+        String token = urlUtils.getToken(request);
+        Integer ttype =urlUtils.getType(request);
         username = u.getLoginname();
         roles = u.getRoleLists();
         //根据当前登陆人
-        String date = dateFormat.format(new Date());
+        String date = daydateFormat.format(new Date());
         String status =null;
         //创建对象
         QueryWrapper<Inspect> queryWrapper = new QueryWrapper<>();
@@ -128,30 +134,14 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
             if(FieldUtils.isObjectNotEmpty(map.get("end_d2"))){
                 Date end_d2 =  new Date(Long.parseLong((String) map.get("end_d2")));
                 queryWrapper.apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),end_time,20) <= convert(varchar(20),'"+end_d2+"',20)");}
-            feignRespBean = routeService.findRouteIds((String)FieldUtils.ifObjectEmptyToNullStr(map.get("waterManagementOffice")), (Integer) map.get("routeName"),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("pointInspectionType")), (Integer) map.get("planName"),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("planPorid")),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("planType")));
+            feignRespBean = routeService.findRouteIds((String)FieldUtils.ifObjectEmptyToNullStr(map.get("waterManagementOffice")), (Integer) map.get("routeName"),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("pointInspectionType")), (Integer) map.get("planName"),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("planPorid")),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("planType")),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("routeType")));
         }
-        List<HashMap<String,Object>> feignMap = (List<HashMap<String, Object>>) feignRespBean.getObj();
-        /*if (FieldUtils.isObjectNotEmpty(feignMap)){
-            if(feignMap.size()>0){
-                *//*for (int i = 0; i < feignMap.size(); i++) {
-                    *//**//*if (i == 0) {
-                        queryWrapper.eq("route_id", feignMap.get(0).get("routeIds"));
-                        queryWrapper.eq("plan_id", feignMap.get(0).get("planIds"));
-                    } else {*//**//*
-                    Integer routeIds = Integer.valueOf((Integer) feignMap.get(i).get("routeIds"));
-                    Integer planIds = Integer.valueOf((Integer) feignMap.get(i).get("planIds"));
-                    queryWrapper.and(inspectQueryWrapper -> inspectQueryWrapper.or(wrapper -> wrapper.eq("plan_id", routeIds).eq("plan_id", planIds)));
+        List<HashMap<String,Object>> feignlist = (List<HashMap<String, Object>>) feignRespBean.getObj();
 
-                }*//*
-            }else{
-                queryWrapper.eq("route_id","");
-                queryWrapper.eq("plan_id","");
-            }
-        }*/
         if(FieldUtils.isObjectNotEmpty(map.get("tasktype"))){
             queryWrapper.eq("task_type",map.get("tasktype"));
         }
-        if(feignMap.size()>0){
+        /*if(feignMap.size()>0){
             queryWrapper.and(wrapper -> {
                 for(HashMap<String,Object> info: feignMap){
                     wrapper.or()
@@ -162,7 +152,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         }else{
             queryWrapper.eq("route_id",0);
             queryWrapper.eq("plan_id",0);
-        }
+        }*/
         RespBean respBean = new RespBean();
         List<Inspect> list = new ArrayList<>();
         List<Map<String,Object>> resultList = new ArrayList<>();
@@ -174,6 +164,11 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
             }
         }else{
             queryWrapper.eq("inspect_person",username);
+        }
+        //前端选择全部之后，pagesize就是最大数值
+        if(pageSize == 1){
+            QueryWrapper<Inspect> query = new QueryWrapper<>();
+            pageSize = inspectMapper.selectList(query).size();
         }
         IPage<Inspect> page = new Page<Inspect>(pageNo,pageSize);
         page =inspectMapper.selectPage(page,queryWrapper);
@@ -201,7 +196,6 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         }else if("4".equals(type)){
             queryWrapper.eq("status","未派发");
             respBean.setMsg("未派发列表");
-
         }else if("5".equals(type)){
             queryWrapper.and(wrapper ->wrapper.eq("status","未处理").or().eq("status","处理中").or().eq("status","已完成").or().eq("status","已延期"));
             respBean.setMsg("已派发列表");
@@ -221,57 +215,53 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                 Map<String, Object> map2 = new HashMap<String, Object>();
                 Map<String, Object> map3 = new HashMap<String, Object>();
                 Inspect inspect = list.get(i);
+                map1 = FieldUtils.objectToMap(inspect);
+                map1.put("routeName","");
+                map1.put("routeType","");
+                map1.put("waterManagementOffice", "");
+                map1.put("planInspectionMileage", "");
+                map1.put("pointInspectionType", "");
+                map1.put("hiddenDangerAmount", "");
+                map1.put("overReason", "");
+                map1.put("signIn", "");
+                map1.put("waterOfficeMenu", "");
+                map1.put("routeTypeMenu", "");
+                map1.put("pointInspectionTypeMenu", "");
+                map1.put("planName", "");
+                map1.put("planType", "");
+                map1.put("planPorid", "");
+                map1.put("planTypeMenu","");
+                map1.put("planPoridMenu","");
                 //创建对象
-                if(FieldUtils.isObjectNotEmpty(inspect.getRouteId())){
+                /*if(FieldUtils.isObjectNotEmpty(inspect.getRouteId())){
                     map2 = (Map<String, Object>) routeService.findDetail(inspect.getRouteId()).getObj();
                 }
                 if(FieldUtils.isObjectNotEmpty(inspect.getPlanId())){
                     map3 = (Map<String, Object>) planService.findById(inspect.getPlanId()).getObj();
-                }
-                if(FieldUtils.isObjectNotEmpty(map2)) {
-                    // 合并
-                    Map<String, Object> combineResultMap = new HashMap<String, Object>();
-                    map1 = FieldUtils.objectToMap(inspect);
-                    map1.put("routeName", FieldUtils.ifObjectEmpty(map2.get("routeName")));
-                    map1.put("routeType", FieldUtils.ifObjectEmpty(map2.get("routeType")));
-                    map1.put("waterManagementOffice", FieldUtils.ifObjectEmpty(map2.get("waterManagementOffice")));
-                    map1.put("planInspectionMileage", FieldUtils.ifObjectEmpty(map2.get("planInspectionMileage")));
-                    map1.put("pointInspectionType", FieldUtils.ifObjectEmpty(map2.get("pointInspectionType")));
-                    map1.put("hiddenDangerAmount", FieldUtils.ifObjectEmpty(map2.get("hiddenDangerAmount")));
-                    map1.put("overReason", FieldUtils.ifObjectEmpty(map2.get("overReason")));
-                    map1.put("signIn", FieldUtils.ifObjectEmpty(map2.get("signIn")));
-                    map1.put("waterOfficeMenu", FieldUtils.ifObjectEmpty(map2.get("waterOfficeMenu")));
-                    map1.put("routeTypeMenu", FieldUtils.ifObjectEmpty(map2.get("routeTypeMenu")));
-                    map1.put("pointInspectionTypeMenu", FieldUtils.ifObjectEmpty(map2.get("pointInspectionTypeMenu")));
-                }else{
-                    // 合并
-                    Map<String, Object> combineResultMap = new HashMap<String, Object>();
-                    map1 = FieldUtils.objectToMap(inspect);
-                    map1.put("routeName","");
-                    map1.put("routeType","");
-                    map1.put("waterManagementOffice", "");
-                    map1.put("planInspectionMileage", "");
-                    map1.put("pointInspectionType", "");
-                    map1.put("hiddenDangerAmount", "");
-                    map1.put("overReason", "");
-                    map1.put("signIn", "");
-                    map1.put("waterOfficeMenu", "");
-                    map1.put("routeTypeMenu", "");
-                    map1.put("pointInspectionTypeMenu", "");
-                }
-                if(FieldUtils.isObjectNotEmpty(map3)){
-                    Map<String, Object> combineResultMap = new HashMap<String, Object>();
-                    map1.put("planName", FieldUtils.ifObjectEmpty(map3.get("planName")));
-                    map1.put("planType", FieldUtils.ifObjectEmpty(map3.get("planType")));
-                    map1.put("planPorid", FieldUtils.ifObjectEmpty(map3.get("planPorid")));
-                    map1.put("planTypeMenu", FieldUtils.ifObjectEmpty(map3.get("planTypeMenu")));
-                    map1.put("planPoridMenu",FieldUtils.ifObjectEmpty(map3.get("planPoridMenu")));
-                }else{
-                    map1.put("planName", "");
-                    map1.put("planType", "");
-                    map1.put("planPorid", "");
-                    map1.put("planTypeMenu","");
-                    map1.put("planPoridMenu","");
+                }*/
+                if(feignlist.size()>0){
+                    for (int j = 0; j < feignlist.size(); j++) {
+                        if(list.get(i).getRouteId().equals(feignlist.get(j).get("route_id")) && list.get(i).getPlanId().equals(feignlist.get(j).get("plan_id"))){
+                            map1 = FieldUtils.objectToMap(inspect);
+                            map1.put("routeName", FieldUtils.ifObjectEmpty(feignlist.get(j).get("route_name")));
+                            map1.put("routeType", FieldUtils.ifObjectEmpty(feignlist.get(j).get("route_type")));
+                            map1.put("waterManagementOffice", FieldUtils.ifObjectEmpty(feignlist.get(j).get("water_management_office")));
+                            map1.put("planInspectionMileage", FieldUtils.ifObjectEmpty(feignlist.get(j).get("plan_inspection_mileage")));
+                            map1.put("pointInspectionType", FieldUtils.ifObjectEmpty(feignlist.get(j).get("point_inspection_type")));
+                            map1.put("hiddenDangerAmount", FieldUtils.ifObjectEmpty(feignlist.get(j).get("hidden_danger_amount")));
+                            map1.put("overReason", FieldUtils.ifObjectEmpty(feignlist.get(j).get("over_reason")));
+                            map1.put("signIn", FieldUtils.ifObjectEmpty(feignlist.get(j).get("sign_in")));
+                            map1.put("waterOfficeMenu", FieldUtils.ifObjectEmpty(feignlist.get(j).get("water_office_menu")));
+                            map1.put("routeTypeMenu", FieldUtils.ifObjectEmpty(feignlist.get(j).get("route_type_menu")));
+                            map1.put("pointInspectionTypeMenu", FieldUtils.ifObjectEmpty(feignlist.get(j).get("point_inspection_type_menu")));
+
+                            map1.put("planName", FieldUtils.ifObjectEmpty(feignlist.get(j).get("plan_name")));
+                            map1.put("planType", FieldUtils.ifObjectEmpty(feignlist.get(j).get("plan_type")));
+                            map1.put("planPorid", FieldUtils.ifObjectEmpty(feignlist.get(j).get("plan_porid")));
+                            map1.put("planTypeMenu", FieldUtils.ifObjectEmpty(feignlist.get(j).get("plan_type_menu")));
+                            map1.put("planPoridMenu",FieldUtils.ifObjectEmpty(feignlist.get(j).get("plan_porid_menu")));
+                        }
+                    }
                 }
                 resultList.add(map1);
             }
@@ -281,9 +271,9 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         return RespBean.ok("").setObj(result);
     }
 
-    private List<Inspect> getlistName(List<Inspect> list) {
+    private List<Inspect> getlistName(List<Inspect> list,HttpServletRequest request) throws UnsupportedEncodingException {
         //获取人员名称列表
-        RespBean respBean = authService.selectUserByRole("ROLE_BZY");
+        RespBean respBean = urlUtils.selectUserByRole("ROLE_BZY",request);
         List<HashMap<String,String>> userlist = (List<HashMap<String, String>>) respBean.getObj();
         if(list.size()>0){
             for (int i = 0; i < list.size(); i++) {
@@ -325,7 +315,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
     }
 
     @Override
-    public RespBean getInspectDetailById(String inspect_task_id) throws IllegalAccessException {
+    public RespBean getInspectDetailById(String inspect_task_id,HttpServletRequest request) throws IllegalAccessException, UnsupportedEncodingException, ParseException {
         if(FieldUtils.isStringNotEmpty(inspect_task_id)){
             Map<String, Object> map1 = new HashMap<String, Object>();
             Map<String, Object> map2 = new HashMap<String, Object>();
@@ -334,7 +324,8 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
             QueryWrapper<Inspect> queryWrapper = new QueryWrapper<>();
             QueryWrapper<Track> query = new QueryWrapper<>();
             Inspect inspect = inspectMapper.selectOne(queryWrapper.eq("inspect_task_id",inspect_task_id));
-            query.eq("inspect_task_id",inspect_task_id);
+            query.eq("inspect_person",inspect.getInspectPerson());
+            String person = inspect.getInspectPerson();
             if(FieldUtils.isObjectNotEmpty(inspect)){
                 if(FieldUtils.isObjectNotEmpty(inspect.getRouteId())){
                     map2 = (Map<String, Object>) routeService.findDetail(inspect.getRouteId()).getObj();
@@ -354,11 +345,30 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                 if(FieldUtils.isObjectNotEmpty(map1)){
                     combineResultMap.putAll(map1);
                 }
+                String date = dateFormat.format(new Date());
+                Date endDate = new Date();
                 //查出作业前和作业后的附件
                 List<HashMap<String,Object>> qfilelist = (List<HashMap<String, Object>>) fileService.selectOneByPid(inspect_task_id,"作业前").getObj();
                 List<HashMap<String,Object>> hfilelist = (List<HashMap<String, Object>>) fileService.selectOneByPid(inspect_task_id,"作业后").getObj();
-                //根据任务编号查出gps轨迹
-                List<Track> tracklist = trackMapper.selectList(query);
+                //根据任务编号查出gps轨迹,判断是否任务已开始有轨迹,没有开始就没有轨迹
+                List<Track> tracklist = new ArrayList<>();
+                if(FieldUtils.isObjectNotEmpty(inspect.getActBeginTime())){
+                    System.out.println(inspect_task_id+"开始时间不为空,开始时间是:"+inspect.getActBeginTime());
+                    //说明任务已开始
+                    if(FieldUtils.isObjectNotEmpty(inspect.getActEndTime())){
+                        //说明任务做完了
+                        System.out.println(inspect_task_id+"结束时间不为空,结束时间是:"+inspect.getActEndTime());
+                        query.apply("convert(varchar(20),gps_time,20) >= convert(varchar(20),'"+inspect.getActBeginTime()+"',20)");
+                        query.apply("convert(varchar(20),gps_time,20) <= convert(varchar(20),'"+inspect.getActEndTime()+"',20)");
+                        tracklist = trackMapper.selectList(query);
+                    }else{
+                        //和目前时间作比较
+                        System.out.println(inspect_task_id+"结束时间为空");
+                        query.apply("convert(varchar(20),gps_time,20) >= convert(varchar(20),'"+inspect.getActBeginTime()+"',20)");
+                        query.apply("convert(varchar(20),gps_time,20) <= convert(varchar(20),'"+date+"',20)");
+                        tracklist = trackMapper.selectList(query);
+                    }
+                }
                 combineResultMap.put("tracklist",tracklist);
                 combineResultMap.put("qfilelist",qfilelist);
                 combineResultMap.put("hfilelist",hfilelist);
@@ -413,11 +423,12 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
 
     @Override
     @Transactional
-    public RespBean addPlanTask(String waterManagementOffice,Integer routeId,String  routeName ,Integer planId,String planName) throws ParseException {
+    public RespBean addPlanTask(String waterManagementOffice,Integer routeId,String  routeName ,Integer planId,String planName,HttpServletRequest request) throws ParseException, UnsupportedEncodingException {
         if(FieldUtils.isObjectNotEmpty(planId) && FieldUtils.isObjectNotEmpty(routeId) ){
             RespBean re = planService.findById(planId);
             Map map = (Map) re.getObj();
             Map enumMap = new HashMap();
+            Map<String, Object> tempmap =new HashMap<>();
             String cycleStr = null;
             if(FieldUtils.isObjectNotEmpty(map.get("planPorid")) && FieldUtils.isObjectNotEmpty(map.get("startTime")) && FieldUtils.isObjectNotEmpty(map.get("endTime"))){
                 Date start =  daydateFormat.parse((String) map.get("startTime"));
@@ -429,7 +440,9 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                         cycleStr = (String) enumMap.get("desc");
                     }
                 }
-                createTask(start,end,cycleStr,routeId,planId,waterManagementOffice,"");
+                tempmap = (Map<String, Object>) routeService.findDetail(routeId).getObj();
+                int all = (int) tempmap.get("signIn");
+                createTask(start,end,cycleStr,routeId,planId,waterManagementOffice,"",all,"2");
                 return RespBean.ok("参数为空！");
 
             }else{
@@ -442,9 +455,10 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
 
     @Override
     @Transactional
-    public RespBean autoCreate(Map<String, Object> params) throws ParseException {
+    public RespBean autoCreate(Map<String, Object> params,HttpServletRequest request) throws ParseException, UnsupportedEncodingException {
         String cycleStr =null;
         Map enumMap = new HashMap();
+        Map<String, Object> map = new HashMap<>();
         if(FieldUtils.isObjectNotEmpty(params.get("waterManagementOffice")) && FieldUtils.isObjectNotEmpty(params.get("planId")) && FieldUtils.isObjectNotEmpty(params.get("routeId"))){
             if(FieldUtils.isObjectNotEmpty(params.get("period")) && FieldUtils.isObjectNotEmpty(params.get("startTime")) && FieldUtils.isObjectNotEmpty(params.get("endTime"))){
                 String waterManagementOffice = (String) params.get("waterManagementOffice");
@@ -461,7 +475,10 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                         cycleStr = (String) enumMap.get("desc");
                     }
                 }
-                return createTask(start,end,cycleStr,routeId,planId,waterManagementOffice,diameter);
+                //获取路线详情
+                map = (Map<String, Object>) routeService.findDetail(routeId).getObj();
+                int all = (int) map.get("signIn");
+                return createTask(start,end,cycleStr,routeId,planId,waterManagementOffice,diameter,all,"1");
             }else{
                 return RespBean.error("计划开始时间，计划结束时间或计划周期不完整，无法创建计划任务！");
             }
@@ -470,37 +487,90 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         }
     }
 
-    public RespBean createTask(Date start,Date end,String cycleStr,Integer routeId,Integer planId,String waterManagementOffice,String diameter) throws ParseException {
+    public RespBean createTask(Date start,Date end,String cycleStr,Integer routeId,Integer planId,String waterManagementOffice,String diameter,int all,String type) throws ParseException {
+        Integer cycle  = NumberUtils.numberTransform(cycleStr.substring(0,1));
+        int days=0;//相差几个单位的时间
+        int nums=0;//任务的数量
+        //如果按照天去巡查
+        if(cycleStr.contains("天")){
+            days = DateUtils.daysBetween(start,end)+1;
+            nums = (int) Math.floor(days/cycle);
+        }else if(cycleStr.contains("周")){
+            days = DateUtils.daysBetween(start,end)+1;
+            nums = (int) Math.floor(days/7/cycle);
+        }else if(cycleStr.contains("月")){
+            days = DateUtils.monthsBetween(start,end)+1;
+            nums = (int) Math.floor(days/cycle);
+        }else if(cycleStr.contains("季")){
+            days = DateUtils.monthsBetween(start,end)+1;
+            nums = (int) Math.floor(days/3/cycle);
+        }else if(cycleStr.contains("年")){
+            days = DateUtils.yearsBetween(start,end)+1;
+            nums = (int) Math.floor(days/cycle);
+        }
         List<String> list = new ArrayList<>();
-        int days = DateUtils.daysBetween(start,end)+1;
-        Integer cycle = Integer.valueOf(cycleStr.substring(0,1));
-        int nums = (int) Math.floor(days/cycle);
-        String date = dateFormat.format(new Date());
-        if(nums>0){
-            for(int i=0;i<nums;i++){
-                Inspect inspect = new Inspect();
-                String inspect_task_id = "";
-                inspect_task_id = redisGeneratorCode.createGenerateCode("计划任务","JH",true,4);
-                logger.info("生成的任务编号："+inspect_task_id +"------------------------");
-                inspect.setInspectTaskId(inspect_task_id);
-                inspect.setBeginTime(daydateFormat.format(DateUtils.daysAdd(start,cycle*i)));
-                inspect.setDeadTime(daydateFormat.format(DateUtils.daysAdd(start,cycle*(i+1)-1)));
-                inspect.setPlanId(planId);
-                inspect.setRouteId(routeId);
-                inspect.setTaskType("计划任务");
-                inspect.setCompleteRate("0");
-                inspect.setStatus("未派发");
-                inspect.setWaterManagementOffice(waterManagementOffice);
-                inspect.setDiameter(diameter);
-                inspect.setCycle(cycleStr);
-                inspect.setCreateTime(date);
-                list.add(inspect_task_id);
-                inspectMapper.insert(inspect);
+        /*int days = DateUtils.daysBetween(start,end)+1;*/
+        /*cycle = Integer.valueOf(cycleStr.substring(0,1));*/
+        if(FieldUtils.isObjectNotEmpty(routeId)){
+            String date = dateFormat.format(new Date());
+            if(nums>0){
+                for(int i=0;i<nums;i++){
+                    Inspect inspect = new Inspect();
+                    String inspect_task_id = "";
+                    if("3".equals(waterManagementOffice)){
+                        inspect_task_id = redisGeneratorCode.createGenerateCode("城南计划任务","CN",true,4);
+                    }else if("4".equals(waterManagementOffice)){
+                        inspect_task_id = redisGeneratorCode.createGenerateCode("城北计划任务","CB",true,4);
+                    }else{
+                        inspect_task_id = redisGeneratorCode.createGenerateCode("石角计划任务","SJ",true,4);
+                    }
+
+                    logger.info("生成的任务编号："+inspect_task_id +"------------------------");
+                    inspect.setInspectTaskId(inspect_task_id);
+                    if(cycleStr.contains("天")){
+                        inspect.setBeginTime(daydateFormat.format(DateUtils.daysAdd(start,cycle*i)));
+                        inspect.setDeadTime(daydateFormat.format(DateUtils.daysAdd(start,cycle*(i+1)-1)));
+                    }else if(cycleStr.contains("周")){
+                        inspect.setBeginTime(daydateFormat.format(DateUtils.daysAdd(start,cycle*i*7)));
+                        inspect.setDeadTime(daydateFormat.format(DateUtils.daysAdd(start,cycle*(i+1)*7-1)));
+                    }else if(cycleStr.contains("月")){
+                        inspect.setBeginTime(daydateFormat.format(DateUtils.monthsAdd(start,cycle*i)));
+                        inspect.setDeadTime(daydateFormat.format(DateUtils.daysAdd(DateUtils.monthsAdd(start,cycle*(i+1)),-1)));
+                    }else if(cycleStr.contains("季")){
+                        inspect.setBeginTime(daydateFormat.format(DateUtils.monthsAdd(start,cycle*i*3)));
+                        inspect.setDeadTime(daydateFormat.format(DateUtils.daysAdd(DateUtils.monthsAdd(start,cycle*(i+1)*3),-1)));
+                    }else if(cycleStr.contains("年")){
+                        inspect.setBeginTime(daydateFormat.format(DateUtils.yearsAdd(start,cycle*i)));
+                        inspect.setDeadTime(daydateFormat.format(DateUtils.daysAdd(DateUtils.yearsAdd(start,cycle*(i+1)),-1)));
+                    }
+                    inspect.setPlanId(planId);
+                    inspect.setRouteId(routeId);
+                    inspect.setTaskType("计划任务");
+                    inspect.setCompleteRate("0");
+                    inspect.setStatus("未派发");
+                    inspect.setWaterManagementOffice(waterManagementOffice);
+                    inspect.setDiameter(diameter);
+                    inspect.setCycle(cycleStr);
+                    inspect.setCreateTime(date);
+                    inspect.setAllpoint(all);
+                    inspect.setDonepoint(0);
+                    inspect.setInplacepoint(0);
+                    list.add(inspect_task_id);
+                    inspectMapper.insert(inspect);
+                }
+            }
+            //feign接口 routeService
+            System.out.println("生成任务数量="+list.size()+"---------------");
+            if("1".equals(type)){
+                if(FieldUtils.isObjectNotEmpty(planId)){
+                    routeService.taskPoint(list,routeId,planId);
+                }else{
+                    return RespBean.ok("路线编号或计划编号为空！");
+                }
+            }else{
+                routeService.taskPoint(list,routeId,planId);
             }
         }
-        //feign接口 routeService
-        System.out.println("生成任务数量="+list.size()+"---------------");
-        routeService.taskPoint(list,routeId,planId);
         return RespBean.ok("生成任务完成！");
     }
 
@@ -541,12 +611,17 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                 String inspectTaskId = (String) map.get("inspectTaskId");
                 List<HashMap<String,Object>> allList = (List<HashMap<String, Object>>) routeService.findListByTaskId(routeId,inspectTaskId).getObj();
                 List<HashMap<String,Object>> ywcList = (List<HashMap<String, Object>>) routeService.findSignedList(routeId,inspectTaskId).getObj();
+                List<HashMap<String,Object>> ydwList = (List<HashMap<String, Object>>) routeService.findSignedList(routeId,inspectTaskId).getObj();
                 if(allList.size()>0  && allList.size()>= ywcList.size()){
                     String complete_rate =  String.valueOf((int) Math.floor(ywcList.size()*100/allList.size()));
                     QueryWrapper<Inspect> queryWrapper = new QueryWrapper<>();
                     Inspect inspect = inspectMapper.selectOne(queryWrapper.eq("inspect_task_id",inspectTaskId));
                     inspect.setInspectTaskId(inspectTaskId);
                     inspect.setCompleteRate(complete_rate);
+                    inspect.setAllpoint(allList.size());
+                    inspect.setDonepoint(ywcList.size());
+                    inspect.setInplacepoint(ydwList.size());
+                    inspect.setArrivalRate(String.valueOf((int) Math.floor(ydwList.size()*100/allList.size())));
                     String siteConditionsDesc ="";
                     if("null".equals(map.get("siteConditionsDesc")) || !FieldUtils.isObjectNotEmpty(map.get("siteConditionsDesc"))){
                         siteConditionsDesc="";
@@ -587,7 +662,6 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
     @Override
     @Transactional
     public RespBean send(Map<String, Object> params,HttpServletRequest request) throws UnsupportedEncodingException {
-
         LoginUser u = urlUtils.getAll(request);
         String name = u.getName();
         if(FieldUtils.isObjectNotEmpty(params) && FieldUtils.isObjectNotEmpty(params.get("form"))) {
@@ -676,7 +750,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
     }
 
     @Override
-    public RespBean getTaskListByTime(Date begin_time1, Date begin_time2, Date dead_time1, Date dead_time2,String checkMan) {
+    public RespBean getTaskListByTime(Date begin_time1, Date begin_time2, Date dead_time1, Date dead_time2,String checkMan,HttpServletRequest request) throws UnsupportedEncodingException {
         QueryWrapper<Inspect> queryWrapper = new QueryWrapper<>();
         if(FieldUtils.isObjectNotEmpty(begin_time1)){
             queryWrapper.apply(FieldUtils.isStringNotEmpty(dateFormat.format(begin_time1)),"convert(varchar(20),begin_time,20) >= convert(varchar(20),'"+begin_time1+"',20)");
@@ -694,7 +768,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
             queryWrapper.eq("inspect_person",checkMan);
         }
         List<Inspect> list = inspectMapper.selectList(queryWrapper);
-        list = getlistName(list);
+        list = getlistName(list,request);
         List<HashMap<String,Object>> result = new ArrayList<>();
         Iterator <Inspect> t = list.iterator();
         while(t.hasNext()){
@@ -729,6 +803,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         }
         List<HashMap<String,Object>> sumresult = new ArrayList<>();
         List<HashMap<String,Object>> rateresult = new ArrayList<>();
+        List<HashMap<String,Object>> rdwlresult = new ArrayList<>();
         List<HashMap<String,Object>> logresult = new ArrayList<>();
         if(FieldUtils.isStringNotEmpty(unit)){
             if(FieldUtils.isStringNotEmpty(beginTime) & FieldUtils.isStringNotEmpty(deadTime) & !"null".equals(beginTime) & !"null".equals(deadTime)){
@@ -753,6 +828,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                     sumresult = inspectMapper.selectTasksByDays(waterManagementOffice,beginTime,searchTime);
                     rateresult = inspectMapper.selectTasksRateByDays(waterManagementOffice,beginTime,searchTime);
                     logresult = inspectMapper.selectTaskslogByDays(waterManagementOffice,beginTime,searchTime);
+                    rdwlresult = inspectMapper.selectTaskDwlByDays(waterManagementOffice,beginTime,searchTime);
                 }
             }else{
                 //根据管理所和单位查出近12单位的数据
@@ -777,6 +853,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                     sumresult = inspectMapper.selectTasksByDays(waterManagementOffice,beginTime,searchTime);
                     rateresult = inspectMapper.selectTasksRateByDays(waterManagementOffice,beginTime,searchTime);
                     logresult = inspectMapper.selectTaskslogByDays(waterManagementOffice,beginTime,searchTime);
+                    rdwlresult = inspectMapper.selectTaskDwlByDays(waterManagementOffice,beginTime,searchTime);
                 }
             }
         }else{
@@ -785,10 +862,12 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         //补全空数据
         sumresult = supplement(sumresult,unit,beginTime,deadTime);
         rateresult = supplement(rateresult,unit,beginTime,deadTime);
+        rdwlresult = supplement(rdwlresult,unit,beginTime,deadTime);
         resultMap.put("numsList",sumresult);
         resultMap.put("rateresult",rateresult);
         resultMap.put("logresult",logresult);
-        return RespBean.ok("logresult:巡查日志表，rateresult：完成率，numsList：数量统计").setObj(resultMap);
+        resultMap.put("dwlresult",rdwlresult);
+        return RespBean.ok("logresult:巡查日志表，rateresult：完成率，dwlresult：到位率，numsList：数量统计").setObj(resultMap);
     }
 
     @Override
@@ -933,6 +1012,166 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         }else{
             return RespBean.error("map参数为空!");
         }
+    }
+
+    @Override
+    public RespBean uploadDeviceGPS(Map<String, Object> params) {
+        if(FieldUtils.isObjectNotEmpty(params)){
+            Device device = JSONObject.parseObject(JSONObject.toJSONString(params), Device.class);
+            //创建对象
+            if(FieldUtils.isStringNotEmpty(device.getInspectTaskId())){
+                String date = dateFormat.format(new Date());
+                device.setCountTime(date);
+                deviceMapper.updateById(device);
+                return RespBean.ok("修改成功！").setObj(device);
+            }else{
+                return RespBean.error("缺少任务编号！");
+            }
+        }else{
+            return RespBean.error("map参数为空!");
+        }
+    }
+
+    @Override
+    public RespBean getDeviceInfo(HttpServletRequest request) throws ParseException, UnsupportedEncodingException {
+        //创建对象
+        Map<String, Object> result = new HashMap<String, Object>();
+        List<Device> list = new ArrayList<>();
+        QueryWrapper<Device> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("status","在线");
+        List<HashMap<String, Object>> personlist = (List<HashMap<String, Object>>) urlUtils.selectUserByRole("ROLE_BZY",request).getObj();
+        list = deviceMapper.selectList(queryWrapper);
+        if(list.size()>0){
+            for (int i = 0; i < list.size(); i++) {
+                Map<String, Object> map = new HashMap<String, Object>();
+                String d = DateUtils.calLastedTime(dateFormat.parse(list.get(i).getCountTime()));
+                list.get(i).setStoptime(d);
+                QueryWrapper<Inspect> inspectqueryWrapper = new QueryWrapper<>();
+                queryWrapper = new QueryWrapper<>();
+                inspectqueryWrapper.eq("inspect_task_id",list.get(i).getInspectTaskId());
+                Inspect inspect = inspectMapper.selectOne(inspectqueryWrapper);
+                map = (Map<String, Object>) routeService.findDetail(inspect.getRouteId()).getObj();
+                list.get(i).setRouteInfo(map);
+                for (int j = 0; j < personlist.size(); j++) {
+                    if(personlist.get(j).get("username").equals(list.get(i).getInspectPerson())){
+                        list.get(i).setInspectPersonName((String) personlist.get(j).get("name"));
+                    }
+                }
+            }
+        }
+        result.put("onlinePeople",list.size());
+        result.put("devicesInfo",list);
+        return RespBean.ok("").setObj(result);
+    }
+
+    @Override
+    public RespBean getMapOverviewInfo(String time,String unit,HttpServletRequest request) throws UnsupportedEncodingException {
+        //unit 1：年 2 ：月
+        //判断是按年查询还是按月查询
+        HashMap<String,Object> result = new HashMap<>();
+        List<HashMap<String, Object>> personlist = (List<HashMap<String, Object>>) urlUtils.selectUserByRole("ROLE_BZY",request).getObj();
+        List<HashMap<String,Object>> officelist = (List<HashMap<String, Object>>) routeService.findEnumMenu("用水管理所").getObj();
+        //查询出所有巡查人该时间段的完成率，到位率，巡查里程
+        List<HashMap<String, Object>> wcllist = new ArrayList<>();
+        List<HashMap<String, Object>> officeinfolist = new ArrayList<>();
+        List<HashMap<String, Object>> tracklist = new ArrayList<>();
+        if("1".equals(unit)){
+            wcllist =inspectMapper.selectwclAnddwlByyear(time);
+            officeinfolist = inspectMapper.selectOfficeInfoByYear(time);
+            if(personlist.size()>0){
+                for (int i = 0; i < personlist.size(); i++) {
+                    tracklist = new ArrayList<>();
+                    if(wcllist.size()>0){
+                        for (int j = 0; j < wcllist.size(); j++) {
+                            if(personlist.get(i).get("username").equals(wcllist.get(j).get("inspect_person"))){
+                                personlist.get(i).put("wcl",wcllist.get(j).get("wcl"));
+                                personlist.get(i).put("dwl",wcllist.get(j).get("dwl"));
+                            }else{
+                                personlist.get(i).put("wcl",0);
+                                personlist.get(i).put("dwl",0);
+                            }
+                        }
+                    }else{
+                        personlist.get(i).put("wcl",0);
+                        personlist.get(i).put("dwl",0);
+                    }
+                    tracklist = inspectMapper.selectInspectMileByyear((String) personlist.get(i).get("username"),time);
+                    personlist.get(i).put("miles",inspectMile(tracklist));
+                }
+            }
+        }else{
+            wcllist =inspectMapper.selectwclAnddwlBymonth(time);
+            officeinfolist = inspectMapper.selectOfficeInfoByMonth(time);
+            if(personlist.size()>0){
+                for (int i = 0; i < personlist.size(); i++) {
+                    personlist.get(i).put("wcl",0);
+                    personlist.get(i).put("dwl",0);
+                    tracklist = new ArrayList<>();
+                    if(wcllist.size()>0){
+                        for (int j = 0; j < wcllist.size(); j++) {
+                            if(personlist.get(i).get("username").equals(wcllist.get(j).get("inspect_person"))){
+                                personlist.get(i).put("wcl",wcllist.get(j).get("wcl"));
+                                personlist.get(i).put("dwl",wcllist.get(j).get("dwl"));
+                            }
+                        }
+                    }
+                    tracklist = inspectMapper.selectInspectMileBymonth((String) personlist.get(i).get("username"),time);
+                    personlist.get(i).put("miles",inspectMile(tracklist));
+                }
+            }
+        }
+        result.put("personlist",personlist);
+        //获取各个管理所的完成率，到位率，覆盖率
+        if(officelist.size()>0){
+            for (int i = 0; i <officelist.size(); i++) {
+                officelist.get(i).put("wcl",0);
+                officelist.get(i).put("dwl",0);
+                for (int j = 0; j < officeinfolist.size(); j++) {
+                    if(officelist.get(i).get("code").equals(officeinfolist.get(j).get("water_management_office"))){
+                        officelist.get(i).put("wcl",officeinfolist.get(j).get("wcl"));
+                        officelist.get(i).put("dwl",officeinfolist.get(j).get("dwl"));
+                    }
+                }
+            }
+        }
+        result.put("officelist",officelist);
+        return RespBean.ok("").setObj(result);
+    }
+
+    @Override
+    public RespBean selectUserByRole(String rol,HttpServletRequest request) throws UnsupportedEncodingException {
+        return urlUtils.selectUserByRole(rol,request);
+    }
+
+    @Override
+    public RespBean
+    selectUserByRoleAndDept(String rol,String dept,HttpServletRequest request) throws UnsupportedEncodingException {
+        return urlUtils.selectUserByRoleAndDept(rol,dept,request);
+    }
+
+    //计算每个人的巡查里程
+    public double inspectMile(List<HashMap<String, Object>>  tracklist){
+        double n = 0;
+        if(tracklist.size()>0){
+            for (int i = 0; i < tracklist.size()-1; i++) {
+                n+= gps2m(Double.valueOf(tracklist.get(i).get("latitude").toString()),Double.valueOf(tracklist.get(i).get("longitude").toString()),Double.valueOf(tracklist.get(i+1).get("latitude").toString()),Double.valueOf(tracklist.get(i+1).get("longitude").toString()));
+            }
+        }
+        return n/1000;
+    }
+
+
+    public double gps2m(double lat_a, double lng_a, double lat_b, double lng_b) {
+        double radLat1 = (lat_a * Math.PI / 180.0);
+        double radLat2 = (lat_b * Math.PI / 180.0);
+        double a = radLat1 - radLat2;
+        double b = (lng_a - lng_b) * Math.PI / 180.0;
+        double s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2)
+                + Math.cos(radLat1) * Math.cos(radLat2)
+                * Math.pow(Math.sin(b / 2), 2)));
+        s = s * EARTH_RADIUS;
+        s = Math.round(s * 10000) / 10000;
+        return s;
     }
 
     @Override
@@ -1094,7 +1333,6 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         }
         return olist;
     }
-
 
     //关阀分析
     public RespBean getcloseValues(String gid){

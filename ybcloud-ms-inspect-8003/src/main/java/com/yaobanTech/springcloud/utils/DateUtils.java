@@ -88,5 +88,31 @@ public class DateUtils {
         Date startDate = calendar.getTime();
         return startDate;
     }
+    /**
+     * 当前时间之前的时间与当前时间相差多少秒
+     * @param startDate 当前时间之前的时间
+     * @return
+     */
+    public static String calLastedTime(Date startDate) {
+        long nowDate = new Date().getTime();
+        long startDateTime = startDate.getTime();
+        int ds = (int) ((nowDate - startDateTime) / 1000);
+        String DateTimes = null;
+        long days = ds / ( 60 * 60 * 24);
+        long hours = (ds % ( 60 * 60 * 24)) / (60 * 60);
+        long minutes = (ds % ( 60 * 60)) /60;
+        long seconds = ds % 60;
+        if(days>0){
+        DateTimes= days + "天" + hours + "小时" + minutes + "分钟" + seconds + "秒";
+        }else if(hours>0){
+        DateTimes=hours + "小时" + minutes + "分钟" + seconds + "秒";
+        }else if(minutes>0){
+        DateTimes=minutes + "分钟"
+        + seconds + "秒";
+        }else{
+        DateTimes=seconds + "秒";
+        }
+        return DateTimes;
+    }
 
 }

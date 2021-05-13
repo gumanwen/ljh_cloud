@@ -7,6 +7,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.Map;
 
 @Api(value = "管理人员Controller" , tags = "管理人员--接口")
@@ -118,25 +122,40 @@ public class UserRightsController {
 
     @ApiOperation(value ="openfeign 根据角色查询用户")
     @GetMapping("selectUserByRole")
-    public RespBean selectUserByRole(@RequestParam  String role){
-        return userRightsService.selectUserByRole(role);
+    public RespBean selectUserByRole(@RequestParam  String role,@RequestParam("type")Integer type,@RequestParam("token")String token){
+        return userRightsService.selectUserByRole(role,type,token);
+    }
+
+    @ApiOperation(value ="openfeign 根据角色和部门查询用户")
+    @GetMapping("selectUserByRoleAndDept")
+    public RespBean selectUserByRoleAndDept(@RequestParam  String role,@RequestParam  String dept,@RequestParam("type")Integer type,@RequestParam("token")String token){
+        return userRightsService.selectUserByRoleAndDept(role,dept,type,token);
     }
 
     @ApiOperation(value ="openfeign: 根据账号名获取姓名")
     @GetMapping("getNameByUsername")
-    public RespBean getNameByUsername(@RequestParam("username")  String username){
-        return userRightsService.getNameByUsername(username);
+    public RespBean getNameByUsername(@RequestParam("username")  String username,@RequestParam("type")Integer type,@RequestParam("token")  String token){
+        return userRightsService.getNameByUsername(username,type,token);
     }
+
+    @ApiOperation(value ="openfeign: 批量根据账号名获取姓名")
+    @GetMapping("getAllNameByUsername")
+    public RespBean getAllNameByUsername(@RequestParam("nameList") List<String> nameList, HttpServletRequest request) throws UnsupportedEncodingException {
+        return userRightsService.getAllNameByUsername(nameList,request);
+    }
+
     @ApiOperation("openfeign: 获取当前登录人")
     @GetMapping("/getCurrentUser")
     public RespBean getCurrentUser(@RequestParam("token") String token) {
         return userRightsService.getCurrentUser(token);
     }
+
     @ApiOperation("openfeign: 获取当前登录人和角色")
     @GetMapping("/getCurrentUserAndRole")
     public RespBean getCurrentUserAndRole(@RequestParam("token") String token) {
         return userRightsService.getCurrentUserAndRole(token);
     }
+
     @ApiOperation("openfeign: 获取当前登录人所有信息")
     @GetMapping("/getAll")
     public RespBean getAll(@RequestParam("token")String token,@RequestParam("type")Integer type){

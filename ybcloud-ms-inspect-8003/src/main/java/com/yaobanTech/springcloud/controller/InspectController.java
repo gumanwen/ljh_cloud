@@ -72,14 +72,14 @@ public class InspectController {
 
     @ApiOperation("web：新增计划任务")
     @PostMapping("/temp/addPlanTask")
-    public RespBean addPlanTask(String waterManagementOffice,Integer routeId,String  routeName ,Integer planId,String planName) throws ParseException {
-        return iInspectService.addPlanTask(waterManagementOffice,routeId,routeName,planId,planName);
+    public RespBean addPlanTask(String waterManagementOffice,Integer routeId,String  routeName ,Integer planId,String planName,HttpServletRequest request) throws ParseException, UnsupportedEncodingException {
+        return iInspectService.addPlanTask(waterManagementOffice,routeId,routeName,planId,planName,request);
     }
 
     @ApiOperation("app & web：获取计划任务详情")
     @GetMapping("/plan/getInspectDetailById")
-    public RespBean getInspectDetailById(String inspect_task_id) throws IllegalAccessException {
-        return iInspectService.getInspectDetailById(inspect_task_id);
+    public RespBean getInspectDetailById(String inspect_task_id,HttpServletRequest request) throws IllegalAccessException, UnsupportedEncodingException, ParseException {
+        return iInspectService.getInspectDetailById(inspect_task_id,request);
     }
 
     @ApiOperation("app & web：修改计划任务详情")
@@ -111,9 +111,9 @@ public class InspectController {
 
     @ApiOperation("openfeign：保存计划之后自动生成任务")
     @PostMapping("/task/autoCreate")
-    public RespBean autoCreate(@RequestBody Map<String, Object> params) throws ParseException {
+    public RespBean autoCreate(@RequestBody Map<String, Object> params,HttpServletRequest request) throws ParseException, UnsupportedEncodingException {
         //调用route的rest接口
-        return iInspectService.autoCreate(params);
+        return iInspectService.autoCreate(params,request);
     }
 
     @ApiOperation("web：派发")
@@ -148,24 +148,6 @@ public class InspectController {
         return iInspectService.findSignedList(routeId,inspectTaskId);
     }
 
-    @ApiOperation("openfeign: 获取当前登录人")
-    @GetMapping("/getCurrentUser")
-    public Object getCurrentUser(@RequestParam("token") String token) {
-        return authService.getCurrentUser(token);
-    }
-
-    @ApiOperation("openfeign: 获取当前登录人")
-    @GetMapping("/getCurrentUserAndRole")
-    public Object getCurrentUserAndRole(@RequestParam("token") String token) {
-        return authService.getCurrentUserAndRole(token);
-    }
-
-    @ApiOperation("openfeign: 根据账号名获取姓名")
-    @GetMapping("/getNameByUsername")
-    public Object getNameByUsername(String username) {
-        return authService.getNameByUsername(username);
-    }
-
     /*已完成的任务不能终止。*/
     @ApiOperation("web: 终止任务")
     @GetMapping("/stop")
@@ -196,8 +178,8 @@ public class InspectController {
 
     @ApiOperation("opnefeign:根据任务开始时间过滤任务编号")
     @GetMapping("/getTaskListByTime")
-    public RespBean getTaskListByTime(Date  taskStart1,Date taskEnd1,Date taskStart2,Date taskEnd2,String checkMan){
-        return iInspectService.getTaskListByTime(taskStart1,taskEnd1,taskStart2,taskEnd2,checkMan);
+    public RespBean getTaskListByTime(Date  taskStart1,Date taskEnd1,Date taskStart2,Date taskEnd2,String checkMan,HttpServletRequest request) throws UnsupportedEncodingException {
+        return iInspectService.getTaskListByTime(taskStart1,taskEnd1,taskStart2,taskEnd2,checkMan,request);
     }
 
     @ApiOperation("gis：测试递归")
@@ -218,6 +200,17 @@ public class InspectController {
         return iInspectService.appInspectStatistics(request);
     }
 
+    @ApiOperation("根据角色获取用户")
+    @GetMapping("/selectUserByRole")
+    public RespBean selectUserByRole(String role,HttpServletRequest request) throws UnsupportedEncodingException {
+        return iInspectService.selectUserByRole(role,request);
+    }
+    @ApiOperation("根据角色获取用户")
+    @GetMapping("/selectUserByRoleAndDept")
+    public RespBean selectUserByRoleAndDept(String role,String dept,HttpServletRequest request) throws UnsupportedEncodingException {
+        return iInspectService.selectUserByRoleAndDept(role,dept,request);
+    }
+
     @ApiOperation("/上传GPS坐标")
     @PostMapping("/uploadGPS")
     public RespBean uploadGPS(@RequestBody Map<String, Object> params){
@@ -235,5 +228,24 @@ public class InspectController {
     public Object isModifiable(Integer routeId) {
         return iInspectService.isModifiable(routeId);
     }
+
+    @ApiOperation("/上传设备坐标")
+    @PostMapping("/uploadDeviceGPS")
+    public RespBean uploadDeviceGPS(@RequestBody Map<String, Object> params){
+        return iInspectService.uploadDeviceGPS(params);
+    }
+
+    @ApiOperation("获取在线人员信息")
+    @GetMapping("/getDeviceInfo")
+    public RespBean getDeviceInfo(HttpServletRequest request) throws ParseException, UnsupportedEncodingException {
+        return iInspectService.getDeviceInfo(request);
+    }
+
+    @ApiOperation("获取某年某月的地图概况信息")
+    @GetMapping("/getMapOverviewInfo")
+    public RespBean getMapOverviewInfo(String time,String unit,HttpServletRequest request) throws ParseException, UnsupportedEncodingException {
+        return iInspectService.getMapOverviewInfo(time,unit,request);
+    }
+
 }
 
