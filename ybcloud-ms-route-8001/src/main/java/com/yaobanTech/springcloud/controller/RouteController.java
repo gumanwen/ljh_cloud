@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.List;
 
 @RestController
 @RefreshScope
@@ -43,14 +44,26 @@ public class RouteController {
 
     @ApiOperation("查询路线详情")
     @GetMapping("findDetail")
-    public RespBean findDetail(@RequestParam Integer id) throws UnsupportedEncodingException {
-        return routeService.findDetail(id);
+    public RespBean findDetail(@RequestParam Integer id,HttpServletRequest request) throws UnsupportedEncodingException {
+        return routeService.findDetail(id,request);
+    }
+
+    @ApiOperation("查询路线详情")
+    @GetMapping("openFindDetail")
+    public RespBean openFindDetail(@RequestParam Integer id,@RequestParam String token,@RequestParam Integer type,HttpServletRequest request) throws UnsupportedEncodingException {
+        return routeService.openFindDetail(id,token,type,request);
     }
 
     @ApiOperation("查询路线列表")
     @GetMapping("findList")
     public RespBean findList(HttpServletRequest request) throws UnsupportedEncodingException {
         return routeService.findAll(request);
+    }
+
+    @ApiOperation("根据ids查询路线列表")
+    @GetMapping("findListByIds")
+    public RespBean findListByIds(@RequestParam List<Integer> routeIds) {
+        return routeService.findListByIds(routeIds);
     }
 
     @ApiOperation("查询未删除路线列表")
@@ -86,8 +99,8 @@ public class RouteController {
     @ApiOperation("条件查询路线id列表")
     @GetMapping("findRouteIds")
     public RespBean findRouteIds(@RequestParam String waterManagementOffice, Integer routeId,@RequestParam String pointInspectionType,
-           Integer planId ,@RequestParam String planPorid,@RequestParam String planType) throws UnsupportedEncodingException {
-        return routeService.findRouteIds(waterManagementOffice,routeId,pointInspectionType,planId,planPorid,planType);
+           Integer planId ,@RequestParam String planPorid,@RequestParam String planType,@RequestParam String routeType) throws UnsupportedEncodingException {
+        return routeService.findRouteIds(waterManagementOffice,routeId,pointInspectionType,planId,planPorid,planType,routeType);
     }
 
 }

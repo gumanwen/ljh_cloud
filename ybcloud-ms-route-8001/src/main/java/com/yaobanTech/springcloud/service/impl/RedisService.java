@@ -132,10 +132,10 @@ public class RedisService {
         Date date = new Date();
         // 自定义前缀
         sb.append(prefix);
-//        if (date != null) {
-//            DateFormat df = new SimpleDateFormat("yyyyMMdd");
-//            sb.append(df.format(date));
-//        }
+        if (date != null) {
+            DateFormat df = new SimpleDateFormat("yyyyMMdd");
+            sb.append(df.format(date));
+        }
 
         /* 对不满足长度的id值,使用0补齐 */
         // redis 生成的id值

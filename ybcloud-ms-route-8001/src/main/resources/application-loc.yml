@@ -51,6 +51,10 @@ spring:
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
   application:
     name: routeService
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
 mybatis:
   #mapper-locations: classpath:mapping/*Mapper.xml
   #type-aliases-package: com.yaoban.kmsw.pojos
@@ -66,3 +70,14 @@ ribbon:
   ReadTimeout: 7000
 qyserver:
   ipAdd: http://218.17.45.99:8850/api/auth/user/get
+feign:
+  okhttp:
+    enabled: false
+  client:
+    config:
+      default:
+        connect-timeout: 20000
+        read-timeout: 20000
+        execution:
+          timeout:
+            enable: false

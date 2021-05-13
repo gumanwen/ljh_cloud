@@ -8,6 +8,7 @@ bootJar {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
     implementation group: 'org.springframework.boot', name: 'spring-boot-devtools', version: '2.3.5.RELEASE'
     implementation group: 'com.microsoft.sqlserver', name: 'mssql-jdbc', version: '7.4.1.jre8'
     compile group: 'com.alibaba.cloud', name: 'spring-cloud-starter-alibaba-nacos-discovery', version: '2.2.1.RELEASE'

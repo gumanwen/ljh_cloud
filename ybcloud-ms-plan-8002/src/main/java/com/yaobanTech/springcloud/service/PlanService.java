@@ -184,7 +184,6 @@ public class PlanService {
     public RespBean findAll(HttpServletRequest request) throws UnsupportedEncodingException {
         LoginUser u = urlUtils.getAll(request);
         String user = u.getLoginname();
-        String chineseName = (String)oauthService.getChineseName(u.getLoginname()).getObj();
         String role = u.getRoleLists();
         List<BizPlan> list = null;
         if(!"".equals(role) && role !=null && role.contains("BZZ")){
@@ -193,22 +192,31 @@ public class PlanService {
         else{
             list = planMapper.findAll(user);
         }
-
-            if(!list.isEmpty()){
+        //获取用户名列表
+        List<String> nameList = list.stream().map(o -> {
+            return o.getPlanCreatedBy();
+        }).collect(Collectors.toList());
+        //获取路线id列表
+        List<Integer> routeIds = list.stream().map(o -> {
+            return o.getRouteId();
+        }).collect(Collectors.toList());
+        RespBean r1 = oauthService.getNameList(nameList);
+        List<HashMap<String, String>> names = (List<HashMap<String, String>>) r1.getObj();
+//        RespBean r2 = routeService.getListByIds(routeIds);
+        if(!list.isEmpty()){
                 for (int i = 0; i < list.size(); i++) {
                     BizPlan plan = list.get(i);
+                    RespBean respBean = routeService.findDetail(plan.getRouteId());
                     Map map = (Map) findEnum(plan.getPlanType()).getObj();
                     Map ps = (Map) findEnum(plan.getPlanStatus()).getObj();
                     Map pp = (Map) findEnum(plan.getPlanPorid()).getObj();
                     plan.setPlanTypeMenu(map);
                     plan.setPlanStatusMenu(ps);
                     plan.setPlanPoridMenu(pp);
-                    plan.setPlanCreatedByCN(chineseName);
-                    RespBean respBean = routeService.findDetail(plan.getRouteId());
+                    names.stream().forEach(a -> {
+                        plan.setPlanCreatedByCN(a.get(plan.getPlanCreatedBy()));
+                    });
                     Object o = respBean.getObj();
-                    if(respBean.getStatus() == 500){
-                        throw new RuntimeException("Feign调用路线服务失败！");
-                    }
                     plan.setRouteObj(o);
                 }
             }
@@ -223,19 +231,20 @@ public class PlanService {
     }
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public RespBean findById(Integer id) throws UnsupportedEncodingException {
+    public RespBean findById(Integer id,HttpServletRequest request) throws UnsupportedEncodingException {
         BizPlan bp = bizPlanRepository.findDetail(id);
         if(bp != null) {
             String user = bp.getPlanCreatedBy();
-            String chineseName = (String)oauthService.getChineseName(user).getObj();
+            String chineseName = urlUtils.getNameByUsername(user,request);
             RespBean respBean = routeService.findDetail(bp.getRouteId());
             Object o = respBean.getObj();
             Map map = (Map) findEnum(bp.getPlanType()).getObj();
             Map ps = (Map) findEnum(bp.getPlanStatus()).getObj();
-            Map pp = (Map) findEnum(bp.getPlanPorid()).getObj();
+           // Map pp = (Map) findEnum(bp.getPlanPorid()).getObj();
+            HashMap<String, Object> pp = (HashMap<String, Object>) routeService.findEnum(bp.getPlanPorid()).getObj();
             HashMap<String, Object> hashMap = (HashMap<String, Object>) o;
             String office = (String) hashMap.get("waterManagementOffice");
-            HashMap<String, Object> waterUseOffice = (HashMap<String, Object>) findEnum(office).getObj();
+            HashMap<String, Object> waterUseOffice = (HashMap<String, Object>) routeService.findEnum(office).getObj();
             bp.setPlanTypeMenu(map);
             bp.setPlanStatusMenu(ps);
             bp.setPlanPoridMenu(pp);
@@ -256,7 +265,7 @@ public class PlanService {
                 bp.setAttachment(fileList);
             return RespBean.ok("查询成功！", bp);
         }
-        return RespBean.ok("查询成功！", bp);
+        return RespBean.ok("未查询到相应计划数据！", bp);
     }
 
     @Transactional
@@ -312,7 +321,6 @@ public class PlanService {
         //获取当前用户
         LoginUser u = urlUtils.getAll(request);
         String user = u.getLoginname();
-        String chineseName = (String)oauthService.getChineseName(user).getObj();
         if("null".equals(routeName)){
             routeName = null;
         }
@@ -349,6 +357,7 @@ public class PlanService {
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
                 BizPlan plan = list.get(i);
+                String chineseName = urlUtils.getNameByUsername(plan.getPlanCreatedBy(),request);
                 Map map = (Map) findEnum(plan.getPlanType()).getObj();
                 Map ps = (Map) findEnum(plan.getPlanStatus()).getObj();
                 Map pp = (Map) findEnum(plan.getPlanPorid()).getObj();

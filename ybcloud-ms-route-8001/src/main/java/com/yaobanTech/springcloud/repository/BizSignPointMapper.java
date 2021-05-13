@@ -2,6 +2,7 @@ package com.yaobanTech.springcloud.repository;
 
 import com.yaobanTech.springcloud.domain.*;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Component;
@@ -84,18 +85,19 @@ public interface BizSignPointMapper {
             "</script>"})
     void update(BizSignPoint bizSignPoint);
 
-    @Select(value="SELECT b.route_id as routeIds,b.id as planIds " +
+    @Select(value="SELECT a.*,b.*,b.id as plan_id " +
             "FROM `ybcloud-ms-plan-8002`.`biz_plan` b " +
             "JOIN `ybcloud-ms-route-8001`.`biz_route` a ON a.id = b.route_id " +
             "WHERE 1=1 " +
-            "AND IF(#{waterManagementOffice} is not null,water_management_office = #{waterManagementOffice},1=1) " +
+            "AND IF(#{waterManagementOffice} is not null,a.water_management_office = #{waterManagementOffice},1=1) " +
             "AND IF(#{routeId} is not null,a.id = #{routeId},1=1) " +
-            "AND IF(#{pointInspectionType} is not null,point_inspection_type = #{pointInspectionType},1=1) " +
+            "AND IF(#{pointInspectionType} is not null,a.point_inspection_type = #{pointInspectionType},1=1) " +
             "AND IF(#{planId} is not null,b.id = #{planId},1=1) " +
-            "AND IF(#{planPorid} is not null,plan_porid = #{planPorid},1=1) " +
-            "AND IF(#{planType} is not null,plan_type = #{planType},1=1) ")
+            "AND IF(#{planPorid} is not null,b.plan_porid = #{planPorid},1=1) " +
+            "AND IF(#{routeType} is not null,a.route_type = #{routeType},1=1) " +
+            "AND IF(#{planType} is not null,b.plan_type = #{planType},1=1) ")
 
-    List<HashMap<String,Object>> findRouteIds(String waterManagementOffice, Integer routeId, String pointInspectionType, Integer planId , String planPorid, String planType);
+    List<HashMap<String,Object>> findRouteIds(@Param("waterManagementOffice") String waterManagementOffice,@Param("routeId") Integer routeId, @Param("pointInspectionType")String pointInspectionType,@Param("planId") Integer planId , @Param("planPorid")String planPorid,@Param("planType") String planType,@Param("routeType") String routeType);
 
     @Select(value="SELECT a.* " +
             "FROM `ybcloud-ms-route-8001`.`biz_leak_point` a " +
@@ -117,7 +119,7 @@ public interface BizSignPointMapper {
             "AND IF(#{constructionE1} is not null, a.construction_start_date >= #{constructionE1},1=1 ) " +
             "AND IF(#{constructionE2} is not null, a.construction_start_date < #{constructionE2},1=1 ) " +
             "AND IF(#{commitDate} is not null, a.commit_date >= #{commitDate},1=1 ) " +
-            "AND IF(#{endDate} is not null, a.end_date < #{endDate},1=1 ) " +
+            "AND IF(#{endDate} is not null, a.end_date <= #{endDate},1=1 ) " +
             "AND IF(#{hiddenDangerPointStatus} is not null, a.hidden_danger_point_status = #{hiddenDangerPointStatus},1=1 ) " +
             "AND IF(#{riskLevel} is not null, a.risk_level = #{riskLevel},1=1 ) " +
             "AND IF(#{projectType} is not null, a.project_type = #{projectType},1=1 ) " +
@@ -145,12 +147,12 @@ public interface BizSignPointMapper {
             "ORDER BY c.modify_time DESC")
     List<HashMap<String,Object>> findCondition(SignPointQuery signPointQuery);
 
-    @Select(value="SELECT a.*,b.plan_name,c.*,c.id as sign_point_id " +
+    @Select(value="SELECT a.*,b.plan_name,c.*,c.id as sign_point_id,c.signed_time " +
             "FROM `ybcloud-ms-route-8001`.`biz_route` a " +
             "right JOIN `ybcloud-ms-route-8001`.`biz_signed_point` c ON a.id = c.route_id " +
             "JOIN `ybcloud-ms-plan-8002`.`biz_plan` b on b.id = c.plan_id "+
             "WHERE a.enabled = 1 and b.enabled = 1 and c.enabled = 1 " +
-            "AND IF(#{waterUserOffice} is not null,  a.water_management_office = #{waterUserOffice},1=1) " +
+            "AND IF(#{waterUserOffice} is not null,a.water_management_office = #{waterUserOffice},1=1) " +
             "AND IF(#{routeName} is not null, a.route_name = #{routeName},1=1 ) " +
             "AND IF(#{routeType} is not null, a.route_type = #{routeType},1=1 ) " +
             "AND IF(#{pointInspectionType} is not null, a.point_inspection_type = #{pointInspectionType},1=1 ) " +
@@ -165,6 +167,7 @@ public interface BizSignPointMapper {
             "ORDER BY c.modify_time DESC")
     List<HashMap<String,Object>> findConditionElse(SignPointQuery signPointQuery);
 
+
     @Select(value = "SELECT * FROM `biz_hidden_danger_point` WHERE 1 = 1 " +
             "AND IF( #{waterUseOffice} not like '', water_use_office = #{waterUseOffice}, 1 = 1 ) " +
 //            "and end_date is null " +
@@ -172,9 +175,19 @@ public interface BizSignPointMapper {
 //            "or end_date is not null " +
 //            "AND IF ( #{start} IS NOT NULL, commit_date >#{start}, commit_date > ( SELECT DATE_SUB( CURDATE( ), INTERVAL 12 DAY ) ) ) " +
 //            "and IF ( #{end} IS NOT NULL, commit_date <= #{end}, commit_date <= ( SELECT DATE_SUB( now( ), INTERVAL 1 SECOND ) ) ) ")
-            "AND IF ( #{start} not like '', commit_date >#{start}, 1 = 1 ) " +
-            "and IF ( #{end} IS not like '', commit_date <= #{end}, 1 = 1 ) ")
-            List<BizHiddenDangerPointEntity> countDangerPointList(String waterUseOffice ,  String start ,  String end);
+            "AND IF ( #{start} not like '', commit_date >=#{start}, 1 = 1 ) " +
+            "and IF ( #{end} not like '', DATE_FORMAT(commit_date,'%Y-%m-%d') <= #{end}, 1 = 1 ) ")
+    List<BizHiddenDangerPointEntity> countDangerPointList(@Param("waterUseOffice") String waterUseOffice ,  @Param("start") String start ,  @Param("end")String end);
+
+    @Select(value="SELECT a.*,c.*,(@i :=@i+1) AS rowid " +
+            "FROM `ybcloud-ms-route-8001`.`biz_route` a " +
+            "right JOIN `ybcloud-ms-route-8001`.`biz_signed_point` c ON a.id = c.route_id, " +
+            "(SELECT @i :=0) AS it WHERE a.enabled = 1 and c.enabled = 1 " +
+            "AND IF(#{waterUseOffice}  not like '',a.water_management_office = #{waterUseOffice},1=1) " +
+            "AND IF(#{start}  not like '',c.signed_time >= #{start},1=1) " +
+            "AND IF(#{end}  not like '',c.signed_time < #{end},1=1) " +
+            "ORDER BY a.created_time DESC")
+    List<HashMap<String,Object>> findConditionByEndPoint(@Param("waterUseOffice") String waterUseOffice , @Param("start")String start , @Param("end")String end);
 
     @Select(value = "SELECT a.sum + b.sum FROM ( " +
             "SELECT count( * ) AS sum FROM `biz_hidden_danger_point` WHERE 1 = 1 " +
@@ -187,7 +200,7 @@ public interface BizSignPointMapper {
             "AND IF ( #{start} IS NOT NULL, `biz_leak_point`.commit_date > #{start}, `biz_leak_point`.commit_date > ( SELECT DATE_SUB( CURDATE( ), INTERVAL 12 DAY ))) " +
             "AND IF ( #{end} IS NOT NULL, `biz_leak_point`.commit_date < #{end}, `biz_leak_point`.commit_date < ( SELECT date_sub(now(),interval 1 second))) " +
             ") b ")
-    Integer countSum(String waterUseOffice ,  String start ,  String end);
+    Integer countSum(@Param("waterUseOffice") String waterUseOffice , @Param("start")String start , @Param("end")String end);
 
     @Select(value = "SELECT\n" +
             "\tcount( * ) * 1.0 AS k \n" +
@@ -204,7 +217,7 @@ public interface BizSignPointMapper {
             "AND\n" +
             "IF\n" +
             "\t( #{end} IS NOT NULL, commit_date <#{end}, commit_date < ( SELECT DATE_SUB( now( ), INTERVAL 1 SECOND ) ) )")
-    Double countDangerPoint(String waterUseOffice ,  String start ,  String end);
+    Double countDangerPoint(@Param("waterUseOffice") String waterUseOffice , @Param("start")String start , @Param("end")String end);
 
     @Select(value = "SELECT\n" +
             "\tcount( * ) * 1.0 AS k \n" +
@@ -221,6 +234,6 @@ public interface BizSignPointMapper {
             "AND\n" +
             "IF\n" +
             "\t( #{end} IS NOT NULL, commit_date <#{end}, commit_date < ( SELECT DATE_SUB( now( ), INTERVAL 1 SECOND ) ) )")
-    Double countLeakPoint(String waterUseOffice ,  String start ,  String end);
+    Double countLeakPoint(@Param("waterUseOffice") String waterUseOffice , @Param("start")String start , @Param("end")String end);
 
 }

@@ -181,10 +181,28 @@ public class BizHiddenDangerPointEntity {
 	private String x;
 
 	/**
-	 * x坐标
+	 * y坐标
 	 */
 	@Column(name = "y" )
 	private String y;
+
+	/**
+	 * 其他施工方式
+	 */
+	@Column(name = "other_project_type" )
+	private String otherProjectType;
+
+	/**
+	 * 其他施工方式
+	 */
+	@Column(name = "other_construction_type" )
+	private String otherConstructionType;
+
+	/**
+	 * 修改时间
+	 */
+	@Column(name = "modify_time" )
+	private String modifyTime;
 
 	/**
 	 * 隐患时长
@@ -289,6 +307,30 @@ public class BizHiddenDangerPointEntity {
 		this.fileList = fileList;
 		this.sgfs = sgfs;
 		this.gdlx = gdlx;
+	}
+
+	public String getOtherProjectType() {
+		return otherProjectType;
+	}
+
+	public void setOtherProjectType(String otherProjectType) {
+		this.otherProjectType = otherProjectType;
+	}
+
+	public String getOtherConstructionType() {
+		return otherConstructionType;
+	}
+
+	public void setOtherConstructionType(String otherConstructionType) {
+		this.otherConstructionType = otherConstructionType;
+	}
+
+	public String getModifyTime() {
+		return modifyTime;
+	}
+
+	public void setModifyTime(String modifyTime) {
+		this.modifyTime = modifyTime;
 	}
 
 	public String getHiddenDangerPointStatus() {

@@ -67,8 +67,8 @@ public class PlanController {
 
     @ApiOperation("查询计划详情")
     @GetMapping("findById")
-    public RespBean findById(@RequestParam Integer id) throws UnsupportedEncodingException {
-        return planService.findById(id);
+    public RespBean findById(@RequestParam Integer id,HttpServletRequest request) throws UnsupportedEncodingException {
+        return planService.findById(id,request);
     }
 
     @ApiOperation("查询路线对应的所有计划")

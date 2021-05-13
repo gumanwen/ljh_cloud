@@ -91,4 +91,22 @@ public class SignPointController {
         return signPointService.findCondition(map);
     }
 
+    @ApiOperation("查询角色所有末梢点列表")
+    @GetMapping("findEndPointList")
+    public RespBean findEndPointList(@RequestParam String waterUseOffice,String start,String end){
+        return signPointService.findEndPointList(waterUseOffice,start,end);
+    }
+
+    @ApiOperation("查询最近10条签到点巡查记录")
+    @GetMapping("top10")
+    public RespBean top10(){
+        return signPointService.top10();
+    }
+
+//    @ApiOperation("查询签到点覆盖率")
+//    @GetMapping("per")
+//    public RespBean per(){
+//        return signPointService.per();
+//    }
+
 }

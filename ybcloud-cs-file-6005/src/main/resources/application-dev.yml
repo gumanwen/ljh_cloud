@@ -57,3 +57,4 @@ web:
 ribbon:
     ConnectTimeout: 30000
     ReadTimeout: 7000
+url: http://119.135.180.178:8850/api/pipenetInspect

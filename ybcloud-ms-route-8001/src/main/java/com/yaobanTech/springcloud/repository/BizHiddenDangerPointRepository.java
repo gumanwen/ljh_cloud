@@ -29,6 +29,9 @@ public interface BizHiddenDangerPointRepository extends JpaRepository<BizHiddenD
     @Query(value = " from BizHiddenDangerPointEntity t where t.enabled = 1 and t.id = ?1")
     BizHiddenDangerPointEntity findHiddenDangerPoint(Integer id);
 
+    @Query(value = "select * from biz_hidden_danger_point t where t.enabled = 1 order by t.modify_time limit 10 ",nativeQuery = true)
+    List<BizHiddenDangerPointEntity> top();
+
     @Query(value = " from BizHiddenDangerPointEntity t where t.enabled = 1 and t.hiddenDangerPointCode = ?1")
     BizHiddenDangerPointEntity findHiddenDangerPoint(String code);
 

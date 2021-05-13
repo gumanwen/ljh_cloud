@@ -138,6 +138,12 @@ public class BizRoute  implements Serializable {
 	private String addr;
 
 	/**
+	 * 图片地址
+	 */
+	@Column(name = "area" )
+	private String area;
+
+	/**
 	 * 用水管理所枚举对象
 	 */
     @Transient
@@ -195,6 +201,14 @@ public class BizRoute  implements Serializable {
 		this.pointInspectionTypeMenu = pointInspectionTypeMenu;
 		this.routeCreatorCN = routeCreatorCN;
 		this.bizSignPoints = bizSignPoints;
+	}
+
+	public String getArea() {
+		return area;
+	}
+
+	public void setArea(String area) {
+		this.area = area;
 	}
 
 	public static long getSerialVersionUID() {

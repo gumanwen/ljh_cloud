@@ -18,4 +18,7 @@ public interface InspectService {
     @GetMapping("/api/inspect/isModifiable")
     RespBean comfirmModify(@RequestParam("routeId") Integer routeId);
 
+    @GetMapping("/api/inspect/deleteRoute")
+    Boolean deleteRoute(@RequestParam("routeId") Integer routeId);
+
 }

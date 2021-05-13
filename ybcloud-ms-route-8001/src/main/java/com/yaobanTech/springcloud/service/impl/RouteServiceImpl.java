@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.util.RouteMatcher;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -82,6 +83,9 @@ public class RouteServiceImpl {
             try {
                 List<BizSignPoint> pointList = bizRoute.getBizSignPoints();
                 for (int i = 0; i <pointList.size() ; i++) {
+                    if(pointList.get(i).getTroubleCode() != null && !"".equals(pointList.get(i).getTroubleCode())){
+                        bizSignPointRepository.copyFiles(pointList.get(i).getId().toString(),pointList.get(i).getTroubleCode());
+                    }
                     pointList.get(i).setRouteId(bizRoute.getId());
                     pointList.get(i).setRouteType(bizRoute.getRouteType());
                     pointList.get(i).setPointInspectionType(bizRoute.getPointInspectionType());
@@ -138,18 +142,16 @@ public class RouteServiceImpl {
     public RespBean deleteRoute(Integer id) {
         Integer i = null;
         if(id != null) {
+            Boolean bool = null;
             try {
-                BizRoute detail = bizRouteRepository.findDetail(id);
-                List<BizSignPoint> signPoints = detail.getBizSignPoints();
-                List<Object> list = (List<Object>) planService.findByRouteId(id).getObj();
-                if(signPoints.isEmpty() && list.isEmpty()) {
-                    i = bizRouteRepository.deleteRoute(id);
+                bool = inspectService.deleteRoute(id);
+                if(bool){
+                    Integer integer = bizRouteRepository.deleteRoute(id);
                 }else{
-                    return RespBean.error("删除失败！该路线包含计划或签到点,无法进行删除操作！");
+                    return RespBean.error("该路线下任务状态不允许删除！");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                return RespBean.error("删除失败！");
             }
         }else{
             return RespBean.error("id为空！");
@@ -161,7 +163,6 @@ public class RouteServiceImpl {
     public RespBean findCondition(HashMap<String,Object> hashMap,HttpServletRequest request) throws UnsupportedEncodingException {
         //获取当前用户
         LoginUser u = urlUtils.getAll(request);
-        String chineseName = (String)oauthService.getChineseName(u.getLoginname()).getObj();
         RouteCondition routeCondition = JSONObject.parseObject(JSONObject.toJSONString(hashMap.get("form")), RouteCondition.class);
         Specification<BizRoute> spec = new Specification<BizRoute>() {
             @Override
@@ -214,6 +215,7 @@ public class RouteServiceImpl {
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
                 BizRoute route = list.get(i);
+                String chineseName = urlUtils.getNameByUsername(route.getRouteCreator(),request);
                 List<BizSignPoint> points = route.getBizSignPoints();
                 if(points.size()>0){
                     for(int j =0; j<points.size();j++){
@@ -245,7 +247,6 @@ public class RouteServiceImpl {
     public RespBean findAll(HttpServletRequest request) throws UnsupportedEncodingException {
         LoginUser u = urlUtils.getAll(request);
         String user = u.getLoginname();
-        String chineseName = (String)oauthService.getChineseName(u.getLoginname()).getObj();
         String role = u.getRoleLists();
         List<BizRoute> list = null;
         if(!"".equals(role) && role !=null && role.contains("BZZ")){
@@ -257,6 +258,7 @@ public class RouteServiceImpl {
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
                 BizRoute route = list.get(i);
+                String chineseName = urlUtils.getNameByUsername(route.getRouteCreator(),request);
                 List<BizSignPoint> points = route.getBizSignPoints();
                 if(points.size()>0){
                     for(int j =0; j<points.size();j++){
@@ -290,7 +292,7 @@ public class RouteServiceImpl {
     public RespBean findExitAll(HttpServletRequest request) throws UnsupportedEncodingException {
         LoginUser u = urlUtils.getAll(request);
         String user = u.getLoginname();
-        String chineseName = (String)oauthService.getChineseName(u.getLoginname()).getObj();
+        String chineseName = urlUtils.getNameByUsername(user,request);
         List<BizRoute> list = bizRouteRepository.findExitList(user);
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
@@ -328,12 +330,12 @@ public class RouteServiceImpl {
     }
 
     @Transactional(propagation= Propagation.NOT_SUPPORTED)
-    public RespBean findDetail(Integer id) throws UnsupportedEncodingException {
+    public RespBean findDetail(Integer id,HttpServletRequest request) throws UnsupportedEncodingException {
         BizRoute br = bizRouteRepository.findDetail(id);
         if(br != null) {
             List<BizSignPoint> pointList = (List<BizSignPoint>) signPointService.findList(br.getId()).getObj();
             List<BizSignPoint> list = br.getBizSignPoints();
-            String chineseName = (String)oauthService.getChineseName(br.getRouteCreator()).getObj();
+            String chineseName = (String)urlUtils.getNameByUsername(br.getRouteCreator(),request);
             //获取报建文件列表
             if(list.size()>0){
                 for(int i =0; i<list.size(); i++){
@@ -361,6 +363,17 @@ public class RouteServiceImpl {
             br.setRouteCreatorCN(chineseName);
         }
         return RespBean.ok("查询成功！",br);
+    }
+
+    public RespBean findListByIds(List<Integer> routeIds){
+        List<BizRoute> collect = null;
+        if(!routeIds.isEmpty()){
+            collect = routeIds.stream().map(o -> {
+                BizRoute route = bizRouteRepository.findDetail(o);
+                return route;
+            }).collect(Collectors.toList());
+        }
+        return RespBean.ok("查询成功！",collect);
     }
 
     public RespBean findEnumMenu(String mode){
@@ -402,7 +415,8 @@ public class RouteServiceImpl {
         return RespBean.ok("查询成功！", map);
     }
 
-    public RespBean findRouteIds(String waterManagementOffice,Integer routeId,String pointInspectionType,Integer planId ,String planPorid,String planType){
+    public RespBean findRouteIds(String waterManagementOffice,Integer routeId,String pointInspectionType,Integer planId ,String planPorid,String planType,String routeType){
+        List<HashMap<String, Object>> list  = null;
         if("".equals(waterManagementOffice)){
             waterManagementOffice = null;
         }
@@ -415,8 +429,69 @@ public class RouteServiceImpl {
         if("".equals(planType)){
             planType = null;
         }
-        List<HashMap<String, Object>> ids = bizSignPointMapper.findRouteIds(waterManagementOffice, routeId, pointInspectionType, planId, planPorid, planType);
-        return RespBean.ok("查询成功！",ids);
+        if("".equals(routeType)){
+            routeType = null;
+        }
+        List<HashMap<String, Object>> ids = bizSignPointMapper.findRouteIds(waterManagementOffice, routeId, pointInspectionType, planId, planPorid, planType,routeType);
+        if(!ids.isEmpty()){
+          list = ids.stream().map(o -> {
+                        Map waterOfficeMenu = (Map) findEnum((String) o.get("water_management_office")).getObj();
+                        Map routeTypeMenu = (Map) findEnum((String) o.get("route_type")).getObj();
+                        Map pointInspectionTypeMenu = (Map) findEnum((String) o.get("point_inspection_type")).getObj();
+                        Map planPoridMenu = (Map) findEnum((String) o.get("plan_porid")).getObj();
+                        Map planTypeMenu = (Map) findEnum((String) o.get("plan_type")).getObj();
+                        o.put("water_office_menu", waterOfficeMenu);
+                        o.put("route_type_menu", routeTypeMenu);
+                        o.put("point_inspection_type_menu", pointInspectionTypeMenu);
+                        o.put("plan_porid_menu", planPoridMenu);
+                        o.put("plan_type_menu", planTypeMenu);
+                        return o;
+                    }
+            ).collect(Collectors.toList());
+
+        }
+        return RespBean.ok("查询成功！",list);
     }
 
+
+    @Transactional(propagation= Propagation.NOT_SUPPORTED)
+    public RespBean openFindDetail(Integer id,String token,Integer type,HttpServletRequest request) throws UnsupportedEncodingException {
+        BizRoute br = bizRouteRepository.findDetail(id);
+        if(type == 1){
+            request.setAttribute("Authorization",token);
+        }else{
+            request.setAttribute("TW-Authorization",token);
+        }
+        if(br != null) {
+            List<BizSignPoint> pointList = (List<BizSignPoint>) signPointService.findList(br.getId()).getObj();
+            List<BizSignPoint> list = br.getBizSignPoints();
+            String chineseName = (String)urlUtils.getNameByUsername(br.getRouteCreator(),request);
+            //获取报建文件列表
+            if(list.size()>0){
+                for(int i =0; i<list.size(); i++){
+                    //获取报建文件列表
+                    if(FieldUtils.isObjectNotEmpty(list.get(i).getFileType())) {
+                        RespBean respBean = fileService.selectOneByPid(String.valueOf((Integer) list.get(i).getId()), (String) list.get(i).getFileType());
+                        Object o = respBean.getObj();
+                        List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>)o ;
+                        if(respBean.getStatus() == 500){
+                            throw new RuntimeException("Feign调用文件服务失败");
+                        }
+                        list.get(i).setFileList(fileList);
+                    }
+                }
+            }
+
+            Map waterOfficeMenu = (Map) findEnum(br.getWaterManagementOffice()).getObj();
+            Map routeTypeMenu = (Map) findEnum(br.getRouteType()).getObj();
+            Map pointInspectionTypeMenu = (Map) findEnum(br.getPointInspectionType()).getObj();
+            br.setRouteTypeMenu(routeTypeMenu);
+            br.setWaterOfficeMenu(waterOfficeMenu);
+            br.setBizSignPoints(pointList);
+            br.setPointInspectionTypeMenu(pointInspectionTypeMenu);
+            br.setBizSignPoints(list);
+            br.setRouteCreatorCN(chineseName);
+        }
+        return RespBean.ok("查询成功！",br);
+    }
 }
