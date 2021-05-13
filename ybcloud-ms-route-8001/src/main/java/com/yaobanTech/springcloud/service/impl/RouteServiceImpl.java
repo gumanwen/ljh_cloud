@@ -366,14 +366,16 @@ public class RouteServiceImpl {
     }
 
     public RespBean findListByIds(List<Integer> routeIds){
-        List<BizRoute> collect = null;
+        List<BizRoute> list = new ArrayList<>();
         if(!routeIds.isEmpty()){
-            collect = routeIds.stream().map(o -> {
-                BizRoute route = bizRouteRepository.findDetail(o);
-                return route;
-            }).collect(Collectors.toList());
+            for (int i = 0; i < routeIds.size(); i++) {
+                BizRoute route = bizRouteRepository.findDetail(routeIds.get(i));
+                Map waterOfficeMenu = (Map) findEnum(route.getWaterManagementOffice()).getObj();
+                route.setWaterOfficeMenu(waterOfficeMenu);
+                list.add(route);
+            }
         }
-        return RespBean.ok("查询成功！",collect);
+        return RespBean.ok("查询成功！",list);
     }
 
     public RespBean findEnumMenu(String mode){

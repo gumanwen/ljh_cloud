@@ -219,7 +219,7 @@ public class PlanService {
                         }
                     });
                     routes.stream().forEach(b -> {
-                        if(plan.getRouteId().equals(b.get("route_id"))){
+                        if(plan.getRouteId()==(b.get("id"))){
                             plan.setRouteObj(b);
                         }
                     });
