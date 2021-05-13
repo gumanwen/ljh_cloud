@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.List;
 
 @RestController
 @RefreshScope
@@ -57,6 +58,12 @@ public class RouteController {
     @GetMapping("findList")
     public RespBean findList(HttpServletRequest request) throws UnsupportedEncodingException {
         return routeService.findAll(request);
+    }
+
+    @ApiOperation("根据ids查询路线列表")
+    @GetMapping("findListByIds")
+    public RespBean findListByIds(@RequestParam List<Integer> routeIds) {
+        return routeService.findListByIds(routeIds);
     }
 
     @ApiOperation("查询未删除路线列表")

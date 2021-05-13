@@ -58,13 +58,13 @@ public class LeakPointServiceImpl {
             try {
                 String leakPointCode = null;
                 if("3".equals(bizLeakPointEntity.getWaterUseOffice())){
-                    leakPointCode =redisService.createGenerateCode("漏点","CNL",true,4);
+                    leakPointCode =redisService.createGenerateCode("漏点","CNLD",true,4);
                 }
                 else if("4".equals(bizLeakPointEntity.getWaterUseOffice())){
-                    leakPointCode =redisService.createGenerateCode("漏点","CBL",true,4);
+                    leakPointCode =redisService.createGenerateCode("漏点","CBLD",true,4);
                 }
                 else if("5".equals(bizLeakPointEntity.getWaterUseOffice())){
-                    leakPointCode =redisService.createGenerateCode("漏点","SJL",true,4);
+                    leakPointCode =redisService.createGenerateCode("漏点","SJLD",true,4);
                 }else{
                     return RespBean.error("用水管理所参数不符合系统约定，生成编号异常！");
                 }

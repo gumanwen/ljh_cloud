@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.util.RouteMatcher;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -82,6 +83,9 @@ public class RouteServiceImpl {
             try {
                 List<BizSignPoint> pointList = bizRoute.getBizSignPoints();
                 for (int i = 0; i <pointList.size() ; i++) {
+                    if(pointList.get(i).getTroubleCode() != null && !"".equals(pointList.get(i).getTroubleCode())){
+                        bizSignPointRepository.copyFiles(pointList.get(i).getId().toString(),pointList.get(i).getTroubleCode());
+                    }
                     pointList.get(i).setRouteId(bizRoute.getId());
                     pointList.get(i).setRouteType(bizRoute.getRouteType());
                     pointList.get(i).setPointInspectionType(bizRoute.getPointInspectionType());
@@ -159,7 +163,6 @@ public class RouteServiceImpl {
     public RespBean findCondition(HashMap<String,Object> hashMap,HttpServletRequest request) throws UnsupportedEncodingException {
         //获取当前用户
         LoginUser u = urlUtils.getAll(request);
-        String chineseName = urlUtils.getNameByUsername(u.getLoginname(),request);
         RouteCondition routeCondition = JSONObject.parseObject(JSONObject.toJSONString(hashMap.get("form")), RouteCondition.class);
         Specification<BizRoute> spec = new Specification<BizRoute>() {
             @Override
@@ -212,6 +215,7 @@ public class RouteServiceImpl {
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
                 BizRoute route = list.get(i);
+                String chineseName = urlUtils.getNameByUsername(route.getRouteCreator(),request);
                 List<BizSignPoint> points = route.getBizSignPoints();
                 if(points.size()>0){
                     for(int j =0; j<points.size();j++){
@@ -359,6 +363,17 @@ public class RouteServiceImpl {
             br.setRouteCreatorCN(chineseName);
         }
         return RespBean.ok("查询成功！",br);
+    }
+
+    public RespBean findListByIds(List<Integer> routeIds){
+        List<BizRoute> collect = null;
+        if(!routeIds.isEmpty()){
+            collect = routeIds.stream().map(o -> {
+                BizRoute route = bizRouteRepository.findDetail(o);
+                return route;
+            }).collect(Collectors.toList());
+        }
+        return RespBean.ok("查询成功！",collect);
     }
 
     public RespBean findEnumMenu(String mode){

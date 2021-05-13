@@ -110,7 +110,7 @@ public class RedisService {
     private Long generateId(String key, Date date) {
         RedisAtomicLong counter = new RedisAtomicLong(key, redisTemplate.getConnectionFactory());
         // 通过key获取自增并设定过期时间
-//        counter.expireAt(date);
+        counter.expireAt(date);
         return counter.incrementAndGet();
     }
 
@@ -129,13 +129,13 @@ public class RedisService {
         // 拼接的字符串
         StringBuffer sb = new StringBuffer();
         // 当前日期
-//        Date date = new Date();
+        Date date = new Date();
         // 自定义前缀
         sb.append(prefix);
-//        if (date != null) {
-//            DateFormat df = new SimpleDateFormat("yyyyMMdd");
-//            sb.append(df.format(date));
-//        }
+        if (date != null) {
+            DateFormat df = new SimpleDateFormat("yyyyMMdd");
+            sb.append(df.format(date));
+        }
 
         /* 对不满足长度的id值,使用0补齐 */
         // redis 生成的id值

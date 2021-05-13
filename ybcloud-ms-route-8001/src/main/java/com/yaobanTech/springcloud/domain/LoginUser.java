@@ -1,7 +1,5 @@
 package com.yaobanTech.springcloud.domain;
 
-import com.yaobanTech.springcloud.domain.ClientTypeEnum;
-
 import java.util.Date;
 import java.util.List;
 
@@ -57,6 +55,11 @@ public class LoginUser {
     private Integer deptid;
 
     /**
+     * 用水管理所
+     */
+    private String deptName;;
+
+    /**
      * 备注
      */
     private String remark;
@@ -97,6 +100,14 @@ public class LoginUser {
      * 是否超级管理员
      */
     private  Boolean isSuperAdmin;
+
+    public String getDeptName() {
+        return deptName;
+    }
+
+    public void setDeptName(String deptName) {
+        this.deptName = deptName;
+    }
 
     public Integer getId() {
         return id;
