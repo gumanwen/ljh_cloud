@@ -174,6 +174,12 @@ public class BizPlan  implements Serializable {
 	private Map<String,Object> planStatusMenu;
 
 	/**
+	 * 路线名称
+	 */
+	@Transient
+	private String routeName;
+
+	/**
 	 * 附件
 	 */
 	@Transient
@@ -231,6 +237,14 @@ public class BizPlan  implements Serializable {
 		this.routeId = routeId;
 		this.mainKey = mainKey;
 		this.troubleCode = troubleCode;
+	}
+
+	public String getRouteName() {
+		return routeName;
+	}
+
+	public void setRouteName(String routeName) {
+		this.routeName = routeName;
 	}
 
 	public String getExamineDate() {

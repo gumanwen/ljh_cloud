@@ -74,13 +74,13 @@ public class HiddenDangerPointServiceImpl {
                 String user = u.getLoginname();
                 String deptName = u.getDeptName();
                 if(deptName.contains("城南")){
-                    hiddenDangerPointCode =redisService.createGenerateCode("隐患点","CNYH",true,6);
+                    hiddenDangerPointCode =redisService.createGenerateCode("隐患点","CNYH",true,2);
                 }
                 else if(deptName.contains("城北")){
-                    hiddenDangerPointCode =redisService.createGenerateCode("隐患点","CBYH",true,6);
+                    hiddenDangerPointCode =redisService.createGenerateCode("隐患点","CBYH",true,2);
                 }
                 else if(deptName.contains("石角")){
-                    hiddenDangerPointCode =redisService.createGenerateCode("隐患点","SJYH",true,6);
+                    hiddenDangerPointCode =redisService.createGenerateCode("隐患点","SJYH",true,2);
                 }else{
                     return RespBean.error("用水管理所参数不符合系统约定，生成编号异常！");
                 }
@@ -321,12 +321,12 @@ public class HiddenDangerPointServiceImpl {
         List<BizHiddenDangerPointEntity> list = null;
         if(hiddenDangerPointQuery != null){
             LoginUser u = urlUtils.getAll(request);
-            String user = u.getLoginname();
-            String chineseName = u.getName();
+//            String user = u.getLoginname();
             list = bizSignPointMapper.hiddenDangerPointQuery(hiddenDangerPointQuery);
             if(!list.isEmpty()){
                 for (int i = 0; i < list.size(); i++) {
                     BizHiddenDangerPointEntity hiddenDangerPointEntity = list.get(i);
+                    String chineseName = urlUtils.getNameByUsername(hiddenDangerPointEntity.getCommitBy(),request);
                     HashMap<String,Object> hiddenDangerStatusEnum = (HashMap)routeService.findEnum(hiddenDangerPointEntity.getHiddenDangerPointStatus()).getObj();
 //                    HashMap<String,Object> projectTypeEnum = (HashMap)routeService.findEnum(hiddenDangerPointEntity.getProjectType()).getObj();
 //                    HashMap<String,Object> riskLevelEnum = (HashMap)routeService.findEnum(hiddenDangerPointEntity.getRiskLevel()).getObj();

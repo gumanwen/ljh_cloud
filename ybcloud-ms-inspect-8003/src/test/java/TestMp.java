@@ -1,10 +1,5 @@
-import com.alibaba.fastjson.JSONArray;
-import com.yaobanTech.springcloud.entity.BizHiddenDangerPointEntity;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 public class TestMp {
 
@@ -15,10 +10,6 @@ public class TestMp {
         Date beginDate = sdf.parse(beginTime);
         beginTime = dateFormat.format(beginDate);
         System.out.println("111");*/
-        BizHiddenDangerPointEntity p = new BizHiddenDangerPointEntity(10, 11);
-        Object obj = JSONArray.toJSON(p);
-        String json = obj.toString();
-        System.out.println(json);
     }
 
     public static void main(String[] args) throws ParseException {

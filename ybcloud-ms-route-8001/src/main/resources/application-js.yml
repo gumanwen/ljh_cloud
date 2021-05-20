@@ -23,6 +23,10 @@ spring:
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
   application:
     name: routeService
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
   cloud:
     nacos:
       discovery:

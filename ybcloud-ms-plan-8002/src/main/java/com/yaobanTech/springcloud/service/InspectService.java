@@ -19,4 +19,7 @@ public interface InspectService {
     @GetMapping("/api/inspect/task/autoCreate")
     RespBean sendInspectInfo(@RequestBody HashMap<String,Object> param);
 
+    @GetMapping("/api/inspect/isDelete")
+    Boolean deleteRoute(@RequestParam("routeId") Integer routeId,@RequestParam("planId") Integer planId);
+
 }

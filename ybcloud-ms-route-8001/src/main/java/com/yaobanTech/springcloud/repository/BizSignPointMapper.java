@@ -100,6 +100,23 @@ public interface BizSignPointMapper {
     List<HashMap<String,Object>> findRouteIds(@Param("waterManagementOffice") String waterManagementOffice,@Param("routeId") Integer routeId, @Param("pointInspectionType")String pointInspectionType,@Param("planId") Integer planId , @Param("planPorid")String planPorid,@Param("planType") String planType,@Param("routeType") String routeType);
 
     @Select(value="SELECT a.* " +
+            "FROM `ybcloud-ms-route-8001`.`biz_route` a " +
+            "WHERE 1=1 " +
+            "AND IF(#{waterManagementOffice} is not null,a.water_management_office = #{waterManagementOffice},1=1) " +
+            "AND IF(#{pointInspectionType} is not null,a.point_inspection_type = #{pointInspectionType},1=1) " +
+            "AND IF(#{planInspectionMileageStart} is not null,a.plan_inspection_mileage >= #{planInspectionMileageStart},1=1) " +
+            "AND IF(#{planInspectionMileageEnd} is not null,a.plan_inspection_mileage <= #{planInspectionMileageEnd},1=1) " +
+            "AND IF(#{createdTimeStart} is not null,a.created_time >= #{createdTimeStart},1=1) " +
+            "AND IF(#{createdTimeEnd} is not null,a.created_time <= #{createdTimeEnd},1=1) " +
+            "AND IF(#{routeName} is not null,a.route_name = #{routeName},1=1) " +
+            "AND IF(#{routeType} is not null,a.route_type = #{routeType},1=1) " +
+            "AND (IF(#{mainKey} is not null,a.area = #{mainKey},1=1) " +
+            "OR IF(#{mainKey} is not null,a.route_creator = #{mainKey},1=1) " +
+            "OR IF(#{mainKey} is not null,a.route_name = #{mainKey},1=1)) ")
+    List<BizRoute> findRouteCondition(RouteCondition routeCondition);
+
+
+    @Select(value="SELECT a.* " +
             "FROM `ybcloud-ms-route-8001`.`biz_leak_point` a " +
             "WHERE a.enabled = 1 " +
             "AND IF(#{assetType} is not null,  a.asset_type = #{assetType},1=1)" +
@@ -125,6 +142,12 @@ public interface BizSignPointMapper {
             "AND IF(#{projectType} is not null, a.project_type = #{projectType},1=1 ) " +
             "AND IF(#{constructionType} is not null, a.construction_type = #{constructionType},1=1 ) " +
             "AND IF(#{networkNotification} is not null, a.network_notification = #{networkNotification},1=1 ) " +
+            "AND ( IF(#{mainKey} is not null, a.project_name = #{mainKey},1=1 ) " +
+            "OR IF(#{mainKey} is not null, a.construction_position = #{mainKey},1=1 ) " +
+            "OR IF(#{mainKey} is not null, a.build_company = #{mainKey},1=1 ) " +
+            "OR IF(#{mainKey} is not null, a.build_company_agent = #{mainKey},1=1 ) " +
+            "OR IF(#{mainKey} is not null, a.construction_company = #{mainKey},1=1 ) " +
+            "OR IF(#{mainKey} is not null, a.reason like #{mainKey},1=1 )) " +
             "ORDER BY a.commit_Date DESC")
     List<BizHiddenDangerPointEntity> hiddenDangerPointQuery(HiddenDangerPointQuery hiddenDangerPointQuery);
 
@@ -163,6 +186,7 @@ public interface BizSignPointMapper {
             "AND IF(#{pipeDiameter} is not null, c.pipe_diameter = #{pipeDiameter},1=1 ) " +
             "AND IF(#{signStatus} is not null, c.sign_point_status = #{signStatus},1=1 ) " +
             "AND IF(#{hiddenCode} is not null, c.trouble_code = #{hiddenCode},1=1 ) " +
+            "AND IF(#{mainKey} is not null, c.site_conditions_desc = #{mainKey},1=1 ) " +
             "AND FIND_IN_SET(c.task_id, #{taskidList}) " +
             "ORDER BY c.modify_time DESC")
     List<HashMap<String,Object>> findConditionElse(SignPointQuery signPointQuery);

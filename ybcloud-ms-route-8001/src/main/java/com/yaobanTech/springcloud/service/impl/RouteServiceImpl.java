@@ -139,12 +139,13 @@ public class RouteServiceImpl {
         return RespBean.ok("修改成功！",bizRoute.getBizSignPoints());
     }
 
+    @Transactional
     public RespBean deleteRoute(Integer id) {
         Integer i = null;
         if(id != null) {
             Boolean bool = null;
             try {
-                bool = inspectService.deleteRoute(id);
+                bool = inspectService.deleteRoute(id,0);
                 if(bool){
                     Integer integer = bizRouteRepository.deleteRoute(id);
                 }else{
@@ -160,63 +161,23 @@ public class RouteServiceImpl {
     }
 
     @Transactional(propagation= Propagation.NOT_SUPPORTED)
-    public RespBean findCondition(HashMap<String,Object> hashMap,HttpServletRequest request) throws UnsupportedEncodingException {
+    public RespBean findCondition(RouteCondition routeCondition,HttpServletRequest request) throws UnsupportedEncodingException {
         //获取当前用户
         LoginUser u = urlUtils.getAll(request);
-        RouteCondition routeCondition = JSONObject.parseObject(JSONObject.toJSONString(hashMap.get("form")), RouteCondition.class);
-        Specification<BizRoute> spec = new Specification<BizRoute>() {
-            @Override
-            public Predicate toPredicate(Root<BizRoute> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-                List<Predicate> predicates = new ArrayList<>();
-                //从root取属性
-                //cb构造查询条件
-                //cb连接查询条件
-                if(routeCondition.getWaterManagementOffice() != null){
-                    Predicate p1 = cb.equal(root.get("waterManagementOffice"), routeCondition.getWaterManagementOffice());
-                    predicates.add(p1);
-                }
-                if(routeCondition.getPointInspectionType() != null){
-                    Predicate p2 = cb.equal(root.get("pointInspectionType"), routeCondition.getPointInspectionType());
-                    predicates.add(p2);
-                }
-                if(routeCondition.getPlanInspectionMileageStart() != null){
-
-                    Predicate p3 = cb.ge(root.get("planInspectionMileage"), routeCondition.getPlanInspectionMileageStart());
-                    predicates.add(p3);
-                }
-                if(routeCondition.getPlanInspectionMileageEnd() != null){
-
-                    Predicate p3 = cb.le(root.get("planInspectionMileage"), routeCondition.getPlanInspectionMileageEnd());
-                    predicates.add(p3);
-                }
-                if(routeCondition.getCreatedTimeStart() != null){
-                    Predicate p4 = cb.greaterThanOrEqualTo(root.get("createdTime"), routeCondition.getCreatedTimeStart());
-                    predicates.add(p4);
-                }
-                if(routeCondition.getCreatedTimeEnd() != null){
-                    Predicate p4 = cb.lessThanOrEqualTo(root.get("createdTime"), routeCondition.getCreatedTimeEnd());
-                    predicates.add(p4);
-                }
-                if(routeCondition.getRouteName() != null){
-                    Predicate p5 = cb.equal(root.get("routeName"), routeCondition.getRouteName());
-                    predicates.add(p5);
-                }
-                if(routeCondition.getRouteType() != null){
-                    Predicate p6 = cb.equal(root.get("routeType"), routeCondition.getRouteType());
-                    predicates.add(p6);
-                }
-                return cb.and(predicates.toArray(new Predicate[predicates.size()]));
-            }
-        };
-        //排序
-        Sort sort = Sort.by(Sort.Direction.DESC,"createdTime");
-        List<BizRoute> list = bizRouteRepository.findAll(spec,sort);
+        List<BizRoute> list = bizSignPointMapper.findRouteCondition(routeCondition);
+        //获取用户名列表
+        List<String> nameList = list.stream().map(o -> {
+            return o.getRouteCreator();
+        }).collect(Collectors.toList());
+        RespBean r1 = oauthService.getNameList(nameList);
+        List<HashMap<String, String>> names = (List<HashMap<String, String>>) r1.getObj();
         //查询附件
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
                 BizRoute route = list.get(i);
-                String chineseName = urlUtils.getNameByUsername(route.getRouteCreator(),request);
-                List<BizSignPoint> points = route.getBizSignPoints();
+                RespBean r2 = signPointService.findList(route.getId());
+                List<BizSignPoint> points = (List<BizSignPoint>) r2.getObj();
+                route.setBizSignPoints(points);
                 if(points.size()>0){
                     for(int j =0; j<points.size();j++){
                         //获取报建文件列表
@@ -236,7 +197,11 @@ public class RouteServiceImpl {
                 route.setRouteTypeMenu(routeTypeMenu);
                 route.setWaterOfficeMenu(waterOfficeMenu);
                 route.setPointInspectionTypeMenu(pointInspectionTypeMenu);
-                route.setRouteCreatorCN(chineseName);
+                names.stream().forEach(a -> {
+                    if(route.getRouteCreator().equals(a.get("username"))){
+                        route.setRouteCreatorCN(a.get("name"));
+                    }
+                });
             }
         }
        return RespBean.ok("查询成功！",list);

@@ -1,6 +1,7 @@
 package com.yaobanTech.springcloud.controller;
 
 import com.yaobanTech.springcloud.domain.RespBean;
+import com.yaobanTech.springcloud.domain.RouteCondition;
 import com.yaobanTech.springcloud.service.impl.RouteServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -92,8 +93,8 @@ public class RouteController {
 
     @ApiOperation("条件查询路线信息")
     @PostMapping("findCondition")
-    public RespBean findCondition(@RequestBody HashMap<String,Object> hashMap,HttpServletRequest request) throws UnsupportedEncodingException {
-        return routeService.findCondition(hashMap,request);
+    public RespBean findCondition(@RequestBody RouteCondition routeCondition, HttpServletRequest request) throws UnsupportedEncodingException {
+        return routeService.findCondition(routeCondition,request);
     }
 
     @ApiOperation("条件查询路线id列表")

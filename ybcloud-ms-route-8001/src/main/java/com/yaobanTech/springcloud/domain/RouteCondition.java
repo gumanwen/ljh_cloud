@@ -1,35 +1,21 @@
 package com.yaobanTech.springcloud.domain;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.util.Date;
-
 public class RouteCondition {
 
     private String waterManagementOffice;
     private String pointInspectionType;
     private Double planInspectionMileageStart;
     private Double planInspectionMileageEnd;
-    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(
-            pattern = "yyyy-MM-dd HH:mm:ss",
-            timezone = "GMT+8"
-    )
-    private Date createdTimeStart;
-    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(
-            pattern = "yyyy-MM-dd HH:mm:ss",
-            timezone = "GMT+8"
-    )
-    private Date createdTimeEnd;
+    private String createdTimeStart;
+    private String createdTimeEnd;
     private String routeName;
     private String routeType;
+    private String mainKey;
 
     public RouteCondition() {
     }
 
-    public RouteCondition(String waterManagementOffice, String pointInspectionType, Double planInspectionMileageStart, Double planInspectionMileageEnd, Date createdTimeStart, Date createdTimeEnd, String routeName, String routeType) {
+    public RouteCondition(String waterManagementOffice, String pointInspectionType, Double planInspectionMileageStart, Double planInspectionMileageEnd, String createdTimeStart, String createdTimeEnd, String routeName, String routeType, String mainKey) {
         this.waterManagementOffice = waterManagementOffice;
         this.pointInspectionType = pointInspectionType;
         this.planInspectionMileageStart = planInspectionMileageStart;
@@ -38,6 +24,7 @@ public class RouteCondition {
         this.createdTimeEnd = createdTimeEnd;
         this.routeName = routeName;
         this.routeType = routeType;
+        this.mainKey = mainKey;
     }
 
     public String getWaterManagementOffice() {
@@ -72,6 +59,21 @@ public class RouteCondition {
         this.planInspectionMileageEnd = planInspectionMileageEnd;
     }
 
+    public String getCreatedTimeStart() {
+        return createdTimeStart;
+    }
+
+    public void setCreatedTimeStart(String createdTimeStart) {
+        this.createdTimeStart = createdTimeStart;
+    }
+
+    public String getCreatedTimeEnd() {
+        return createdTimeEnd;
+    }
+
+    public void setCreatedTimeEnd(String createdTimeEnd) {
+        this.createdTimeEnd = createdTimeEnd;
+    }
 
     public String getRouteName() {
         return routeName;
@@ -89,33 +91,11 @@ public class RouteCondition {
         this.routeType = routeType;
     }
 
-    public Date getCreatedTimeStart() {
-        return createdTimeStart;
+    public String getMainKey() {
+        return mainKey;
     }
 
-    public void setCreatedTimeStart(Date createdTimeStart) {
-        this.createdTimeStart = createdTimeStart;
-    }
-
-    public Date getCreatedTimeEnd() {
-        return createdTimeEnd;
-    }
-
-    public void setCreatedTimeEnd(Date createdTimeEnd) {
-        this.createdTimeEnd = createdTimeEnd;
-    }
-
-    @Override
-    public String toString() {
-        return "RouteCondition{" +
-                "waterManagementOffice='" + waterManagementOffice + '\'' +
-                ", pointInspectionType='" + pointInspectionType + '\'' +
-                ", planInspectionMileageStart=" + planInspectionMileageStart +
-                ", planInspectionMileageEnd=" + planInspectionMileageEnd +
-                ", createdTimeStart=" + createdTimeStart +
-                ", createdTimeEnd=" + createdTimeEnd +
-                ", routeName='" + routeName + '\'' +
-                ", routeType='" + routeType + '\'' +
-                '}';
+    public void setMainKey(String mainKey) {
+        this.mainKey = mainKey;
     }
 }
