@@ -1,6 +1,7 @@
 package com.yaobanTech.springcloud.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.yaobanTech.springcloud.ToolUtils.DateFormatUtils;
 import com.yaobanTech.springcloud.ToolUtils.UrlUtils;
 import com.yaobanTech.springcloud.domain.BizPlan;
 import com.yaobanTech.springcloud.domain.LoginUser;
@@ -78,7 +79,7 @@ public class PlanService {
                     try {
                         bizPlan.setEnabled(1);
                         bizPlan.setPlanStatus("11");
-                        bizPlan.setPlanCreatedTime(new Date());
+                        bizPlan.setPlanCreatedTime(DateFormatUtils.DateToStr(new Date()));
                         LoginUser u = urlUtils.getAll(request);
                         String user = u.getLoginname();
                         bizPlan.setPlanCreatedBy(user);

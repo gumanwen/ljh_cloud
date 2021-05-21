@@ -81,6 +81,10 @@ public class RouteServiceImpl {
         }
         if(bizRoute != null && !bizRoute.getBizSignPoints().isEmpty() && bizRoute.getId() == null) {
             try {
+                bizRoute.setCreatedTime(new Date());
+                bizRoute.setRouteCreator(user);
+                bizRoute.setEnabled(1);
+                BizRoute route = bizRouteRepository.save(bizRoute);
                 List<BizSignPoint> pointList = bizRoute.getBizSignPoints();
                 for (int i = 0; i <pointList.size() ; i++) {
                     if(pointList.get(i).getTroubleCode() != null && !"".equals(pointList.get(i).getTroubleCode())){
@@ -90,12 +94,10 @@ public class RouteServiceImpl {
                     pointList.get(i).setRouteType(bizRoute.getRouteType());
                     pointList.get(i).setPointInspectionType(bizRoute.getPointInspectionType());
                     pointList.get(i).setEnabled(1);
+                    pointList.get(i).setRouteId(bizRoute.getId());
                 }
                 List<BizSignPoint> list = bizSignPointRepository.saveAll(pointList);
-                bizRoute.setCreatedTime(new Date());
-                bizRoute.setRouteCreator(user);
-                bizRoute.setEnabled(1);
-                BizRoute route = bizRouteRepository.save(bizRoute);
+
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("保存失败！");

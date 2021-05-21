@@ -112,7 +112,8 @@ public interface BizSignPointMapper {
             "AND IF(#{routeType} is not null,a.route_type = #{routeType},1=1) " +
             "AND (IF(#{mainKey} is not null,a.area = #{mainKey},1=1) " +
             "OR IF(#{mainKey} is not null,a.route_creator = #{mainKey},1=1) " +
-            "OR IF(#{mainKey} is not null,a.route_name = #{mainKey},1=1)) ")
+            "OR IF(#{mainKey} is not null,a.route_name = #{mainKey},1=1)) " +
+            "ORDER BY a.enabled desc,a.created_time desc")
     List<BizRoute> findRouteCondition(RouteCondition routeCondition);
 
 
