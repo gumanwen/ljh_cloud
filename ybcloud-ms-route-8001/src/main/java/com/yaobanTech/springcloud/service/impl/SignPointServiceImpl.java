@@ -319,9 +319,9 @@ public class SignPointServiceImpl {
                         Map routeTypeEnum = (Map) EnumMenu.findEnum((String)maps.get(i).get("route_type")).getObj();
                         Map waterManagementOfficeEnum = (Map) EnumMenu.findEnum((String)maps.get(i).get("water_management_office")).getObj();
                         //获取报建文件列表
-                        RespBean res = fileService.selectOneByPid(maps.get(i).get("sign_point_id").toString(), "qddfj");
-                        List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) res.getObj();
-                        maps.get(i).put("fileList",fileList);
+//                        RespBean res = fileService.selectOneByPid(maps.get(i).get("sign_point_id").toString(), "qddfj");
+//                        List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) res.getObj();
+//                        maps.get(i).put("fileList",fileList);
                         maps.get(i).put("pointInspectionTypeEnum",pointInspectionTypeEnum);
                         maps.get(i).put("routeTypeEnum",routeTypeEnum);
                         maps.get(i).put("waterManagementOfficeEnum",waterManagementOfficeEnum);
@@ -332,7 +332,6 @@ public class SignPointServiceImpl {
                                 maps.get(i).put("inspect_person",list.get(j).get("inspect_person"));
                                 maps.get(i).put("begin_time",list.get(j).get("begin_time"));
                                 maps.get(i).put("dead_time",list.get(j).get("dead_time"));
-                                maps.get(i).put("plan_name",list.get(j).get("plan_name"));
                             }
                         }
                     }
