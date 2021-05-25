@@ -180,19 +180,6 @@ public class RouteServiceImpl {
                 RespBean r2 = signPointService.findList(route.getId());
                 List<BizSignPoint> points = (List<BizSignPoint>) r2.getObj();
                 route.setBizSignPoints(points);
-                if(points.size()>0){
-                    for(int j =0; j<points.size();j++){
-                        //获取报建文件列表
-                        if(FieldUtils.isObjectNotEmpty(points.get(j).getFileType())) {
-                            RespBean respBean = fileService.selectOneByPid(String.valueOf((Integer) points.get(j).getId()), (String) points.get(j).getFileType());
-                            List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) respBean.getObj();
-                            if(respBean.getStatus() == 500){
-                                throw new RuntimeException("Feign调用文件服务失败");
-                            }
-                            points.get(j).setFileList(fileList);
-                        }
-                    }
-                }
                 Map waterOfficeMenu = (Map) findEnum(route.getWaterManagementOffice()).getObj();
                 Map routeTypeMenu = (Map) findEnum(route.getRouteType()).getObj();
                 Map pointInspectionTypeMenu = (Map) findEnum(route.getPointInspectionType()).getObj();
