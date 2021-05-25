@@ -350,6 +350,7 @@ public class SignPointServiceImpl {
                 if(((String)a.get("task_id")).equals(((String)b.get("inspectTaskId")))){
                     a.put("name",b.get("name"));
                     a.put("actBeginTime",b.get("actBeginTime"));
+                    a.put("checkInPointSituation",b.get("checkInPointSituation"));
                 }
             });
         });

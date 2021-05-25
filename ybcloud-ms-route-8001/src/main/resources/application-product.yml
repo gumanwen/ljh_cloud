@@ -37,7 +37,7 @@ spring:
         file-extension: properties
         namespace: 8740fef6-e5cd-4bee-aa59-1982b454323e
         group: DEFAULT_GROUP
-mybatis:
+mybatis-plus:
   #mapper-locations: classpath:mapping/*Mapper.xml
   #type-aliases-package: com.yaoban.kmsw.pojos
   configuration:

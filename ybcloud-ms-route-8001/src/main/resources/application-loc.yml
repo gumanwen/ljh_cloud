@@ -55,7 +55,7 @@ spring:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
-mybatis:
+mybatis-plus:
   #mapper-locations: classpath:mapping/*Mapper.xml
   #type-aliases-package: com.yaoban.kmsw.pojos
   configuration:
