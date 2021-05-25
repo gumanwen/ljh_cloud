@@ -99,6 +99,9 @@ public interface BizSignPointMapper {
 
     List<HashMap<String,Object>> findRouteIds(@Param("waterManagementOffice") String waterManagementOffice,@Param("routeId") Integer routeId, @Param("pointInspectionType")String pointInspectionType,@Param("planId") Integer planId , @Param("planPorid")String planPorid,@Param("planType") String planType,@Param("routeType") String routeType);
 
+    @Select(value = "select a.*,b.construction_position,b.project_name from biz_signed_point a left join biz_hidden_danger_point b on a.trouble_code =b.hidden_danger_point_code where a.enabled = 1 and a.trouble_code like '%Y%' and a.sign_point_status ='合格'  order by a.modify_time desc limit 10")
+    List<HashMap<String,Object>> top10();
+
     @Select(value="SELECT a.* " +
             "FROM `ybcloud-ms-route-8001`.`biz_route` a " +
             "WHERE 1=1 " +

@@ -125,15 +125,11 @@ public class SignPointServiceImpl {
         return RespBean.ok("删除成功！");
     }
 
+    @Transactional
     public RespBean findSignedPoint(Integer id) {
         BizSignedPoint byId = null;
         if(id != null) {
-            try {
-                byId = signedPointRepository.findbyId(id);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return RespBean.error("查询失败！");
-            }
+            byId = signedPointRepository.findbyId(id);
         }else{
             return RespBean.error("id为空！");
         }
@@ -148,13 +144,7 @@ public class SignPointServiceImpl {
     public RespBean findSignPoint(Integer id) {
         BizSignPoint byId = null;
         if(id != null) {
-            try {
-                byId = signPointRepository.findSignPointById(id);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                return RespBean.error("查询失败！");
-            }
+            byId = signPointRepository.findSignPointById(id);
         }else{
             return RespBean.error("id为空！");
         }
@@ -343,8 +333,28 @@ public class SignPointServiceImpl {
     }
 
     public  RespBean top10(){
-        List<BizSignedPoint> list = signedPointRepository.top10();
-        return RespBean.ok("查询成功！", list);
+        List<HashMap<String, Object>> maps = bizSignPointMapper.top10();
+        //获取task_id列表
+        List<String> list = maps.stream().map(o -> {
+            String taskId = (String) o.get("task_id");
+            return taskId;
+        }).collect(Collectors.toList());
+        //openFeign调用
+        RespBean bean = inspectService.getFeignInspectDetailById(list);
+        List<HashMap<String, Object>> hashMaps = (List<HashMap<String, Object>>) bean.getObj();
+        maps.stream().forEach(a -> {
+            RespBean res = fileService.selectOneByPid(a.get("id").toString(), (String)a.get("file_type"));
+            List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) res.getObj();
+            a.put("fileList",fileList);
+            hashMaps.stream().forEach(b -> {
+                if(((String)a.get("task_id")).equals(((String)b.get("inspectTaskId")))){
+                    a.put("name",b.get("name"));
+                    a.put("actBeginTime",b.get("actBeginTime"));
+                }
+            });
+        });
+
+        return RespBean.ok("查询成功！", maps);
     }
 
     public  RespBean findEnum(String code){
