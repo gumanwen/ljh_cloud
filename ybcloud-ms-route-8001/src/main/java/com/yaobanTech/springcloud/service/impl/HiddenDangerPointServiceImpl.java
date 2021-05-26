@@ -339,10 +339,10 @@ public class HiddenDangerPointServiceImpl {
                     hiddenDangerPointEntity.setGdlx(hiddenDangerPointEntity.getProjectType().split(","));
                     hiddenDangerPointEntity.setCommitByCN(chineseName);
                     codeList.add(hiddenDangerPointEntity.getHiddenDangerPointCode());
-                    //获取报建文件列表
-                    RespBean respBean = fileService.selectOneByPid(hiddenDangerPointEntity.getHiddenDangerPointCode(), "yhdfj");
-                    List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) respBean.getObj();
-                    hiddenDangerPointEntity.setFileList(fileList);
+//                    //获取报建文件列表
+//                    RespBean respBean = fileService.selectOneByPid(hiddenDangerPointEntity.getHiddenDangerPointCode(), "yhdfj");
+//                    List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) respBean.getObj();
+//                    hiddenDangerPointEntity.setFileList(fileList);
                 }
                 hashMap.put("HiddenDangerPointList",list);
                 hashMap.put("CodeList",codeList);
