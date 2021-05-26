@@ -113,13 +113,13 @@ public class HiddenDangerPointServiceImpl {
                 String user = u.getLoginname();
                 String deptName = u.getDeptName();
                 if(deptName.contains("城南")){
-                    hiddenDangerPointCode =redisService.createGenerateCode("隐患点","CNYH",true,6);
+                    hiddenDangerPointCode =redisService.createGenerateCode("隐患点","CNYH",true,2);
                 }
                 else if(deptName.contains("城北")){
-                    hiddenDangerPointCode =redisService.createGenerateCode("隐患点","CBYH",true,6);
+                    hiddenDangerPointCode =redisService.createGenerateCode("隐患点","CBYH",true,2);
                 }
                 else if(deptName.contains("石角")){
-                    hiddenDangerPointCode =redisService.createGenerateCode("隐患点","SJYH",true,6);
+                    hiddenDangerPointCode =redisService.createGenerateCode("隐患点","SJYH",true,2);
                 }else{
                     return RespBean.error("用水管理所参数不符合系统约定，生成编号异常！");
                 }

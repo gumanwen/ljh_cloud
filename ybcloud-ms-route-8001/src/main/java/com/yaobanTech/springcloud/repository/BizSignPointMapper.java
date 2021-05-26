@@ -205,14 +205,14 @@ public interface BizSignPointMapper {
 //            "or end_date is not null " +
 //            "AND IF ( #{start} IS NOT NULL, commit_date >#{start}, commit_date > ( SELECT DATE_SUB( CURDATE( ), INTERVAL 12 DAY ) ) ) " +
 //            "and IF ( #{end} IS NOT NULL, commit_date <= #{end}, commit_date <= ( SELECT DATE_SUB( now( ), INTERVAL 1 SECOND ) ) ) ")
-            "AND IF ( #{start} not like '', commit_date >=#{start}, 1 = 1 ) " +
+            "AND IF ( #{start} not like '', DATE_FORMAT(commit_date,'%Y-%m-%d') >=#{start}, 1 = 1 ) " +
             "and IF ( #{end} not like '', DATE_FORMAT(commit_date,'%Y-%m-%d') <= #{end}, 1 = 1 ) ")
     List<BizHiddenDangerPointEntity> countDangerPointList(@Param("waterUseOffice") String waterUseOffice ,  @Param("start") String start ,  @Param("end")String end);
 
     @Select(value="SELECT a.*,c.*,(@i :=@i+1) AS rowid " +
             "FROM `ybcloud-ms-route-8001`.`biz_route` a " +
             "right JOIN `ybcloud-ms-route-8001`.`biz_signed_point` c ON a.id = c.route_id, " +
-            "(SELECT @i :=0) AS it WHERE a.enabled = 1 and c.enabled = 1 and c.sign_point_status = '合格' " +
+            "(SELECT @i :=0) AS it WHERE a.enabled = 1 and c.enabled = 1 and c.point_inspection_type = '0' and c.sign_point_status = '合格' " +
             "AND IF(#{waterUseOffice}  not like '',a.water_management_office = #{waterUseOffice},1=1) " +
             "AND IF(#{start}  not like '',date_format(c.signed_time,'%Y-%m-%d') >= #{start},1=1) " +
             "AND IF(#{end}  not like '',date_format(c.signed_time,'%Y-%m-%d') <= #{end},1=1) " +

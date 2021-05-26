@@ -82,29 +82,31 @@ public class RouteServiceImpl {
             }
         }
         if(bizRoute != null && !bizRoute.getBizSignPoints().isEmpty() && bizRoute.getId() == null) {
+            List<BizSignPoint> collect = null;
             try {
                 bizRoute.setCreatedTime(new Date());
                 bizRoute.setRouteCreator(user);
                 bizRoute.setEnabled(1);
                 BizRoute route = bizRouteRepository.save(bizRoute);
                 List<BizSignPoint> pointList = bizRoute.getBizSignPoints();
-                for (int i = 0; i <pointList.size() ; i++) {
-                    if(pointList.get(i).getTroubleCode() != null && !"".equals(pointList.get(i).getTroubleCode())){
-                        fileService.copyFiles(pointList.get(i).getId().toString(),pointList.get(i).getTroubleCode());
-                    }
-                    pointList.get(i).setRouteId(bizRoute.getId());
-                    pointList.get(i).setRouteType(bizRoute.getRouteType());
-                    pointList.get(i).setPointInspectionType(bizRoute.getPointInspectionType());
-                    pointList.get(i).setEnabled(1);
-                    pointList.get(i).setRouteId(bizRoute.getId());
-                }
-                List<BizSignPoint> list = bizSignPointRepository.saveAll(pointList);
+                 collect = pointList.stream().map(o -> {
+                    o.setId(null);
+                    BizSignPoint signPoint = bizSignPointRepository.save(o);
+                    Integer pointId = signPoint.getId();
+                    o.setId(pointId);
+                    fileService.copyFiles(o.getId().toString(), o.getTroubleCode());
+                    o.setRouteId(route.getId());
+                    o.setRouteType(route.getRouteType());
+                    o.setPointInspectionType(route.getPointInspectionType());
+                    o.setEnabled(1);
+                    return o;
+                }).collect(Collectors.toList());
 
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("保存失败！");
             }
-            hashMap.put("signPointList",bizRoute.getBizSignPoints());
+            hashMap.put("signPointList",collect);
             hashMap.put("routeName",bizRoute.getRouteName());
             hashMap.put("routeId",bizRoute.getId());
         }else{
