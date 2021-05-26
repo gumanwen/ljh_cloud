@@ -214,8 +214,8 @@ public interface BizSignPointMapper {
             "right JOIN `ybcloud-ms-route-8001`.`biz_signed_point` c ON a.id = c.route_id, " +
             "(SELECT @i :=0) AS it WHERE a.enabled = 1 and c.enabled = 1 and c.sign_point_status = '合格' " +
             "AND IF(#{waterUseOffice}  not like '',a.water_management_office = #{waterUseOffice},1=1) " +
-            "AND IF(#{start}  not like '',c.signed_time >= #{start},1=1) " +
-            "AND IF(#{end}  not like '',c.signed_time < #{end},1=1) " +
+            "AND IF(#{start}  not like '',date_format(c.signed_time,'%Y-%m-%d') >= #{start},1=1) " +
+            "AND IF(#{end}  not like '',date_format(c.signed_time,'%Y-%m-%d') <= #{end},1=1) " +
             "ORDER BY a.created_time DESC")
     List<HashMap<String,Object>> findConditionByEndPoint(@Param("waterUseOffice") String waterUseOffice , @Param("start")String start , @Param("end")String end);
 
