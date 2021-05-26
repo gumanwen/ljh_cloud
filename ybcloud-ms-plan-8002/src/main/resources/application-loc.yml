@@ -44,6 +44,7 @@ mybatis-plus:
   configuration:
     call-setters-on-nulls: true
     map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #开启SQL语句打印
 
 server:
   port: 8002
