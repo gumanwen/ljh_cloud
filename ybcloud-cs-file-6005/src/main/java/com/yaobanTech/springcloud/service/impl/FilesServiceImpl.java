@@ -148,4 +148,10 @@ public class FilesServiceImpl extends ServiceImpl<FilesMapper, Files> implements
         }
         return RespBean.ok("删除成功！");
     }
+
+    @Override
+    public RespBean copy(String pid,String type) {
+        filesMapper.copyFiles(pid,type);
+        return RespBean.ok("上传成功！");
+    }
 }

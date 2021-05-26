@@ -40,4 +40,10 @@ public class FileController {
     public RespBean remove(@RequestParam("id") String id){
         return iFilesService.remove(id);
     }
+
+    @ApiOperation(value ="复制附件")
+    @GetMapping("/copy")
+    public RespBean copy(@RequestParam("pid") String pid,@RequestParam("type") String type){
+        return iFilesService.copy(pid,type);
+    }
 }

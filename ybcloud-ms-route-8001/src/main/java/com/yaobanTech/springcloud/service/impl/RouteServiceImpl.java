@@ -7,6 +7,7 @@ import com.yaobanTech.springcloud.domain.enumDef.EnumMenu;
 import com.yaobanTech.springcloud.repository.BizRouteRepository;
 import com.yaobanTech.springcloud.repository.BizSignPointMapper;
 import com.yaobanTech.springcloud.repository.BizSignPointRepository;
+import io.seata.spring.annotation.GlobalTransactional;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -65,6 +66,7 @@ public class RouteServiceImpl {
     private UrlUtils urlUtils;
 
     @Transactional
+    @GlobalTransactional
     public RespBean saveRoute(HashMap<String,Object> param,HttpServletRequest request) throws UnsupportedEncodingException {
         HashMap<String,Object> hashMap = new HashMap<>();
         String header = request.getHeader("Authorization");
@@ -88,7 +90,7 @@ public class RouteServiceImpl {
                 List<BizSignPoint> pointList = bizRoute.getBizSignPoints();
                 for (int i = 0; i <pointList.size() ; i++) {
                     if(pointList.get(i).getTroubleCode() != null && !"".equals(pointList.get(i).getTroubleCode())){
-                        bizSignPointRepository.copyFiles(pointList.get(i).getId().toString(),pointList.get(i).getTroubleCode());
+                        fileService.copyFiles(pointList.get(i).getId().toString(),pointList.get(i).getTroubleCode());
                     }
                     pointList.get(i).setRouteId(bizRoute.getId());
                     pointList.get(i).setRouteType(bizRoute.getRouteType());
@@ -173,7 +175,6 @@ public class RouteServiceImpl {
         }).collect(Collectors.toList());
         RespBean r1 = oauthService.getNameList(nameList);
         List<HashMap<String, String>> names = (List<HashMap<String, String>>) r1.getObj();
-        //查询附件
         if(!list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
                 BizRoute route = list.get(i);
@@ -214,19 +215,6 @@ public class RouteServiceImpl {
                 BizRoute route = list.get(i);
                 String chineseName = urlUtils.getNameByUsername(route.getRouteCreator(),request);
                 List<BizSignPoint> points = route.getBizSignPoints();
-                if(points.size()>0){
-                    for(int j =0; j<points.size();j++){
-                        //获取报建文件列表
-                        if(FieldUtils.isObjectNotEmpty(points.get(j).getFileType())) {
-                            RespBean respBean = fileService.selectOneByPid(String.valueOf((Integer) points.get(j).getId()), (String) points.get(j).getFileType());
-                            List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) respBean.getObj();
-                            if(respBean.getStatus() == 500){
-                                throw new RuntimeException("Feign调用文件服务失败");
-                            }
-                            points.get(j).setFileList(fileList);
-                        }
-                    }
-                }
                 Map waterOfficeMenu = (Map) findEnum(route.getWaterManagementOffice()).getObj();
                 Map routeTypeMenu = (Map) findEnum(route.getRouteType()).getObj();
                 Map pointInspectionTypeMenu = (Map) findEnum(route.getPointInspectionType()).getObj();
@@ -252,19 +240,6 @@ public class RouteServiceImpl {
             for (int i = 0; i < list.size(); i++) {
                 BizRoute route = list.get(i);
                 List<BizSignPoint> points = route.getBizSignPoints();
-                if(points.size()>0){
-                    for(int j =0; j<points.size();j++){
-                        //获取报建文件列表
-                        if(FieldUtils.isObjectNotEmpty(points.get(j).getFileType())) {
-                            RespBean respBean = fileService.selectOneByPid(String.valueOf((Integer) points.get(j).getId()), (String) points.get(j).getFileType());
-                            List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) respBean.getObj();
-                            if(respBean.getStatus() == 500){
-                                throw new RuntimeException("Feign调用文件服务失败");
-                            }
-                            points.get(j).setFileList(fileList);
-                        }
-                    }
-                }
                 Map waterOfficeMenu = (Map) findEnum(route.getWaterManagementOffice()).getObj();
                 Map routeTypeMenu = (Map) findEnum(route.getRouteType()).getObj();
                 Map pointInspectionTypeMenu = (Map) findEnum(route.getPointInspectionType()).getObj();

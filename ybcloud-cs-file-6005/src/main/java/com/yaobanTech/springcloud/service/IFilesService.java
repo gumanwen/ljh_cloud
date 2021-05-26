@@ -23,5 +23,7 @@ public interface IFilesService extends IService<Files> {
 
     RespBean remove(String id);
 
+    RespBean copy(String pid,String type);
+
 
 }
