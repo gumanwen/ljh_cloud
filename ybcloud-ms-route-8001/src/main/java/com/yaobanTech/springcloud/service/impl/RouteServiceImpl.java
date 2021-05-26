@@ -321,10 +321,12 @@ public class RouteServiceImpl {
         List<BizRoute> list = new ArrayList<>();
         if(!routeIds.isEmpty()){
             for (int i = 0; i < routeIds.size(); i++) {
-                BizRoute route = bizRouteRepository.findDetail(routeIds.get(i));
-                Map waterOfficeMenu = (Map) findEnum(route.getWaterManagementOffice()).getObj();
-                route.setWaterOfficeMenu(waterOfficeMenu);
-                list.add(route);
+                BizRoute br = bizRouteRepository.findDetail(routeIds.get(i));
+                List<BizSignPoint> pointList = (List<BizSignPoint>) signPointService.findList(br.getId()).getObj();
+                br.setBizSignPoints(pointList);
+                Map waterOfficeMenu = (Map) findEnum(br.getWaterManagementOffice()).getObj();
+                br.setWaterOfficeMenu(waterOfficeMenu);
+                list.add(br);
             }
         }
         return RespBean.ok("查询成功！",list);
