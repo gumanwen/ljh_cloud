@@ -88,7 +88,7 @@ public class BizHiddenDangerPointEntity {
 	 * 设备口径
 	 */
    @Column(name = "equipment_size" )
-	private String equipmentSize;
+	private String networkSize;
 
 	/**
 	 * 工地类型
@@ -268,7 +268,7 @@ public class BizHiddenDangerPointEntity {
 	public BizHiddenDangerPointEntity() {
 	}
 
-	public BizHiddenDangerPointEntity(Integer id, String hiddenDangerPointCode, Integer routeId, String waterUseOffice, String projectName, String constructionPosition, String buildCompany, String buildCompanyAgent, String buildCompanyAgentPhone, String constructionCompany, String constructionCompanyAgentPhone, String equipmentSize, String projectType, String constructionType, String riskLevel, String networkNotification, String memo, String commitBy, String opration, String commitDate, Integer enabled, String hiddenDangerPointStatus, String endDate, String reason, String constructionStartDate, String constructionEndDate, String x, String y, String otherProjectType, String otherConstructionType, String modifyTime, String hiddenLast, List<BizSuggestionEntity> handleAdvice, String commitByCN, HashMap<String, Object> hiddenDangerPointStatusEnum, HashMap<String, Object> projectTypeEnum, HashMap<String, Object> riskLevelEnum, HashMap<String, Object> constructionTypeEnum, List<HashMap<String, Object>> fileList, String[] sgfs, String[] gdlx) {
+	public BizHiddenDangerPointEntity(Integer id, String hiddenDangerPointCode, Integer routeId, String waterUseOffice, String projectName, String constructionPosition, String buildCompany, String buildCompanyAgent, String buildCompanyAgentPhone, String constructionCompany, String constructionCompanyAgentPhone, String networkSize, String projectType, String constructionType, String riskLevel, String networkNotification, String memo, String commitBy, String opration, String commitDate, Integer enabled, String hiddenDangerPointStatus, String endDate, String reason, String constructionStartDate, String constructionEndDate, String x, String y, String hiddenLast, List<BizSuggestionEntity> handleAdvice, String commitByCN, HashMap<String, Object> hiddenDangerPointStatusEnum, HashMap<String, Object> projectTypeEnum, HashMap<String, Object> riskLevelEnum, HashMap<String, Object> constructionTypeEnum, List<HashMap<String, Object>> fileList, String[] sgfs, String[] gdlx) {
 		this.id = id;
 		this.hiddenDangerPointCode = hiddenDangerPointCode;
 		this.routeId = routeId;
@@ -280,7 +280,7 @@ public class BizHiddenDangerPointEntity {
 		this.buildCompanyAgentPhone = buildCompanyAgentPhone;
 		this.constructionCompany = constructionCompany;
 		this.constructionCompanyAgentPhone = constructionCompanyAgentPhone;
-		this.equipmentSize = equipmentSize;
+		this.networkSize = networkSize;
 		this.projectType = projectType;
 		this.constructionType = constructionType;
 		this.riskLevel = riskLevel;
@@ -297,9 +297,6 @@ public class BizHiddenDangerPointEntity {
 		this.constructionEndDate = constructionEndDate;
 		this.x = x;
 		this.y = y;
-		this.otherProjectType = otherProjectType;
-		this.otherConstructionType = otherConstructionType;
-		this.modifyTime = modifyTime;
 		this.hiddenLast = hiddenLast;
 		this.handleAdvice = handleAdvice;
 		this.commitByCN = commitByCN;
@@ -496,12 +493,12 @@ public class BizHiddenDangerPointEntity {
 		this.constructionCompanyAgentPhone = constructionCompanyAgentPhone;
 	}
 
-	public String getEquipmentSize() {
-		return equipmentSize;
+	public String getNetworkSize() {
+		return networkSize;
 	}
 
-	public void setEquipmentSize(String equipmentSize) {
-		this.equipmentSize = equipmentSize;
+	public void setNetworkSize(String networkSize) {
+		this.networkSize = networkSize;
 	}
 
 	public String getProjectType() {
@@ -654,7 +651,7 @@ public class BizHiddenDangerPointEntity {
 				", buildCompanyAgentPhone='" + buildCompanyAgentPhone + '\'' +
 				", constructionCompany='" + constructionCompany + '\'' +
 				", constructionCompanyAgentPhone='" + constructionCompanyAgentPhone + '\'' +
-				", equipmentSize='" + equipmentSize + '\'' +
+				", networkSize='" + networkSize + '\'' +
 				", projectType='" + projectType + '\'' +
 				", constructionType='" + constructionType + '\'' +
 				", riskLevel='" + riskLevel + '\'' +
@@ -671,9 +668,6 @@ public class BizHiddenDangerPointEntity {
 				", constructionEndDate='" + constructionEndDate + '\'' +
 				", x='" + x + '\'' +
 				", y='" + y + '\'' +
-				", otherProjectType='" + otherProjectType + '\'' +
-				", otherConstructionType='" + otherConstructionType + '\'' +
-				", modifyTime='" + modifyTime + '\'' +
 				", hiddenLast='" + hiddenLast + '\'' +
 				", handleAdvice=" + handleAdvice +
 				", commitByCN='" + commitByCN + '\'' +
