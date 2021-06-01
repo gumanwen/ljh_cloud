@@ -90,10 +90,15 @@ public class UrlUtils {
         if(FieldUtils.isStringNotEmpty(tokenT)){
             token = URLDecoder.decode(tokenT,"UTF-8");
             ttype = 2;
+            //默认传多少就是多少，如果传bzy转化成64
+            if("ROLE_BZY".equals(role)){
+                role ="64";
+            }
         }else{
             ttype = 1;
             String header = request.getHeader("Authorization");
             token =  StringUtils.substringAfter(header, "Bearer ");
+            role = "ROLE_BZY";
         }
         RespBean feignRespBean = authService.selectUserByRole(role,ttype,token);
         List<HashMap<String, Object>> result = (List<HashMap<String, Object>>) feignRespBean.getObj();

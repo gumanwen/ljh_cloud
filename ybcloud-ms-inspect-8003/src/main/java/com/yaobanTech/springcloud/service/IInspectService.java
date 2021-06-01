@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,11 +20,13 @@ import java.util.Map;
  */
 public interface IInspectService extends IService<Inspect> {
 
-    RespBean getPlanInspect(long pageNo,long pageSize,Map<String, Object> params ,HttpServletRequest request) throws IllegalAccessException, UnsupportedEncodingException;
+    RespBean getPlanInspect(long pageNo,long pageSize,Map<String, Object> params ,HttpServletRequest request) throws IllegalAccessException, UnsupportedEncodingException, ParseException;
 
     RespBean getTempInspect(String type);
 
     RespBean getInspectDetailById(String inspect_task_id,HttpServletRequest request) throws IllegalAccessException, UnsupportedEncodingException, ParseException;
+
+    RespBean getFeignInspectDetailById(List<String> taskIds);
 
     RespBean updateInspectDetailById(Map<String,Object> params);
 
@@ -80,4 +83,6 @@ public interface IInspectService extends IService<Inspect> {
     RespBean selectUserByRole(String role,HttpServletRequest request) throws UnsupportedEncodingException;
 
     RespBean selectUserByRoleAndDept(String role, String waterManagementOffice, HttpServletRequest request) throws UnsupportedEncodingException;
+
+    Boolean isDelete(Integer routeId, Integer planId);
 }

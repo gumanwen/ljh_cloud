@@ -45,7 +45,7 @@ spring:
                 #namespace: 8740fef6-e5cd-4bee-aa59-1982b454323e
                 #group: DEFAULT_GROUP
 mybatis-plus:
-    #mapper-locations: classpath:mapping/*Mapper.xml
+    mapper-locations: classpath:mapping/*Mapper.xml
     type-aliases-package: com.yaobanTech.springCloud.pojos
     global-config:
         db-config:

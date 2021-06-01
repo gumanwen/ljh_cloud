@@ -1,6 +1,7 @@
 package com.yaobanTech.springcloud.config.oauth2;
 
 import com.yaobanTech.springcloud.utils.JwtUtil;
+import io.jsonwebtoken.Claims;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,9 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+
+import java.util.Date;
+
 /**
  * 鉴权过滤器 验证token
  */
@@ -46,8 +50,13 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
         }else{
             //9. 如果请求头中有令牌则解析令牌
             try {
-                JwtUtil.parseJWT(token);
-                flag =true;
+                Claims c =JwtUtil.parseJWT(token);
+                //判断有没有过期
+                if(c.getExpiration().before(new Date())){
+                    flag =false;
+                }else{
+                    flag =true;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 flag = false;
