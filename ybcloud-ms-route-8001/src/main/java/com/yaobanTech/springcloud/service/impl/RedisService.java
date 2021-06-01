@@ -133,7 +133,7 @@ public class RedisService {
         // 自定义前缀
         sb.append(prefix);
         if (date != null) {
-            DateFormat df = new SimpleDateFormat("yyyyMMdd");
+            DateFormat df = new SimpleDateFormat("yyyyMM");
             sb.append(df.format(date));
         }
 

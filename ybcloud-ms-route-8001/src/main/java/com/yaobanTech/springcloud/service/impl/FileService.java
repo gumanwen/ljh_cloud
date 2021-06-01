@@ -16,6 +16,9 @@ public interface FileService {
     @GetMapping(value = "/api/file/selectOneByPid")
     RespBean selectOneByPid(@RequestParam("pid") String pid, @RequestParam("type") String type);
 
+    @GetMapping(value = "/api/file/copy")
+    RespBean copyFiles(@RequestParam("pid") String pid, @RequestParam("type") String type);
+
 
     @RequestMapping(value = "/api/file/importFiles", method = RequestMethod.POST,
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})

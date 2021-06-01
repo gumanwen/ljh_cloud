@@ -74,13 +74,13 @@ public class HiddenDangerPointServiceImpl {
                 String user = u.getLoginname();
                 String deptName = u.getDeptName();
                 if(deptName.contains("城南")){
-                    hiddenDangerPointCode =redisService.createGenerateCode("隐患点","CNYH",true,6);
+                    hiddenDangerPointCode =redisService.createGenerateCode("隐患点","CNYH",true,2);
                 }
                 else if(deptName.contains("城北")){
-                    hiddenDangerPointCode =redisService.createGenerateCode("隐患点","CBYH",true,6);
+                    hiddenDangerPointCode =redisService.createGenerateCode("隐患点","CBYH",true,2);
                 }
                 else if(deptName.contains("石角")){
-                    hiddenDangerPointCode =redisService.createGenerateCode("隐患点","SJYH",true,6);
+                    hiddenDangerPointCode =redisService.createGenerateCode("隐患点","SJYH",true,2);
                 }else{
                     return RespBean.error("用水管理所参数不符合系统约定，生成编号异常！");
                 }
@@ -101,6 +101,43 @@ public class HiddenDangerPointServiceImpl {
             return RespBean.error("数据为空！");
         }
         return RespBean.ok("保存成功！");
+    }
+
+    @Transactional
+    public RespBean saveHiddenDangerPointWeb(BizHiddenDangerPointEntity bizHiddenDangerPointEntity,HttpServletRequest request) {
+        String type = "yhdfj";
+        if(bizHiddenDangerPointEntity != null) {
+            try {
+                String hiddenDangerPointCode = null;
+                LoginUser u = urlUtils.getAll(request);
+                String user = u.getLoginname();
+                String deptName = u.getDeptName();
+                if(deptName.contains("城南")){
+                    hiddenDangerPointCode =redisService.createGenerateCode("隐患点","CNYH",true,2);
+                }
+                else if(deptName.contains("城北")){
+                    hiddenDangerPointCode =redisService.createGenerateCode("隐患点","CBYH",true,2);
+                }
+                else if(deptName.contains("石角")){
+                    hiddenDangerPointCode =redisService.createGenerateCode("隐患点","SJYH",true,2);
+                }else{
+                    return RespBean.error("用水管理所参数不符合系统约定，生成编号异常！");
+                }
+                bizHiddenDangerPointEntity.setCommitDate(DateFormatUtils.DateToStr(new Date()));
+                bizHiddenDangerPointEntity.setEnabled(1);
+                bizHiddenDangerPointEntity.setHiddenDangerPointStatus("53");
+                bizHiddenDangerPointEntity.setCommitBy(user);
+                bizHiddenDangerPointEntity.setHiddenDangerPointCode(hiddenDangerPointCode);
+                hiddenDangerPointRepository.save(bizHiddenDangerPointEntity);
+            } catch (Exception e) {
+                e.printStackTrace();
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return RespBean.error("保存失败！");
+            }
+        }else{
+            return RespBean.error("数据为空！");
+        }
+        return RespBean.ok("保存成功！",bizHiddenDangerPointEntity.getHiddenDangerPointCode());
     }
 
     @Transactional
@@ -284,12 +321,12 @@ public class HiddenDangerPointServiceImpl {
         List<BizHiddenDangerPointEntity> list = null;
         if(hiddenDangerPointQuery != null){
             LoginUser u = urlUtils.getAll(request);
-            String user = u.getLoginname();
-            String chineseName = u.getName();
+//            String user = u.getLoginname();
             list = bizSignPointMapper.hiddenDangerPointQuery(hiddenDangerPointQuery);
             if(!list.isEmpty()){
                 for (int i = 0; i < list.size(); i++) {
                     BizHiddenDangerPointEntity hiddenDangerPointEntity = list.get(i);
+                    String chineseName = urlUtils.getNameByUsername(hiddenDangerPointEntity.getCommitBy(),request);
                     HashMap<String,Object> hiddenDangerStatusEnum = (HashMap)routeService.findEnum(hiddenDangerPointEntity.getHiddenDangerPointStatus()).getObj();
 //                    HashMap<String,Object> projectTypeEnum = (HashMap)routeService.findEnum(hiddenDangerPointEntity.getProjectType()).getObj();
 //                    HashMap<String,Object> riskLevelEnum = (HashMap)routeService.findEnum(hiddenDangerPointEntity.getRiskLevel()).getObj();
@@ -302,10 +339,10 @@ public class HiddenDangerPointServiceImpl {
                     hiddenDangerPointEntity.setGdlx(hiddenDangerPointEntity.getProjectType().split(","));
                     hiddenDangerPointEntity.setCommitByCN(chineseName);
                     codeList.add(hiddenDangerPointEntity.getHiddenDangerPointCode());
-                    //获取报建文件列表
-                    RespBean respBean = fileService.selectOneByPid(hiddenDangerPointEntity.getHiddenDangerPointCode(), "yhdfj");
-                    List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) respBean.getObj();
-                    hiddenDangerPointEntity.setFileList(fileList);
+//                    //获取报建文件列表
+//                    RespBean respBean = fileService.selectOneByPid(hiddenDangerPointEntity.getHiddenDangerPointCode(), "yhdfj");
+//                    List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) respBean.getObj();
+//                    hiddenDangerPointEntity.setFileList(fileList);
                 }
                 hashMap.put("HiddenDangerPointList",list);
                 hashMap.put("CodeList",codeList);

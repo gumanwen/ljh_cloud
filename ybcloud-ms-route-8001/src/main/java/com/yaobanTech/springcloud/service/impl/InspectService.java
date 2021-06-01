@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Date;
+import java.util.List;
 
 @FeignClient(value ="inspectService")
 public interface InspectService {
@@ -18,7 +19,10 @@ public interface InspectService {
     @GetMapping("/api/inspect/isModifiable")
     RespBean comfirmModify(@RequestParam("routeId") Integer routeId);
 
-    @GetMapping("/api/inspect/deleteRoute")
-    Boolean deleteRoute(@RequestParam("routeId") Integer routeId);
+    @GetMapping("/api/inspect/plan/getFeignInspectDetailById")
+    RespBean getFeignInspectDetailById(@RequestParam("taskIds") List<String> taskIds);
+
+    @GetMapping("/api/inspect/isDelete")
+    Boolean deleteRoute(@RequestParam("routeId") Integer routeId,@RequestParam("planId") Integer planId);
 
 }

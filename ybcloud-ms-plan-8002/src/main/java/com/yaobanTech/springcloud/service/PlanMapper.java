@@ -1,13 +1,11 @@
 package com.yaobanTech.springcloud.service;
 
 import com.yaobanTech.springcloud.domain.BizPlan;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Mapper
@@ -37,4 +35,28 @@ public interface PlanMapper {
                    @Result(column="trouble_code", property="troubleCode", jdbcType= JdbcType.VARCHAR)
            })
    List<BizPlan>  findAll(String user);
+    @Select(value="SELECT a.route_name,a.water_management_office,b.* " +
+            "FROM `ybcloud-ms-plan-8002`.`biz_plan` b " +
+            "JOIN `ybcloud-ms-route-8001`.`biz_route` a ON a.id = b.route_id " +
+            "WHERE 1=1 " +
+            "AND IF(#{routeName} is not null, a.route_name = #{routeName},1=1 ) " +
+            "AND IF(#{waterManagementOffice} is not null, a.water_management_office = #{waterManagementOffice},1=1 ) " +
+            "AND IF(#{planPorid} is not null, b.plan_porid = #{planPorid},1=1 ) " +
+            "AND IF(#{planType} is not null, b.plan_type = #{planType},1=1 ) " +
+            "AND IF(#{startTimeOfPCT} is not null, b.plan_created_time >= #{startTimeOfPCT},1=1 ) " +
+            "AND IF(#{endTimeOfPCT} is not null, b.plan_created_time <= #{endTimeOfPCT},1=1 ) " +
+            "AND IF(#{startTimeOfPCT} is not null, b.start_time >= #{startTimeOfPCT},1=1 ) " +
+            "AND IF(#{endTimeOfPCT} is not null, b.start_time <= #{endTimeOfPCT},1=1 ) " +
+            "AND IF(#{startTimeOfPET} is not null, b.end_time >= #{startTimeOfPET},1=1 ) " +
+            "AND IF(#{endTimeOfPET} is not null, b.end_time <= #{endTimeOfPET},1=1 ) " +
+            "AND (IF(#{mainKey} is not null, b.plan_name = #{mainKey},1=1 ) " +
+            "OR IF(#{mainKey} is not null, b.plan_created_by = #{mainKey},1=1 ) " +
+            "OR IF(#{mainKey} is not null, b.task_desc like #{mainKey},1=1 )) " +
+            "ORDER BY b.enabled DESC ,b.plan_created_time DESC")
+    List<HashMap<String,Object>> findCondition(@Param("routeName") String routeName, @Param("waterManagementOffice")String waterManagementOffice,
+                                               @Param("planPorid")String planPorid, @Param("planType")String planType,
+                                               @Param("startTimeOfPCT")String startTimeOfPCT, @Param("endTimeOfPCT")String endTimeOfPCT,
+                                               @Param("startTimeOfPST")String startTimeOfPST, @Param("endTimeOfPST")String endTimeOfPST,
+                                               @Param("startTimeOfPET")String startTimeOfPET, @Param("endTimeOfPET")String endTimeOfPET,
+                                               @Param("mainKey")String mainKey);
 }

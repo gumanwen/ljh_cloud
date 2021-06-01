@@ -23,6 +23,10 @@ spring:
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
   application:
     name: routeService
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
   cloud:
     nacos:
       discovery:
@@ -33,7 +37,7 @@ spring:
         file-extension: properties
         namespace: 8740fef6-e5cd-4bee-aa59-1982b454323e
         group: DEFAULT_GROUP
-mybatis:
+mybatis-plus:
   #mapper-locations: classpath:mapping/*Mapper.xml
   #type-aliases-package: com.yaoban.kmsw.pojos
   configuration:

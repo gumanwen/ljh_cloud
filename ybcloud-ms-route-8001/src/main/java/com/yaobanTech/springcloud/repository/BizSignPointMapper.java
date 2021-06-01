@@ -5,6 +5,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -99,6 +101,27 @@ public interface BizSignPointMapper {
 
     List<HashMap<String,Object>> findRouteIds(@Param("waterManagementOffice") String waterManagementOffice,@Param("routeId") Integer routeId, @Param("pointInspectionType")String pointInspectionType,@Param("planId") Integer planId , @Param("planPorid")String planPorid,@Param("planType") String planType,@Param("routeType") String routeType);
 
+    @Select(value = "select a.*,b.construction_position,b.project_name from biz_signed_point a left join biz_hidden_danger_point b on a.trouble_code =b.hidden_danger_point_code where a.enabled = 1 and a.trouble_code like '%Y%' and a.sign_point_status ='合格'  order by a.modify_time desc limit 10")
+    List<HashMap<String,Object>> top10();
+
+    @Select(value="SELECT a.* " +
+            "FROM `ybcloud-ms-route-8001`.`biz_route` a " +
+            "WHERE 1=1 " +
+            "AND IF(#{waterManagementOffice} is not null,a.water_management_office = #{waterManagementOffice},1=1) " +
+            "AND IF(#{pointInspectionType} is not null,a.point_inspection_type = #{pointInspectionType},1=1) " +
+            "AND IF(#{planInspectionMileageStart} is not null,a.plan_inspection_mileage >= #{planInspectionMileageStart},1=1) " +
+            "AND IF(#{planInspectionMileageEnd} is not null,a.plan_inspection_mileage <= #{planInspectionMileageEnd},1=1) " +
+            "AND IF(#{createdTimeStart} is not null,a.created_time >= #{createdTimeStart},1=1) " +
+            "AND IF(#{createdTimeEnd} is not null,a.created_time <= #{createdTimeEnd},1=1) " +
+            "AND IF(#{routeName} is not null,a.route_name = #{routeName},1=1) " +
+            "AND IF(#{routeType} is not null,a.route_type = #{routeType},1=1) " +
+            "AND (IF(#{mainKey} is not null,a.area = #{mainKey},1=1) " +
+            "OR IF(#{mainKey} is not null,a.route_creator = #{mainKey},1=1) " +
+            "OR IF(#{mainKey} is not null,a.route_name = #{mainKey},1=1)) " +
+            "ORDER BY a.enabled desc,a.created_time desc")
+    List<BizRoute> findRouteCondition(RouteCondition routeCondition);
+
+
     @Select(value="SELECT a.* " +
             "FROM `ybcloud-ms-route-8001`.`biz_leak_point` a " +
             "WHERE a.enabled = 1 " +
@@ -125,6 +148,12 @@ public interface BizSignPointMapper {
             "AND IF(#{projectType} is not null, a.project_type = #{projectType},1=1 ) " +
             "AND IF(#{constructionType} is not null, a.construction_type = #{constructionType},1=1 ) " +
             "AND IF(#{networkNotification} is not null, a.network_notification = #{networkNotification},1=1 ) " +
+            "AND ( IF(#{mainKey} is not null, a.project_name = #{mainKey},1=1 ) " +
+            "OR IF(#{mainKey} is not null, a.construction_position = #{mainKey},1=1 ) " +
+            "OR IF(#{mainKey} is not null, a.build_company = #{mainKey},1=1 ) " +
+            "OR IF(#{mainKey} is not null, a.build_company_agent = #{mainKey},1=1 ) " +
+            "OR IF(#{mainKey} is not null, a.construction_company = #{mainKey},1=1 ) " +
+            "OR IF(#{mainKey} is not null, a.reason like #{mainKey},1=1 )) " +
             "ORDER BY a.commit_Date DESC")
     List<BizHiddenDangerPointEntity> hiddenDangerPointQuery(HiddenDangerPointQuery hiddenDangerPointQuery);
 
@@ -151,7 +180,7 @@ public interface BizSignPointMapper {
             "FROM `ybcloud-ms-route-8001`.`biz_route` a " +
             "right JOIN `ybcloud-ms-route-8001`.`biz_signed_point` c ON a.id = c.route_id " +
             "JOIN `ybcloud-ms-plan-8002`.`biz_plan` b on b.id = c.plan_id "+
-            "WHERE a.enabled = 1 and b.enabled = 1 and c.enabled = 1 " +
+            "WHERE a.enabled = 1 and b.enabled = 1 and c.enabled = 1 and c.sign_point_status = '合格' " +
             "AND IF(#{waterUserOffice} is not null,a.water_management_office = #{waterUserOffice},1=1) " +
             "AND IF(#{routeName} is not null, a.route_name = #{routeName},1=1 ) " +
             "AND IF(#{routeType} is not null, a.route_type = #{routeType},1=1 ) " +
@@ -163,6 +192,7 @@ public interface BizSignPointMapper {
             "AND IF(#{pipeDiameter} is not null, c.pipe_diameter = #{pipeDiameter},1=1 ) " +
             "AND IF(#{signStatus} is not null, c.sign_point_status = #{signStatus},1=1 ) " +
             "AND IF(#{hiddenCode} is not null, c.trouble_code = #{hiddenCode},1=1 ) " +
+            "AND IF(#{mainKey} is not null, c.site_conditions_desc = #{mainKey},1=1 ) " +
             "AND FIND_IN_SET(c.task_id, #{taskidList}) " +
             "ORDER BY c.modify_time DESC")
     List<HashMap<String,Object>> findConditionElse(SignPointQuery signPointQuery);
@@ -175,17 +205,17 @@ public interface BizSignPointMapper {
 //            "or end_date is not null " +
 //            "AND IF ( #{start} IS NOT NULL, commit_date >#{start}, commit_date > ( SELECT DATE_SUB( CURDATE( ), INTERVAL 12 DAY ) ) ) " +
 //            "and IF ( #{end} IS NOT NULL, commit_date <= #{end}, commit_date <= ( SELECT DATE_SUB( now( ), INTERVAL 1 SECOND ) ) ) ")
-            "AND IF ( #{start} not like '', commit_date >=#{start}, 1 = 1 ) " +
+            "AND IF ( #{start} not like '', DATE_FORMAT(commit_date,'%Y-%m-%d') >=#{start}, 1 = 1 ) " +
             "and IF ( #{end} not like '', DATE_FORMAT(commit_date,'%Y-%m-%d') <= #{end}, 1 = 1 ) ")
     List<BizHiddenDangerPointEntity> countDangerPointList(@Param("waterUseOffice") String waterUseOffice ,  @Param("start") String start ,  @Param("end")String end);
 
     @Select(value="SELECT a.*,c.*,(@i :=@i+1) AS rowid " +
             "FROM `ybcloud-ms-route-8001`.`biz_route` a " +
             "right JOIN `ybcloud-ms-route-8001`.`biz_signed_point` c ON a.id = c.route_id, " +
-            "(SELECT @i :=0) AS it WHERE a.enabled = 1 and c.enabled = 1 " +
+            "(SELECT @i :=0) AS it WHERE a.enabled = 1 and c.enabled = 1 and c.point_inspection_type = '0' and c.sign_point_status = '合格' " +
             "AND IF(#{waterUseOffice}  not like '',a.water_management_office = #{waterUseOffice},1=1) " +
-            "AND IF(#{start}  not like '',c.signed_time >= #{start},1=1) " +
-            "AND IF(#{end}  not like '',c.signed_time < #{end},1=1) " +
+            "AND IF(#{start}  not like '',date_format(c.signed_time,'%Y-%m-%d') >= #{start},1=1) " +
+            "AND IF(#{end}  not like '',date_format(c.signed_time,'%Y-%m-%d') <= #{end},1=1) " +
             "ORDER BY a.created_time DESC")
     List<HashMap<String,Object>> findConditionByEndPoint(@Param("waterUseOffice") String waterUseOffice , @Param("start")String start , @Param("end")String end);
 

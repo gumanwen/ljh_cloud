@@ -1,6 +1,7 @@
 package com.yaobanTech.springcloud.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.yaobanTech.springcloud.ToolUtils.DateFormatUtils;
 import com.yaobanTech.springcloud.ToolUtils.UrlUtils;
 import com.yaobanTech.springcloud.domain.BizPlan;
 import com.yaobanTech.springcloud.domain.LoginUser;
@@ -78,7 +79,7 @@ public class PlanService {
                     try {
                         bizPlan.setEnabled(1);
                         bizPlan.setPlanStatus("11");
-                        bizPlan.setPlanCreatedTime(new Date());
+                        bizPlan.setPlanCreatedTime(DateFormatUtils.DateToStr(new Date()));
                         LoginUser u = urlUtils.getAll(request);
                         String user = u.getLoginname();
                         bizPlan.setPlanCreatedBy(user);
@@ -143,14 +144,13 @@ public class PlanService {
         return RespBean.ok("修改成功！");
     }
 
+    @Transactional
     public RespBean deletePlan(Integer id) {
         if(id != null) {
+            Boolean bool = null;
             try {
-                BizPlan detail = bizPlanRepository.findDetail(id);
-                Date date = new Date();
-                Date startTime = detail.getStartTime();
-               Boolean flag = startTime.before(date);
-                if(!flag) {
+                bool = inspectService.deleteRoute(id,0);
+                if(bool) {
                     bizPlanRepository.deletePlan(id);
                 }else{
                     return RespBean.error("删除失败！该计划已开始,无法删除！");
@@ -202,11 +202,11 @@ public class PlanService {
         }).collect(Collectors.toList());
         RespBean r1 = oauthService.getNameList(nameList);
         List<HashMap<String, String>> names = (List<HashMap<String, String>>) r1.getObj();
-//        RespBean r2 = routeService.getListByIds(routeIds);
+        RespBean r2 = routeService.getListByIds(routeIds);
+        List<HashMap<String, Object>> routes = (List<HashMap<String, Object>>) r2.getObj();
         if(!list.isEmpty()){
                 for (int i = 0; i < list.size(); i++) {
                     BizPlan plan = list.get(i);
-                    RespBean respBean = routeService.findDetail(plan.getRouteId());
                     Map map = (Map) findEnum(plan.getPlanType()).getObj();
                     Map ps = (Map) findEnum(plan.getPlanStatus()).getObj();
                     Map pp = (Map) findEnum(plan.getPlanPorid()).getObj();
@@ -214,10 +214,15 @@ public class PlanService {
                     plan.setPlanStatusMenu(ps);
                     plan.setPlanPoridMenu(pp);
                     names.stream().forEach(a -> {
-                        plan.setPlanCreatedByCN(a.get(plan.getPlanCreatedBy()));
+                        if(plan.getPlanCreatedBy().equals(a.get("username"))){
+                            plan.setPlanCreatedByCN(a.get("name"));
+                        }
                     });
-                    Object o = respBean.getObj();
-                    plan.setRouteObj(o);
+                    routes.stream().forEach(b -> {
+                        if(plan.getRouteId()==(b.get("id"))){
+                            plan.setRouteObj(b);
+                        }
+                    });
                 }
             }
         List<BizPlan> planList = list.stream().sorted(Comparator.comparing(BizPlan::getEnabled).reversed().thenComparing(BizPlan::getPlanCreatedTime).reversed()).
@@ -317,7 +322,7 @@ public class PlanService {
     public RespBean findCondition(String routeName, String waterManagementOffice, String planPorid, String planType,
                                   String startTimeOfPCT, String endTimeOfPCT,
                                   String startTimeOfPST, String endTimeOfPST,
-                                  String startTimeOfPET, String endTimeOfPET, HttpServletRequest request) throws UnsupportedEncodingException {
+                                  String startTimeOfPET, String endTimeOfPET,String mainKey, HttpServletRequest request) throws UnsupportedEncodingException {
         //获取当前用户
         LoginUser u = urlUtils.getAll(request);
         String user = u.getLoginname();
@@ -351,27 +356,45 @@ public class PlanService {
         if("null".equals(endTimeOfPET)){
             endTimeOfPET = null;
         }
+        if("null".equals(mainKey)){
+            mainKey = null;
+        }
 
         //查询计划列表
-        List<BizPlan> list = bizPlanRepository.findCondition(routeName,waterManagementOffice,planPorid,planType,startTimeOfPCT,endTimeOfPCT,startTimeOfPST,endTimeOfPST,startTimeOfPET,endTimeOfPET);
+        List<HashMap<String,Object>> list = planMapper.findCondition(routeName,waterManagementOffice,planPorid,planType,startTimeOfPCT,endTimeOfPCT,startTimeOfPST,endTimeOfPST,startTimeOfPET,endTimeOfPET,mainKey);
+        //获取路线id列表
+        List<Integer> routeIds = list.stream().map(o -> {
+            return (Integer)o.get("route_id");
+        }).collect(Collectors.toList());
+        //获取用户名列表
+        List<String> nameList = list.stream().map(o -> {
+            return (String)o.get("plan_created_by");
+        }).collect(Collectors.toList());
+        RespBean r1 = oauthService.getNameList(nameList);
+        List<HashMap<String, String>> names = (List<HashMap<String, String>>) r1.getObj();
+        RespBean r2 = routeService.getListByIds(routeIds);
+        List<HashMap<String, Object>> routes = (List<HashMap<String, Object>>) r2.getObj();
         if(!list.isEmpty()){
-            for (int i = 0; i < list.size(); i++) {
-                BizPlan plan = list.get(i);
-                String chineseName = urlUtils.getNameByUsername(plan.getPlanCreatedBy(),request);
-                Map map = (Map) findEnum(plan.getPlanType()).getObj();
-                Map ps = (Map) findEnum(plan.getPlanStatus()).getObj();
-                Map pp = (Map) findEnum(plan.getPlanPorid()).getObj();
-                plan.setPlanTypeMenu(map);
-                plan.setPlanStatusMenu(ps);
-                plan.setPlanPoridMenu(pp);
-                plan.setPlanCreatedByCN(chineseName);
-                RespBean respBean = routeService.findDetail(plan.getRouteId());
-                Object o = respBean.getObj();
-                if(respBean.getStatus() == 500){
-                    throw new RuntimeException("Feign调用路线服务失败！");
-                }
-                plan.setRouteObj(o);
-            }
+            list.stream().map(a -> {
+                Map pt = (Map) findEnum((String)a.get("plan_type")).getObj();
+                Map ps = (Map) findEnum((String)a.get("plan_status")).getObj();
+                Map pp = (Map) findEnum((String)a.get("plan_porid")).getObj();
+                a.put("plan_type",pt);
+                a.put("plan_status",ps);
+                a.put("plan_porid",pp);
+                names.stream().forEach(b -> {
+                    if((a.get("plan_created_by").equals(b.get("username")))){
+                       a.put("plan_creator_cn",b.get("name"));
+                    }
+                });
+                routes.stream().forEach(c -> {
+                    if(a.get("route_id")==(c.get("id"))){
+                        a.put("route_obj",c);
+                    }
+                });
+                return a;
+            }).collect(Collectors.toList());
+
         }
         return RespBean.ok("查询成功！", list);
     }

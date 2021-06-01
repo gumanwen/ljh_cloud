@@ -55,12 +55,13 @@ spring:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
-mybatis:
+mybatis-plus:
   #mapper-locations: classpath:mapping/*Mapper.xml
   #type-aliases-package: com.yaoban.kmsw.pojos
   configuration:
     call-setters-on-nulls: true
     map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #开启SQL语句打印
 
 server:
   port: 8001

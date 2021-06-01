@@ -170,8 +170,7 @@ public class BizRoute  implements Serializable {
 	/**
 	 * 签到点
 	 */
-   	@OneToMany(targetEntity = BizSignPoint.class,fetch = FetchType.EAGER)
-	@JoinColumn(name = "route_id",referencedColumnName = "id")
+    @Transient
    	private List<BizSignPoint> bizSignPoints = new ArrayList<>();
 
 	public BizRoute() {

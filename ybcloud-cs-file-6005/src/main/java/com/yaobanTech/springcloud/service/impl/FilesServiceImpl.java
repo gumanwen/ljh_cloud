@@ -12,6 +12,7 @@ import com.yaobanTech.springcloud.service.IFilesService;
 import com.yaobanTech.springcloud.utils.DateFormatUtils;
 import com.yaobanTech.springcloud.utils.FieldUtils;
 import io.seata.core.context.RootContext;
+import io.seata.spring.annotation.GlobalTransactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +62,7 @@ public class FilesServiceImpl extends ServiceImpl<FilesMapper, Files> implements
 
     @Override
     @Transactional
+    @GlobalTransactional
     public RespBean importFiles(MultipartFile[] fileList, String pid, String type) throws IOException {
         String xid = RootContext.getXID();
         System.out.println("xid="+xid);
@@ -145,5 +147,11 @@ public class FilesServiceImpl extends ServiceImpl<FilesMapper, Files> implements
             return RespBean.error("缺少编号pid");
         }
         return RespBean.ok("删除成功！");
+    }
+
+    @Override
+    public RespBean copy(String pid,String type) {
+        filesMapper.copyFiles(pid,type);
+        return RespBean.ok("上传成功！");
     }
 }

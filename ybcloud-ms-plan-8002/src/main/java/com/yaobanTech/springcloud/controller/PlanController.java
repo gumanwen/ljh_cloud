@@ -102,8 +102,9 @@ public class PlanController {
                                   @RequestParam String startTimeOfPCT,@RequestParam String endTimeOfPCT,
                                   @RequestParam String startTimeOfPST,@RequestParam String endTimeOfPST,
                                   @RequestParam String startTimeOfPET,@RequestParam String endTimeOfPET,
+                                  @RequestParam String mainKey,
                                   HttpServletRequest request) throws UnsupportedEncodingException {
-        return planService.findCondition(routeName,waterManagementOffice,planPorid,planType,startTimeOfPCT,endTimeOfPCT,startTimeOfPST,endTimeOfPST,startTimeOfPET,endTimeOfPET,request);
+        return planService.findCondition(routeName,waterManagementOffice,planPorid,planType,startTimeOfPCT,endTimeOfPCT,startTimeOfPST,endTimeOfPST,startTimeOfPET,endTimeOfPET,mainKey,request);
     }
 
     @ApiOperation("计划审核")

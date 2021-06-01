@@ -74,13 +74,9 @@ public class BizPlan  implements Serializable {
 	/**
 	 * 计划制定时间
 	 */
-	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(
-			pattern = "yyyy-MM-dd HH:mm:ss",
-			timezone = "GMT+8"
-	)
+
    	@Column(name = "plan_created_time" )
-	private Date planCreatedTime;
+	private String planCreatedTime;
 
 	/**
 	 * 计划状态
@@ -174,6 +170,12 @@ public class BizPlan  implements Serializable {
 	private Map<String,Object> planStatusMenu;
 
 	/**
+	 * 路线名称
+	 */
+	@Transient
+	private String routeName;
+
+	/**
 	 * 附件
 	 */
 	@Transient
@@ -212,7 +214,7 @@ public class BizPlan  implements Serializable {
 	public BizPlan() {
 	}
 
-	public BizPlan(Integer id, String planName, String planType, Date startTime, Date endTime, String planCreatedBy, Date planCreatedTime, String planStatus, String actProcess, String planProcess, String planPorid, String taskDesc, String area, String memo, Integer enabled, Integer routeId, String mainKey, String troubleCode) {
+	public BizPlan(Integer id, String planName, String planType, Date startTime, Date endTime, String planCreatedBy, String planCreatedTime, String planStatus, String actProcess, String planProcess, String planPorid, String taskDesc, String area, String memo, Integer enabled, Integer routeId, String mainKey, String troubleCode, Object routeObj, Map<String, Object> planTypeMenu, Map<String, Object> planPoridMenu, Map<String, Object> planStatusMenu, String routeName, List<HashMap<String, Object>> attachment, String planCreatedByCN, String waterUseOffice, HashMap<String, Object> waterUseOfficeEnum, String examineDate, String examineAdvice) {
 		this.id = id;
 		this.planName = planName;
 		this.planType = planType;
@@ -231,6 +233,26 @@ public class BizPlan  implements Serializable {
 		this.routeId = routeId;
 		this.mainKey = mainKey;
 		this.troubleCode = troubleCode;
+		this.routeObj = routeObj;
+		this.planTypeMenu = planTypeMenu;
+		this.planPoridMenu = planPoridMenu;
+		this.planStatusMenu = planStatusMenu;
+		this.routeName = routeName;
+		this.attachment = attachment;
+		this.planCreatedByCN = planCreatedByCN;
+		this.waterUseOffice = waterUseOffice;
+		this.waterUseOfficeEnum = waterUseOfficeEnum;
+		this.examineDate = examineDate;
+		this.examineAdvice = examineAdvice;
+	}
+
+
+	public String getRouteName() {
+		return routeName;
+	}
+
+	public void setRouteName(String routeName) {
+		this.routeName = routeName;
 	}
 
 	public String getExamineDate() {
@@ -365,11 +387,11 @@ public class BizPlan  implements Serializable {
 		this.planCreatedBy = planCreatedBy;
 	}
 
-	public Date getPlanCreatedTime() {
+	public String getPlanCreatedTime() {
 		return planCreatedTime;
 	}
 
-	public void setPlanCreatedTime(Date planCreatedTime) {
+	public void setPlanCreatedTime(String planCreatedTime) {
 		this.planCreatedTime = planCreatedTime;
 	}
 

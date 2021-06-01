@@ -38,12 +38,13 @@ spring:
         file-extension: yml
         namespace: 8740fef6-e5cd-4bee-aa59-1982b454323e
         group: DEFAULT_GROUP
-mybatis:
+mybatis-plus:
   #mapper-locations: classpath:mapping/*Mapper.xml
   #type-aliases-package: com.yaoban.kmsw.pojos
   configuration:
     call-setters-on-nulls: true
     map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #开启SQL语句打印
 
 server:
   port: 8002

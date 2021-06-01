@@ -125,15 +125,11 @@ public class SignPointServiceImpl {
         return RespBean.ok("删除成功！");
     }
 
+    @Transactional
     public RespBean findSignedPoint(Integer id) {
         BizSignedPoint byId = null;
         if(id != null) {
-            try {
-                byId = signedPointRepository.findbyId(id);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return RespBean.error("查询失败！");
-            }
+            byId = signedPointRepository.findbyId(id);
         }else{
             return RespBean.error("id为空！");
         }
@@ -148,13 +144,7 @@ public class SignPointServiceImpl {
     public RespBean findSignPoint(Integer id) {
         BizSignPoint byId = null;
         if(id != null) {
-            try {
-                byId = signPointRepository.findSignPointById(id);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                return RespBean.error("查询失败！");
-            }
+            byId = signPointRepository.findSignPointById(id);
         }else{
             return RespBean.error("id为空！");
         }
@@ -232,19 +222,6 @@ public class SignPointServiceImpl {
         if(taskId != null && routeId != null) {
             try {
                  list = signedPointRepository.findListByTaskId(routeId,taskId);
-                if(list.size()>0){
-                    for(int i =0; i<list.size(); i++){
-                        //获取报建文件列表
-                        if(FieldUtils.isObjectNotEmpty(list.get(i).getFileType())) {
-                            RespBean respBean = fileService.selectOneByPid(String.valueOf((Integer) list.get(i).getId()), (String) list.get(i).getFileType());
-                            List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) respBean.getObj();
-                            if(respBean.getStatus() == 500){
-                                throw new RuntimeException("Feign调用文件服务失败");
-                            }
-                            list.get(i).setFileList(fileList);
-                        }
-                    }
-                }
             } catch (Exception e) {
                 e.printStackTrace();
                 return RespBean.error("查询失败！");
@@ -319,9 +296,9 @@ public class SignPointServiceImpl {
                         Map routeTypeEnum = (Map) EnumMenu.findEnum((String)maps.get(i).get("route_type")).getObj();
                         Map waterManagementOfficeEnum = (Map) EnumMenu.findEnum((String)maps.get(i).get("water_management_office")).getObj();
                         //获取报建文件列表
-                        RespBean res = fileService.selectOneByPid(maps.get(i).get("sign_point_id").toString(), "qddfj");
-                        List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) res.getObj();
-                        maps.get(i).put("fileList",fileList);
+//                        RespBean res = fileService.selectOneByPid(maps.get(i).get("sign_point_id").toString(), "qddfj");
+//                        List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) res.getObj();
+//                        maps.get(i).put("fileList",fileList);
                         maps.get(i).put("pointInspectionTypeEnum",pointInspectionTypeEnum);
                         maps.get(i).put("routeTypeEnum",routeTypeEnum);
                         maps.get(i).put("waterManagementOfficeEnum",waterManagementOfficeEnum);
@@ -332,7 +309,6 @@ public class SignPointServiceImpl {
                                 maps.get(i).put("inspect_person",list.get(j).get("inspect_person"));
                                 maps.get(i).put("begin_time",list.get(j).get("begin_time"));
                                 maps.get(i).put("dead_time",list.get(j).get("dead_time"));
-                                maps.get(i).put("plan_name",list.get(j).get("plan_name"));
                             }
                         }
                     }
@@ -344,8 +320,29 @@ public class SignPointServiceImpl {
     }
 
     public  RespBean top10(){
-        List<BizSignedPoint> list = signedPointRepository.top10();
-        return RespBean.ok("查询成功！", list);
+        List<HashMap<String, Object>> maps = bizSignPointMapper.top10();
+        //获取task_id列表
+        List<String> list = maps.stream().map(o -> {
+            String taskId = (String) o.get("task_id");
+            return taskId;
+        }).collect(Collectors.toList());
+        //openFeign调用
+        RespBean bean = inspectService.getFeignInspectDetailById(list);
+        List<HashMap<String, Object>> hashMaps = (List<HashMap<String, Object>>) bean.getObj();
+        maps.stream().forEach(a -> {
+            RespBean res = fileService.selectOneByPid(a.get("id").toString(), (String)a.get("file_type"));
+            List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) res.getObj();
+            a.put("fileList",fileList);
+            hashMaps.stream().forEach(b -> {
+                if(((String)a.get("task_id")).equals(((String)b.get("inspectTaskId")))){
+                    a.put("name",b.get("name"));
+                    a.put("actBeginTime",b.get("actBeginTime"));
+                    a.put("checkInPointSituation",b.get("checkInPointSituation"));
+                }
+            });
+        });
+
+        return RespBean.ok("查询成功！", maps);
     }
 
     public  RespBean findEnum(String code){
