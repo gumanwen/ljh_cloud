@@ -249,6 +249,7 @@ public class PlanService {
             HashMap<String, Object> pp = (HashMap<String, Object>) routeService.findEnum(bp.getPlanPorid()).getObj();
             HashMap<String, Object> hashMap = (HashMap<String, Object>) o;
             String office = (String) hashMap.get("waterManagementOffice");
+            String routeName = (String) hashMap.get("routeName");
             HashMap<String, Object> waterUseOffice = (HashMap<String, Object>) routeService.findEnum(office).getObj();
             bp.setPlanTypeMenu(map);
             bp.setPlanStatusMenu(ps);
@@ -256,6 +257,7 @@ public class PlanService {
             bp.setWaterUseOffice(office);
             bp.setWaterUseOfficeEnum(waterUseOffice);
             bp.setPlanCreatedByCN(chineseName);
+            bp.setRouteName(routeName);
             if(respBean.getStatus() == 500){
                 throw new RuntimeException("Feign调用路线服务失败！");
             }
