@@ -48,7 +48,7 @@ public class InspectController {
 
     @ApiOperation("app & web:获取计划任务列表")
     @PostMapping("/plan/getAllInspect")
-    public RespBean getPlanInspect(long pageNo,long pageSize,@RequestBody Map<String, Object> params,HttpServletRequest request) throws IllegalAccessException, UnsupportedEncodingException {
+    public RespBean getPlanInspect(long pageNo,long pageSize,@RequestBody Map<String, Object> params,HttpServletRequest request) throws IllegalAccessException, UnsupportedEncodingException, ParseException {
         return iInspectService.getPlanInspect(pageNo, pageSize, params, request);
     }
 
@@ -80,6 +80,12 @@ public class InspectController {
     @GetMapping("/plan/getInspectDetailById")
     public RespBean getInspectDetailById(String inspect_task_id,HttpServletRequest request) throws IllegalAccessException, UnsupportedEncodingException, ParseException {
         return iInspectService.getInspectDetailById(inspect_task_id,request);
+    }
+
+    @ApiOperation("openfeign: openfeign获取任务详情")
+    @GetMapping("/plan/getFeignInspectDetailById")
+    public RespBean getFeignInspectDetailById(@RequestParam(value = "taskIds") List<String> taskIds){
+        return iInspectService.getFeignInspectDetailById(taskIds);
     }
 
     @ApiOperation("app & web：修改计划任务详情")
@@ -247,5 +253,10 @@ public class InspectController {
         return iInspectService.getMapOverviewInfo(time,unit,request);
     }
 
+    @ApiOperation("openfeign:任务是否可以删除")
+    @GetMapping("/isDelete")
+    public Boolean isDelete(Integer routeId,Integer planId){
+        return iInspectService.isDelete(routeId,planId);
+    }
 }
 

@@ -488,14 +488,21 @@ public class UserRightsService {
             token =  StringUtils.substringAfter(header, "Bearer ");
         }
         if(ttype == 1){
-            result = userMapper.loadAllUserByUsername(namelist);
+            if(namelist.size()>0){
+                result = userMapper.loadAllUserByUsername(namelist);
+            }
         }else{
             if(namelist.size()>0){
+                List<User> userlist = urlUtils.selectAllUserByRole(token);
                 for (int i = 0; i < namelist.size(); i++) {
-                    HashMap<String,String> temp =new HashMap<>();
-                    temp.put("username",namelist.get(i));
-                    temp.put("name",urlUtils.getNameByuser(namelist.get(i),token));
-                    result.add(temp);
+                    for (int j = 0; j < userlist.size(); j++) {
+                        if(namelist.get(i).equals(userlist.get(j).getUsername())){
+                            HashMap<String,String> temp =new HashMap<>();
+                            temp.put("username",namelist.get(i));
+                            temp.put("name",userlist.get(j).getName());
+                            result.add(temp);
+                        }
+                    }
                 }
             }
         }

@@ -173,12 +173,15 @@ public class Inspect implements Serializable {
      * 已到位签到点
      */
     private int inplacepoint;
-
+    /**
+     * 区域
+     */
+    private String area;
 
     public Inspect() {
     }
 
-    public Inspect(String inspectTaskId, String waterManagementOffice, String diameter, String beginTime, String deadTime, String actBeginTime, String actEndTime, String status, String inspectPerson, String name, String sender, String completeRate, String arrivalRate, String liveSitustion, String checkInPointSituation, String gisMap, String taskType, String sendTime, String overReason, String modifyBy, String completeTime, Integer planId, Integer routeId, String cycle, String result, String createTime, String endReason, String endTime, String notinplace, int allpoint, int donepoint, int inplacepoint) {
+    public Inspect(String inspectTaskId, String waterManagementOffice, String diameter, String beginTime, String deadTime, String actBeginTime, String actEndTime, String status, String inspectPerson, String name, String sender, String completeRate, String arrivalRate, String liveSitustion, String checkInPointSituation, String gisMap, String taskType, String sendTime, String overReason, String modifyBy, String completeTime, Integer planId, Integer routeId, String cycle, String result, String createTime, String endReason, String endTime, String notinplace, int allpoint, int donepoint, int inplacepoint, String area) {
         this.inspectTaskId = inspectTaskId;
         this.waterManagementOffice = waterManagementOffice;
         this.diameter = diameter;
@@ -211,6 +214,15 @@ public class Inspect implements Serializable {
         this.allpoint = allpoint;
         this.donepoint = donepoint;
         this.inplacepoint = inplacepoint;
+        this.area = area;
+    }
+
+    public String getArea() {
+        return area;
+    }
+
+    public void setArea(String area) {
+        this.area = area;
     }
 
     public int getInplacepoint() {
