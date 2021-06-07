@@ -192,8 +192,10 @@ public class RouteServiceImpl {
                 route.setWaterOfficeMenu(waterOfficeMenu);
                 route.setPointInspectionTypeMenu(pointInspectionTypeMenu);
                 names.stream().forEach(a -> {
-                    if(route.getRouteCreator().equals(a.get("username"))){
-                        route.setRouteCreatorCN(a.get("name"));
+                    if(FieldUtils.isObjectNotEmpty(a.get("username")) && FieldUtils.isObjectNotEmpty(route.getRouteCreator())){
+                        if(a.get("username").equals(route.getRouteCreator())){
+                            route.setRouteCreatorCN(a.get("name"));
+                        }
                     }
                 });
             }

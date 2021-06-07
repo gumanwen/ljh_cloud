@@ -359,6 +359,9 @@ public class HiddenDangerPointServiceImpl {
         if(!list.isEmpty()){
            res = list.stream().map(a -> {
                 HashMap<String, Object> risk = (HashMap) routeService.findEnum(a.getRiskLevel()).getObj();
+               RespBean files = fileService.selectOneByPid(a.getId().toString(),"yhdfj");
+               List<HashMap<String, Object>> fileList = (List<HashMap<String, Object>>) files.getObj();
+                a.setFileList(fileList);
                 a.setRiskLevelEnum(risk);
                return a;
            }).collect(Collectors.toList());
