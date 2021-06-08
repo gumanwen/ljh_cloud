@@ -101,3 +101,5 @@ eureka:
         hostname: 10.1.4.16
         prefer-ip-address: true
         instance-id: 10.1.4.16:8888
+qyserver:
+    ipAdd: http://119.135.180.178:8850/api/auth/user/get

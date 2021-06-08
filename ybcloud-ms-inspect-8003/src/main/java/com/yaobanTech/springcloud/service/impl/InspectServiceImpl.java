@@ -247,7 +247,6 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                 if(FieldUtils.isObjectNotEmpty(inspect.getPlanId())){
                     map3 = (Map<String, Object>) planService.findById(inspect.getPlanId()).getObj();
                 }*/
-
                 if(FieldUtils.isObjectNotEmpty(feignlist)){
                     if(feignlist.size()>0){
                         for (int j = 0; j < feignlist.size(); j++) {
@@ -1085,9 +1084,10 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                 String taskid = list.get(i).getInspectTaskId();
                 inspectqueryWrapper.eq("inspect_task_id",taskid);
                 Inspect inspect = inspectMapper.selectOne(inspectqueryWrapper);
-
-                map = (Map<String, Object>) routeService.findDetail(inspect.getRouteId()).getObj();
-                list.get(i).setRouteInfo(map);
+                if(FieldUtils.isObjectNotEmpty(inspect)){
+                    map = (Map<String, Object>) routeService.findDetail(inspect.getRouteId()).getObj();
+                    list.get(i).setRouteInfo(map);
+                }
                 for (int j = 0; j < personlist.size(); j++) {
                     if(personlist.get(j).get("username").equals(list.get(i).getInspectPerson())){
                         list.get(i).setInspectPersonName((String) personlist.get(j).get("name"));
