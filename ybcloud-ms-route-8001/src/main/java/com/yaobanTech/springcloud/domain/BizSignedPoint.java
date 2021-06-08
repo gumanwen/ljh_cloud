@@ -227,11 +227,25 @@ public class BizSignedPoint implements Serializable {
 	@Column(name = "opration_by" )
 	private String oprationBy;
 
+	/**
+	 * 距离
+	 */
+	@Column(name = "distance" )
+	private String distance;
+
 
 	public BizSignedPoint() {
 	}
 
-	public BizSignedPoint(Integer id, Integer signPointCode, String currentChoosedAddress, String troubleCode, String troubleReason, String hiddenDangerType, String handleSuggestion, Integer enabled, Integer routeId, String location, String pipeDiameter, String memo, String siteConditions, String siteConditionsDesc, String hiddenDangerAddress, String hiddenDangerReason, String dischargeAddress, String dischargeTimeLast, String dischargeTime, String estimatedDischarge, String routeType, String pointInspectionType, String signPointStatus, Date modifyTime, String signedTime, String taskId, String fileType, String signPointType, List<HashMap<String, Object>> fileList, String inPlace, String notInPlaceReason, Integer planId, String oprationBy) {
+	public String getDistance() {
+		return distance;
+	}
+
+	public void setDistance(String distance) {
+		this.distance = distance;
+	}
+
+	public BizSignedPoint(Integer id, Integer signPointCode, String currentChoosedAddress, String troubleCode, String troubleReason, String hiddenDangerType, String handleSuggestion, Integer enabled, Integer routeId, String location, String pipeDiameter, String memo, String siteConditions, String siteConditionsDesc, String hiddenDangerAddress, String hiddenDangerReason, String dischargeAddress, String dischargeTimeLast, String dischargeTime, String estimatedDischarge, String routeType, String pointInspectionType, String signPointStatus, Date modifyTime, String signedTime, String taskId, String fileType, String signPointType, List<HashMap<String, Object>> fileList, String inPlace, String notInPlaceReason, Integer planId, String oprationBy, String distance) {
 		this.id = id;
 		this.signPointCode = signPointCode;
 		this.currentChoosedAddress = currentChoosedAddress;
@@ -265,6 +279,7 @@ public class BizSignedPoint implements Serializable {
 		this.notInPlaceReason = notInPlaceReason;
 		this.planId = planId;
 		this.oprationBy = oprationBy;
+		this.distance = distance;
 	}
 
 	public String getDischargeTime() {

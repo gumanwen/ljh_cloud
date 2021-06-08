@@ -126,11 +126,13 @@ public class RouteServiceImpl {
             try {
                 List<BizSignPoint> list = bizRoute.getBizSignPoints();
                 List<BizSignPoint> points = list.stream().map(a -> {
+                    a.setRouteId(bizRoute.getId());
                     a.setEnabled(1);
                     a.setPointInspectionType(bizRoute.getPointInspectionType());
                     a.setRouteType(bizRoute.getRouteType());
                     return a;
                 }).collect(Collectors.toList());
+                bizRoute.setSignIn(points.size());
                 bizSignPointRepository.saveAll(points);
                bizRouteRepository.save(bizRoute);
 
