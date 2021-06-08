@@ -108,36 +108,37 @@ public class UrlUtils {
                     System.out.println("当前用户的code是:"+code);
                     // 6. 断开连接，释放资源
                     connection.disconnect();
-
                     QyRespBean resp =  JSON.parseObject(msg,QyRespBean.class);
-                    if(FieldUtils.isObjectNotEmpty(resp)){
-                        u = JSON.parseObject(String.valueOf(resp.getData()),UserInfo.class);
-                        List<Role> roles = u.getRoles();
-                        Dept dept= u.getDept();
-                        String role = null;
-                        //如果有id为63的角色，判定为巡查队长
-                        loginUser.setRoleLists("ROLE_BZY");
-                        if(roles.size()>0){
-                            for (int i = 0; i < roles.size(); i++) {
-                                if(roles.get(i).getId() == 63){
-                                    loginUser.setRoleLists("ROLE_BZZ");
+                    if(!msg.contains("20001")){
+                        if(FieldUtils.isObjectNotEmpty(resp)){
+                            u = JSON.parseObject(String.valueOf(resp.getData()),UserInfo.class);
+                            List<Role> roles = u.getRoles();
+                            Dept dept= u.getDept();
+                            String role = null;
+                            //如果有id为63的角色，判定为巡查队长
+                            loginUser.setRoleLists("ROLE_BZY");
+                            if(roles.size()>0){
+                                for (int i = 0; i < roles.size(); i++) {
+                                    if(roles.get(i).getId() == 63){
+                                        loginUser.setRoleLists("ROLE_BZZ");
+                                    }
                                 }
                             }
-                        }
-                        loginUser.setDeptName(dept.getName());
-                        loginUser.setName(u.getName());
-                        loginUser.setLoginname(u.getLoginname());
-                        System.out.println("该用户的角色是："+loginUser.getRoleLists());
-                        u.setRoleslist(role);
-                        if(FieldUtils.isObjectNotEmpty(loginUser)){
-                            return loginUser;
+                            loginUser.setDeptName(dept.getName());
+                            loginUser.setName(u.getName());
+                            loginUser.setLoginname(u.getLoginname());
+                            System.out.println("该用户的角色是："+loginUser.getRoleLists());
+                            u.setRoleslist(role);
+                            if(FieldUtils.isObjectNotEmpty(loginUser)){
+                                return loginUser;
+                            }
                         }
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                return loginUser;
-        }
+        return loginUser;
+    }
     //根据英文获取中文
     public String getNameByuser(String username,String token){
         UserVo u = new UserVo();

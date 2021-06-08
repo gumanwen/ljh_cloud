@@ -1,10 +1,12 @@
 package com.yaobanTech.springcloud.config.oauth2;
 
+import com.yaobanTech.springcloud.utils.FieldUtils;
 import com.yaobanTech.springcloud.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -26,6 +28,8 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
     private static final String AUTHORIZE_TOKEN = "Authorization";
     private static final String QY_AUTHORIZE_TOKEN = "TW-Authorization";
     private static final Logger logger = LoggerFactory.getLogger(AuthorizeFilter.class);
+    @Autowired
+    private UrlUtils urlUtils;
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         //1. 获取请求
@@ -63,7 +67,12 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
             }
         }
         if(StringUtils.isNotEmpty(qytoken)){
-            flag = true;
+            LoginUser loginUser = urlUtils.getMsg(qytoken);
+            if(FieldUtils.isObjectNotEmpty(loginUser.getLoginname())){
+                flag = true;
+            }else{
+                flag = false;
+            }
         }
         if(flag){
             //12. 放行
