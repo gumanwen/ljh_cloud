@@ -27,7 +27,6 @@ public class Device implements Serializable {
     /**
      * 自增编号
      */
-
     private Integer id;
 
     /**
@@ -83,12 +82,14 @@ public class Device implements Serializable {
     @TableField(exist = false)
     private Map<String, Object> routeInfo;
 
+    @TableField(exist = false)
+    private Map<String, Object> planInfo;
 
 
     public Device() {
     }
 
-    public Device(Integer id, String inspectTaskId, String inspectPerson, String inspectPersonName, String countTime, String longitude, String latitude, String mapX, String mapY, String status, String stoptime, Map<String, Object> routeInfo) {
+    public Device(Integer id, String inspectTaskId, String inspectPerson, String inspectPersonName, String countTime, String longitude, String latitude, String mapX, String mapY, String status, String stoptime, Map<String, Object> routeInfo, Map<String, Object> planInfo) {
         this.id = id;
         this.inspectTaskId = inspectTaskId;
         this.inspectPerson = inspectPerson;
@@ -101,6 +102,15 @@ public class Device implements Serializable {
         this.status = status;
         this.stoptime = stoptime;
         this.routeInfo = routeInfo;
+        this.planInfo = planInfo;
+    }
+
+    public Map<String, Object> getPlanInfo() {
+        return planInfo;
+    }
+
+    public void setPlanInfo(Map<String, Object> planInfo) {
+        this.planInfo = planInfo;
     }
 
     public String getInspectPersonName() {
