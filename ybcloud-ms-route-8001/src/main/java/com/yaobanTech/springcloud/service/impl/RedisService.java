@@ -77,6 +77,7 @@ public class RedisService {
             Date date = null;
             Long id = null;
             Calendar calendar = Calendar.getInstance();
+            //设置过期时间为每月最后一天
             if (hasExpire) {
                 calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
                 calendar.set(Calendar.HOUR_OF_DAY, 23);
