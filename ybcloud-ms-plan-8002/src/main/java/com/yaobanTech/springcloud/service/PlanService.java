@@ -378,9 +378,14 @@ public class PlanService {
         List<HashMap<String, Object>> routes = (List<HashMap<String, Object>>) r2.getObj();
         if(!list.isEmpty()){
             list.stream().map(a -> {
+                Map ps = new HashMap();
                 Map pt = (Map) findEnum((String)a.get("plan_type")).getObj();
-                Map ps = (Map) findEnum((String)a.get("plan_status")).getObj();
+                ps = (Map) findEnum((String)a.get("plan_status")).getObj();
                 Map pp = (Map) findEnum((String)a.get("plan_porid")).getObj();
+                Date time = (Date) a.get("start_time");
+                if(time.before(new Date()) && ((String)a.get("plan_status")).equals("11")){
+                    ps = (Map) routeService.findEnum("104").getObj();
+                }
                 a.put("plan_type",pt);
                 a.put("plan_status",ps);
                 a.put("plan_porid",pp);
