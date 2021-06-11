@@ -20,6 +20,7 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -383,8 +384,15 @@ public class PlanService {
                 ps = (Map) findEnum((String)a.get("plan_status")).getObj();
                 Map pp = (Map) findEnum((String)a.get("plan_porid")).getObj();
                 Date time = (Date) a.get("start_time");
-                if(time.before(new Date()) && ((String)a.get("plan_status")).equals("11")){
-                    ps = (Map) routeService.findEnum("104").getObj();
+                String s = DateFormatUtils.DateStr(new Date());
+                Date date = null;
+                try {
+                     date = DateFormatUtils.StrDate(s);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                if(time.before(date) && ((String)a.get("plan_status")).equals("11")){
+                    ps = (Map) routeService.findEnum("105").getObj();
                 }
                 a.put("plan_type",pt);
                 a.put("plan_status",ps);
