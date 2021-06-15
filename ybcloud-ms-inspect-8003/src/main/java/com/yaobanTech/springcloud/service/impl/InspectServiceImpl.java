@@ -120,23 +120,23 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         String status =null;
         //创建对象
         QueryWrapper<Inspect> queryWrapper = new QueryWrapper<>();
-        queryWrapper.orderByDesc("create_time");
+        queryWrapper.orderByAsc("begin_time");
         if(FieldUtils.isObjectNotEmpty(map)){
             type = String.valueOf(map.get("status"));
             if(FieldUtils.isObjectNotEmpty(map.get("name"))){queryWrapper.eq("name",map.get("name"));}
             if(FieldUtils.isObjectNotEmpty(map.get("modifyBy"))){queryWrapper.eq("sender",map.get("modifyBy"));}
             if(FieldUtils.isObjectNotEmpty(map.get("begin_d1"))){
-                String begin_d1 = daydateFormat.format(format.parse((String) map.get("begin_d1")));
+                String begin_d1 = (String) map.get("begin_d1");
                 queryWrapper.apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),begin_time,20) >= convert(varchar(20),'"+begin_d1+"',20)");}
             if(FieldUtils.isObjectNotEmpty(map.get("begin_d2"))){
-                String begin_d2 =  daydateFormat.format(format.parse((String) map.get("begin_d2")));
+                String begin_d2 = (String) map.get("begin_d2");
                 queryWrapper.apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),begin_time,20) <= convert(varchar(20),'"+begin_d2+"',20)");}
             if(FieldUtils.isObjectNotEmpty(map.get("end_d1"))){
-                String end_d1 =  daydateFormat.format(format.parse((String) map.get("end_d1")));
-                queryWrapper.apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),end_time,20) >= convert(varchar(20),'"+end_d1+"',20)");}
+                String end_d1 =  (String) map.get("end_d1");
+                queryWrapper.apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),dead_time,20) >= convert(varchar(20),'"+end_d1+"',20)");}
             if(FieldUtils.isObjectNotEmpty(map.get("end_d2"))){
-                String end_d2 =  daydateFormat.format(format.parse((String) map.get("end_d2")));
-                queryWrapper.apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),end_time,20) <= convert(varchar(20),'"+end_d2+"',20)");}
+                String end_d2 =  (String) map.get("end_d2");
+                queryWrapper.apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),dead_time,20) <= convert(varchar(20),'"+end_d2+"',20)");}
             feignRespBean = routeService.findRouteIds((String)FieldUtils.ifObjectEmptyToNullStr(map.get("waterManagementOffice")), (Integer) map.get("routeName"),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("pointInspectionType")), (Integer) map.get("planName"),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("planPorid")),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("planType")),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("routeType")));
         }
         List<HashMap<String,Object>> feignlist = (List<HashMap<String, Object>>) feignRespBean.getObj();
@@ -1077,6 +1077,7 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         if(list.size()>0){
             for (int i = 0; i < list.size(); i++) {
                 Map<String, Object> map = new HashMap<String, Object>();
+                Map<String, Object> planmap = new HashMap<String, Object>();
                 String d = DateUtils.calLastedTime(dateFormat.parse(list.get(i).getCountTime()));
                 list.get(i).setStoptime(d);
                 QueryWrapper<Inspect> inspectqueryWrapper = new QueryWrapper<>();
@@ -1086,7 +1087,9 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
                 Inspect inspect = inspectMapper.selectOne(inspectqueryWrapper);
                 if(FieldUtils.isObjectNotEmpty(inspect)){
                     map = (Map<String, Object>) routeService.findDetail(inspect.getRouteId()).getObj();
+                    planmap = (Map<String, Object>) planService.findById(inspect.getPlanId()).getObj();
                     list.get(i).setRouteInfo(map);
+                    list.get(i).setPlanInfo(planmap);
                 }
                 for (int j = 0; j < personlist.size(); j++) {
                     if(personlist.get(j).get("username").equals(list.get(i).getInspectPerson())){
