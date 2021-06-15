@@ -98,13 +98,13 @@ public class PlanController {
     @ApiOperation("条件查询")
     @GetMapping("findConditon")
     public RespBean findCondition(@RequestParam String routeName,@RequestParam String waterManagementOffice,
-                                  @RequestParam String planPorid,@RequestParam String planType,
+                                  @RequestParam String planPorid,@RequestParam String planType,@RequestParam String planStatus,
                                   @RequestParam String startTimeOfPCT,@RequestParam String endTimeOfPCT,
                                   @RequestParam String startTimeOfPST,@RequestParam String endTimeOfPST,
                                   @RequestParam String startTimeOfPET,@RequestParam String endTimeOfPET,
                                   @RequestParam String mainKey,
                                   HttpServletRequest request) throws UnsupportedEncodingException {
-        return planService.findCondition(routeName,waterManagementOffice,planPorid,planType,startTimeOfPCT,endTimeOfPCT,startTimeOfPST,endTimeOfPST,startTimeOfPET,endTimeOfPET,mainKey,request);
+        return planService.findCondition(routeName,waterManagementOffice,planPorid,planType,planStatus,startTimeOfPCT,endTimeOfPCT,startTimeOfPST,endTimeOfPST,startTimeOfPET,endTimeOfPET,mainKey,request);
     }
 
     @ApiOperation("计划审核")

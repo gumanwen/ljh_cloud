@@ -43,6 +43,7 @@ public interface PlanMapper {
             "AND IF(#{waterManagementOffice} is not null, a.water_management_office = #{waterManagementOffice},1=1 ) " +
             "AND IF(#{planPorid} is not null, b.plan_porid = #{planPorid},1=1 ) " +
             "AND IF(#{planType} is not null, b.plan_type = #{planType},1=1 ) " +
+            "AND IF(#{planStatus} is not null, b.plan_status = #{planStatus},1=1 ) " +
             "AND IF(#{startTimeOfPCT} is not null, b.plan_created_time >= #{startTimeOfPCT},1=1 ) " +
             "AND IF(#{endTimeOfPCT} is not null, b.plan_created_time <= #{endTimeOfPCT},1=1 ) " +
             "AND IF(#{startTimeOfPCT} is not null, b.start_time >= #{startTimeOfPCT},1=1 ) " +
@@ -54,7 +55,7 @@ public interface PlanMapper {
             "OR IF(#{mainKey} is not null, b.task_desc like #{mainKey},1=1 )) " +
             "ORDER BY b.enabled DESC ,b.plan_created_time DESC")
     List<HashMap<String,Object>> findCondition(@Param("routeName") String routeName, @Param("waterManagementOffice")String waterManagementOffice,
-                                               @Param("planPorid")String planPorid, @Param("planType")String planType,
+                                               @Param("planPorid")String planPorid, @Param("planType")String planType,@Param("planStatus") String planStatus,
                                                @Param("startTimeOfPCT")String startTimeOfPCT, @Param("endTimeOfPCT")String endTimeOfPCT,
                                                @Param("startTimeOfPST")String startTimeOfPST, @Param("endTimeOfPST")String endTimeOfPST,
                                                @Param("startTimeOfPET")String startTimeOfPET, @Param("endTimeOfPET")String endTimeOfPET,
