@@ -323,6 +323,7 @@ public class PlanService {
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public RespBean findCondition(String routeName, String waterManagementOffice, String planPorid, String planType,
+                                  String planStatus,
                                   String startTimeOfPCT, String endTimeOfPCT,
                                   String startTimeOfPST, String endTimeOfPST,
                                   String startTimeOfPET, String endTimeOfPET,String mainKey, HttpServletRequest request) throws UnsupportedEncodingException {
@@ -340,6 +341,9 @@ public class PlanService {
         }
         if("null".equals(planType)){
             planType = null;
+        }
+        if("null".equals(planStatus)){
+            planStatus = null;
         }
         if("null".equals(startTimeOfPCT)){
             startTimeOfPCT = null;
@@ -364,7 +368,7 @@ public class PlanService {
         }
 
         //查询计划列表
-        List<HashMap<String,Object>> list = planMapper.findCondition(routeName,waterManagementOffice,planPorid,planType,startTimeOfPCT,endTimeOfPCT,startTimeOfPST,endTimeOfPST,startTimeOfPET,endTimeOfPET,mainKey);
+        List<HashMap<String,Object>> list = planMapper.findCondition(routeName,waterManagementOffice,planPorid,planType,planStatus,startTimeOfPCT,endTimeOfPCT,startTimeOfPST,endTimeOfPST,startTimeOfPET,endTimeOfPET,mainKey);
         //获取路线id列表
         List<Integer> routeIds = list.stream().map(o -> {
             return (Integer)o.get("route_id");

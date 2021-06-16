@@ -154,7 +154,7 @@ public interface BizSignPointMapper {
             "OR IF(#{mainKey} is not null, a.build_company_agent = #{mainKey},1=1 ) " +
             "OR IF(#{mainKey} is not null, a.construction_company = #{mainKey},1=1 ) " +
             "OR IF(#{mainKey} is not null, a.reason like #{mainKey},1=1 )) " +
-            "ORDER BY a.commit_Date DESC")
+            "ORDER BY a.commit_date DESC")
     List<BizHiddenDangerPointEntity> hiddenDangerPointQuery(HiddenDangerPointQuery hiddenDangerPointQuery);
 
     @Select(value="SELECT  a.*,b.plan_name,c.* " +
