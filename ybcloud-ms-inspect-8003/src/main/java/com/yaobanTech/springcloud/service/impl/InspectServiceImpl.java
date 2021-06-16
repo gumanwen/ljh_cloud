@@ -744,6 +744,62 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         }
     }
 
+    @Override
+    @Transactional
+    public RespBean batchSend(Map<String, Object> params, HttpServletRequest request) throws UnsupportedEncodingException {
+        LoginUser u = urlUtils.getAll(request);
+        String name = u.getName();
+        Map map = (Map) params;
+        RespBean feignRespBean = new RespBean();
+        //根据当前登陆人
+        String date = daydateFormat.format(new Date());
+        String inspector = null;
+        String chname =  null;
+        //创建对象
+        QueryWrapper<Inspect> queryWrapper = new QueryWrapper<>();
+        if(FieldUtils.isObjectNotEmpty(map)){
+            inspector = (String) map.get("inspector");
+            chname =  (String) map.get("name");
+            if(FieldUtils.isObjectNotEmpty(map.get("begin_d1"))){
+                String begin_d1 = (String) map.get("begin_d1");
+                queryWrapper.apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),begin_time,20) >= convert(varchar(20),'"+begin_d1+"',20)");}
+            if(FieldUtils.isObjectNotEmpty(map.get("begin_d2"))){
+                String begin_d2 = (String) map.get("begin_d2");
+                queryWrapper.apply(FieldUtils.isStringNotEmpty(date),"convert(varchar(20),begin_time,20) <= convert(varchar(20),'"+begin_d2+"',20)");}
+            feignRespBean = routeService.findRouteIds((String)FieldUtils.ifObjectEmptyToNullStr(map.get("waterManagementOffice")), (Integer) map.get("routeName"),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("pointInspectionType")), (Integer) map.get("planName"),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("planPorid")),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("planType")),(String)FieldUtils.ifObjectEmptyToNullStr(map.get("routeType")));
+        }
+        List<HashMap<String,Object>> feignlist = (List<HashMap<String, Object>>) feignRespBean.getObj();
+
+        if(FieldUtils.isObjectNotEmpty(feignlist)){
+            if(feignlist.size()>0){
+                queryWrapper.and(wrapper -> {
+                    for(HashMap<String,Object> info: feignlist){
+                        wrapper.or()
+                                .eq("route_id",info.get("route_id"))
+                                .eq("plan_id",info.get("plan_id"));
+                    }
+                });
+            }else{
+                queryWrapper.eq("route_id",0);
+                queryWrapper.eq("plan_id",0);
+            }
+        }else{
+            queryWrapper.eq("route_id",0);
+            queryWrapper.eq("plan_id",0);
+        }
+        List<Inspect> list = new ArrayList<>();
+        List<Inspect> result = new ArrayList<>();
+        list= inspectMapper.selectList(queryWrapper);
+        if(list.size()>0){
+            for (int i = 0; i < list.size(); i++) {
+                if(list.get(i).getStatus().equals("已终止") || list.get(i).getStatus().equals("未派发")){
+                    result.add(list.get(i));
+                }
+            }
+        }
+        return RespBean.ok("确定派发给"+inspector+result.size()+"个任务吗？").setObj(result);
+    }
+
     @Transactional
     public RespBean send1(HttpServletRequest request) {
                 Map<String,Object> taskMap = new HashMap<>();
