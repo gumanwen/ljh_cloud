@@ -85,4 +85,6 @@ public interface IInspectService extends IService<Inspect> {
     RespBean selectUserByRoleAndDept(String role, String waterManagementOffice, HttpServletRequest request) throws UnsupportedEncodingException;
 
     Boolean isDelete(Integer routeId, Integer planId);
+
+    RespBean batchSend(Map<String, Object> params, HttpServletRequest request) throws UnsupportedEncodingException;
 }

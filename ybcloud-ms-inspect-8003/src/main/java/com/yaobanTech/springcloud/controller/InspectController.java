@@ -128,6 +128,11 @@ public class InspectController {
         //调用route的rest接口
         return iInspectService.send(params,request);
     }
+    @ApiOperation("web：确定派发吗？")
+    @PostMapping("/task/batchSend")
+    public RespBean batchSend(@RequestBody Map<String, Object> params,HttpServletRequest request) throws UnsupportedEncodingException {
+        return iInspectService.batchSend(params,request);
+    }
 
     @ApiOperation("web：发起")
     @PostMapping("/task/send1")
