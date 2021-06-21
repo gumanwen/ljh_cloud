@@ -130,6 +130,7 @@ public class UserController {
         result.put("username",username);
         result.put("name",u.getName());
         result.put("userId",u.getId());
+        result.put("dept",u.getDept());
         result.put("roles", String.valueOf(object));
         result.put("token", "Bearer "+map.get("access_token"));
         return RespBean.ok("登录成功！").setObj(result);

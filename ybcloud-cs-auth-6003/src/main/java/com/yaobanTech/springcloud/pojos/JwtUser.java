@@ -14,6 +14,7 @@ public class JwtUser implements UserDetails {
     private String username;
     private String password;
     private String name;
+    private String dept;
     private Collection<? extends GrantedAuthority> authorities;
 
     public JwtUser() {
@@ -25,7 +26,16 @@ public class JwtUser implements UserDetails {
         username = user.getUsername();
         password = user.getPassword();
         name = user.getName();
+        dept = user.getDepartment();
         authorities = Collections.singleton(new SimpleGrantedAuthority(user.getRole()));
+    }
+
+    public String getDept() {
+        return dept;
+    }
+
+    public void setDept(String dept) {
+        this.dept = dept;
     }
 
     public Collection<? extends GrantedAuthority> getAuthorities() {

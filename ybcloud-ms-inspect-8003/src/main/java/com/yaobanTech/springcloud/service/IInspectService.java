@@ -87,4 +87,6 @@ public interface IInspectService extends IService<Inspect> {
     Boolean isDelete(Integer routeId, Integer planId);
 
     RespBean batchSend(Map<String, Object> params, HttpServletRequest request) throws UnsupportedEncodingException;
+
+    RespBean getTrackByTime(String inspect_person, String s1, String s2);
 }

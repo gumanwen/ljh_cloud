@@ -1739,4 +1739,20 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
     public Boolean isvalve(){
         return true;
     }
+
+    @Override
+    public RespBean getTrackByTime(String inspect_person, String s1, String s2) {
+        QueryWrapper<Track> query = new QueryWrapper<>();
+        List<Track> result = new ArrayList<>();
+        if(FieldUtils.isStringNotEmpty(inspect_person)){
+            query.orderByAsc("gps_time");
+            query.eq("inspect_person",inspect_person);
+            query.apply("convert(varchar(20),gps_time,20) >= convert(varchar(20),'"+s1+"',20)");
+            query.apply("convert(varchar(20),gps_time,20) <= convert(varchar(20),'"+s2+"',20)");
+            result = trackMapper.selectList(query);
+        }else{
+            return RespBean.error("巡查人为空！");
+        }
+        return RespBean.ok("").setObj(result);
+    }
 }

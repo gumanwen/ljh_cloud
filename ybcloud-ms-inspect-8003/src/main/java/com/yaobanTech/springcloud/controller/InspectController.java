@@ -15,6 +15,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.text.StyledEditorKit;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.Date;
@@ -262,6 +263,12 @@ public class InspectController {
     @GetMapping("/isDelete")
     public Boolean isDelete(Integer routeId,Integer planId){
         return iInspectService.isDelete(routeId,planId);
+    }
+
+    @ApiOperation("web:根据时间段过滤人员轨迹")
+    @GetMapping("/getTrackByTime")
+    public RespBean getTrackByTime(String inspect_person,String s1,String s2){
+        return iInspectService.getTrackByTime(inspect_person,s1,s2);
     }
 }
 
