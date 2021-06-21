@@ -205,6 +205,12 @@ public class BizHiddenDangerPointEntity {
 	private String modifyTime;
 
 	/**
+	 * 施工单位负责人
+	 */
+	@Column(name = "construction_agent" )
+	private String constructionAgent;
+
+	/**
 	 * 隐患时长
 	 */
 	@Transient
@@ -307,6 +313,14 @@ public class BizHiddenDangerPointEntity {
 		this.fileList = fileList;
 		this.sgfs = sgfs;
 		this.gdlx = gdlx;
+	}
+
+	public String getConstructionAgent() {
+		return constructionAgent;
+	}
+
+	public void setConstructionAgent(String constructionAgent) {
+		this.constructionAgent = constructionAgent;
 	}
 
 	public String getOtherProjectType() {
