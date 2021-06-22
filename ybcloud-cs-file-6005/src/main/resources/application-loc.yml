@@ -3,7 +3,7 @@ spring:
         allow-bean-definition-overriding: true
     datasource:
         driver-class-name: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://localhost:3306/ybcloud-cs-file-6005?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
+        url: jdbc:mysql://192.168.50.91:3306/ybcloud-cs-file-6005?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
         username: root
         password: 123456
         type: com.alibaba.druid.pool.DruidDataSource
@@ -27,10 +27,10 @@ spring:
     cloud:
         nacos:
             discovery:
-                server-addr: 192.168.50.91:8848 #Nacos作为服务中心地址
-                ip: 192.168.50.91
+                server-addr: 192.168.50.167:8848 #Nacos作为服务中心地址
+                ip: 192.168.50.167
             config:
-                server-addr: 192.168.50.91:8848
+                server-addr: 192.168.50.167:8848
                 #file-extension: properties
                 #namespace: 8740fef6-e5cd-4bee-aa59-1982b454323e
                 #group: DEFAULT_GROUP
@@ -50,7 +50,7 @@ mybatis-plus:
         log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #开启SQL语句打印
 server:
     port: 6005
-    ip: 192.168.50.91
+    ip: 192.168.50.167
     max-http-header-size: 8192
 web:
     upload-path: C:/fujian/
@@ -59,4 +59,4 @@ web:
 ribbon:
     ConnectTimeout: 30000
     ReadTimeout: 7000
-url: http://192.168.50.91:8888
+url: http://192.168.50.167:8888

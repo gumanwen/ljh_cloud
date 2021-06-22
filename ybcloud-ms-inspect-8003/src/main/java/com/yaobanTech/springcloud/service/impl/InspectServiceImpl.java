@@ -31,7 +31,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -93,12 +95,6 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
 
     // 计算两点距离
     private final double EARTH_RADIUS = 6378137.0;
-
-    @Value("${server.ip}")
-    private String ip;
-
-    @Value("${server.port}")
-    private String port;
 
     @Autowired
     private UrlUtils urlUtils;
@@ -1755,4 +1751,5 @@ public class InspectServiceImpl extends ServiceImpl<InspectMapper, Inspect> impl
         }
         return RespBean.ok("").setObj(result);
     }
+
 }

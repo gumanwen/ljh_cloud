@@ -207,8 +207,8 @@ public class BizHiddenDangerPointEntity {
 	/**
 	 * 施工单位负责人
 	 */
-	@Column(name = "construction_agent" )
-	private String constructionAgent;
+	@Column(name = "construction_company_agent" )
+	private String constructionCompanyAgent;
 
 	/**
 	 * 隐患时长
@@ -315,12 +315,12 @@ public class BizHiddenDangerPointEntity {
 		this.gdlx = gdlx;
 	}
 
-	public String getConstructionAgent() {
-		return constructionAgent;
+	public String getConstructionCompanyAgent() {
+		return constructionCompanyAgent;
 	}
 
-	public void setConstructionAgent(String constructionAgent) {
-		this.constructionAgent = constructionAgent;
+	public void setConstructionCompanyAgent(String constructionCompanyAgent) {
+		this.constructionCompanyAgent = constructionCompanyAgent;
 	}
 
 	public String getOtherProjectType() {

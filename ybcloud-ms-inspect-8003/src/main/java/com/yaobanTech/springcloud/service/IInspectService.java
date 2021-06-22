@@ -89,4 +89,5 @@ public interface IInspectService extends IService<Inspect> {
     RespBean batchSend(Map<String, Object> params, HttpServletRequest request) throws UnsupportedEncodingException;
 
     RespBean getTrackByTime(String inspect_person, String s1, String s2);
+
 }

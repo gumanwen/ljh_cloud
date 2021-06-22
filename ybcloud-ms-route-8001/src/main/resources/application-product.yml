@@ -60,3 +60,4 @@ ribbon:
   ReadTimeout: 7000
 qyserver:
   ipAdd: http://119.135.180.178:8850/api/auth/user/get
+  orderIp: http://192.168.50.83/JS_CMMS/Services/PDAInterface.asmx?wsdl

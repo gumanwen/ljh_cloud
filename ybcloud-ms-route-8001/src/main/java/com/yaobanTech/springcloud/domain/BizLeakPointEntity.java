@@ -157,7 +157,13 @@ public class BizLeakPointEntity {
    @Column(name = "opration" )
 	private String opration;
 
-   /**
+	/**
+	 * 操作
+	 */
+	@Column(name = "is_transfer" )
+	private String isTransfer;
+
+	/**
 	 * 附件
 	 */
    @Transient
@@ -202,7 +208,7 @@ public class BizLeakPointEntity {
 	public BizLeakPointEntity() {
 	}
 
-	public BizLeakPointEntity(Integer id, String leakPointCode, Integer routeId, String waterUseOffice, String equipmentName, String equipmentSize, String abnormalPhenomena, String abnormalReason, String currentPosition, String autoGetPositon, String memo, String assetType, String commitBy, String commitByCN, String commitDate, Integer enabled, String leakPointStatus, String endDate, String address, String x, String y, String dept, String opration, List<HashMap<String, Object>> attachment, List<HashMap<String, Object>> checkRecord, List<HashMap<String, Object>> handleRecord, HashMap<String, Object> leakPointStatusEnum, HashMap<String, Object> abnormalPhenomenaEnum, HashMap<String, Object> assetTypeEnum) {
+	public BizLeakPointEntity(Integer id, String leakPointCode, Integer routeId, String waterUseOffice, String equipmentName, String equipmentSize, String abnormalPhenomena, String abnormalReason, String currentPosition, String autoGetPositon, String memo, String assetType, String commitBy, String commitByCN, String commitDate, Integer enabled, String leakPointStatus, String endDate, String address, String x, String y, String dept, String opration, String isTransfer, List<HashMap<String, Object>> attachment, List<HashMap<String, Object>> checkRecord, List<HashMap<String, Object>> handleRecord, HashMap<String, Object> leakPointStatusEnum, HashMap<String, Object> abnormalPhenomenaEnum, HashMap<String, Object> assetTypeEnum, List<HashMap<String, Object>> fileList) {
 		this.id = id;
 		this.leakPointCode = leakPointCode;
 		this.routeId = routeId;
@@ -226,12 +232,22 @@ public class BizLeakPointEntity {
 		Y = y;
 		this.dept = dept;
 		this.opration = opration;
+		this.isTransfer = isTransfer;
 		this.attachment = attachment;
 		this.checkRecord = checkRecord;
 		this.handleRecord = handleRecord;
 		this.leakPointStatusEnum = leakPointStatusEnum;
 		this.abnormalPhenomenaEnum = abnormalPhenomenaEnum;
 		this.assetTypeEnum = assetTypeEnum;
+		this.fileList = fileList;
+	}
+
+	public String getIsTransfer() {
+		return isTransfer;
+	}
+
+	public void setIsTransfer(String isTransfer) {
+		this.isTransfer = isTransfer;
 	}
 
 	public List<HashMap<String, Object>> getFileList() {

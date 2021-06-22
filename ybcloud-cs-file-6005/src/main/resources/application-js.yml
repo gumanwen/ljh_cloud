@@ -57,4 +57,4 @@ web:
 ribbon:
     ConnectTimeout: 30000
     ReadTimeout: 7000
-url: http://192.168.50.91:8888
+url: http://192.168.50.167:8888

@@ -24,10 +24,10 @@ spring:
     cloud:
         nacos:
             discovery:
-                server-addr: 192.168.50.91:8848
-                ip: 192.168.50.91
+                server-addr: 192.168.50.167:8848
+                ip: 192.168.50.167
             config:
-                server-addr: 192.168.50.91:8848
+                server-addr: 192.168.50.167:8848
                 file-extension: properties
                 namespace: 8740fef6-e5cd-4bee-aa59-1982b454323e
                 group: DEFAULT_GROUP
@@ -49,19 +49,19 @@ spring:
                   predicates:
                       - Path=/api/activiti/**
                 - id: cs-file
-                  uri: http://192.168.50.91:6005 #负载均衡 动态路由
+                  uri: http://192.168.50.167:6005 #负载均衡 动态路由
                   predicates:
                       - Path=/api/file/**
                 - id: cs-file1
-                  uri: http://192.168.50.91:6005 #负载均衡 动态路由
+                  uri: http://192.168.50.167:6005 #负载均衡 动态路由
                   predicates:
                       - Path=/file/**
                 - id: ms-route
-                  uri: http://192.168.50.91:8001 #负载均衡 动态路由
+                  uri: http://192.168.50.167:8001 #负载均衡 动态路由
                   predicates:
                       - Path=/api/route/**
                 - id: ms-plan
-                  uri: http://192.168.50.91:8002 #负载均衡 动态路由
+                  uri: http://192.168.50.167:8002 #负载均衡 动态路由
                   predicates:
                       - Path=/api/plan/**
                 - id: ms-inspect
@@ -81,14 +81,14 @@ security:
         client:
             client-id: demo-client
             client-secret: demo-secret
-            user-authorization-uri: http://192.168.50.91:6003/oauth/authorize
-            access-token-uri: http://192.168.50.91:6003/oauth/token
+            user-authorization-uri: http://192.168.50.167:6003/oauth/authorize
+            access-token-uri: http://192.168.50.167:6003/oauth/token
             resource:
             jwt:
-                key-uri: http://192.168.50.91:6003/oauth/token_key
+                key-uri: http://192.168.50.167:6003/oauth/token_key
                 key-value: demo
             authorization:
-            check-token-access: http://192.168.50.91:6003/oauth/check_token
+            check-token-access: http://192.168.50.167:6003/oauth/check_token
 ########资源服务器oauth2配置 - 此配置暂时不使用,在代码和数据库中已经存在########################################
 ribbon:
     ConnectTimeout: 30000

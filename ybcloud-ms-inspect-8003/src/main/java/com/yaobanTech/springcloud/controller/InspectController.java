@@ -270,5 +270,6 @@ public class InspectController {
     public RespBean getTrackByTime(String inspect_person,String s1,String s2){
         return iInspectService.getTrackByTime(inspect_person,s1,s2);
     }
+
 }
 

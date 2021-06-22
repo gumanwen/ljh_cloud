@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
@@ -65,6 +66,12 @@ public class LeakPointController {
     @GetMapping("ignore")
     public RespBean ignore(@RequestParam String leakPointCode) throws UnsupportedEncodingException {
         return leakPointService.ignore(leakPointCode);
+    }
+
+    @ApiOperation("web: 转工单")
+    @PostMapping("/transferToOrder")
+    public RespBean transferToOrder(@RequestBody HashMap<String,Object> param) throws IOException {
+        return leakPointService.transferToOrder(param);
     }
 
 }

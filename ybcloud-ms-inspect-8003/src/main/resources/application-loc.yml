@@ -37,7 +37,7 @@ spring:
     cloud:
         nacos:
             discovery:
-                server-addr: 192.168.50.91:8848 #Nacos作为服务中心地址
+                server-addr: 192.168.50.167:8848 #Nacos作为服务中心地址
                 ip: 192.168.50.167
             config:
                 server-addr: 192.168.50.167:8848
@@ -60,3 +60,4 @@ ribbon:
     ReadTimeout: 7000
 qyserver:
     ipAdd: http://218.17.45.99:8850/api/auth/user/get
+    orderIp: http://192.168.50.83/JS_CMMS/Services/PDAInterface.asmx?wsdl
